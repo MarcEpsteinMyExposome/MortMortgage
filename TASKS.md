@@ -204,7 +204,24 @@ npm run test:schemas  # Run schema validation tests
 
 ## Next Tasks (Priority Order)
 
-### 1. TEST-01: E2E Tests
+### 1. ADMIN-UW-01: Admin Underwriting Panel (NEXT)
+**Status**: PLANNED - Ready to implement
+**Goal**: Add interactive underwriting section to admin app detail page
+**Acceptance**:
+- [ ] Action buttons: Run Credit Pull, Verify Income, Get Appraisal, Get Pricing
+- [ ] Results display with risk badges (green/yellow/red)
+- [ ] Qualification summary card (credit score, DTI, LTV, payment)
+- [ ] Results persist in application data
+- [ ] Expandable detail sections for each result
+
+**Files to modify:**
+- `src/pages/admin/apps/[id].tsx` - Main UI changes
+- `src/types/underwriting.ts` (new) - Type definitions
+- `src/lib/underwriting-utils.ts` (new) - Risk calculations
+
+**Implementation details in SESSION.md**
+
+### 2. TEST-01: E2E Tests
 **Status**: Not started
 **Goal**: Cypress E2E test suite
 **Acceptance**:
@@ -212,7 +229,7 @@ npm run test:schemas  # Run schema validation tests
 - [ ] Admin portal test
 - [ ] Export functionality test (including PDF)
 
-### 2. CO-BORROWER-01: Co-Borrower Support (Skipped)
+### 3. CO-BORROWER-01: Co-Borrower Support (Skipped)
 **Status**: Skipped per user request
 **Notes**: Schema supports co-borrowers, UI implementation deferred
 

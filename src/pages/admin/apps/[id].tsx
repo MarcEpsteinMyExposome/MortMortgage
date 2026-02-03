@@ -1,6 +1,19 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import type { UnderwritingData } from '../../../types/underwriting'
+import {
+  getCreditRiskBadge,
+  getDTIRiskBadge,
+  getLTVRiskBadge,
+  getIncomeRiskBadge,
+  getPropertyConfidenceRiskBadge,
+  calculateQualification,
+  getQualificationBadge,
+  formatCurrency,
+  formatPercent,
+  formatDateTime
+} from '../../../lib/underwriting-utils'
 
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft', color: 'bg-yellow-100 text-yellow-800' },
@@ -19,6 +32,15 @@ export default function AdminAppDetail() {
   const [app, setApp] = useState<any>(null)
   const [updating, setUpdating] = useState(false)
   const [exporting, setExporting] = useState(false)
+
+  // Underwriting state
+  const [underwriting, setUnderwriting] = useState<UnderwritingData>({})
+  const [uwLoading, setUwLoading] = useState<{
+    credit: boolean
+    income: boolean
+    property: boolean
+    pricing: boolean
+  }>({ credit: false, income: false, property: false, pricing: false })
 
   useEffect(() => {
     if (!id) return
@@ -107,6 +129,158 @@ export default function AdminAppDetail() {
     }
   }
 
+  // Underwriting Integration Handlers
+  async function handleCreditPull() {
+    if (!borrower.ssn) {
+      alert('Borrower SSN is required for credit pull')
+      return
+    }
+    setUwLoading(prev => ({ ...prev, credit: true }))
+    try {
+      const res = await fetch('/api/integrations/credit-pull', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ssn: borrower.ssn,
+          firstName: borrower.name?.firstName || '',
+          lastName: borrower.name?.lastName || '',
+          dateOfBirth: borrower.dob,
+          currentAddress: borrower.currentAddress?.address
+        })
+      })
+      if (!res.ok) throw new Error('Credit pull failed')
+      const result = await res.json()
+      setUnderwriting(prev => ({
+        ...prev,
+        credit: { result, pulledAt: new Date().toISOString() }
+      }))
+    } catch (err: any) {
+      alert(err?.message || 'Credit pull failed')
+    } finally {
+      setUwLoading(prev => ({ ...prev, credit: false }))
+    }
+  }
+
+  async function handleIncomeVerify() {
+    const employment = Array.isArray(borrower.employment) ? borrower.employment[0] : null
+    if (!employment || !borrower.ssn) {
+      alert('Employment and SSN required for income verification')
+      return
+    }
+    setUwLoading(prev => ({ ...prev, income: true }))
+    try {
+      const res = await fetch('/api/integrations/verify-income', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employerName: employment.employerName || '',
+          jobTitle: employment.position || '',
+          statedAnnualIncome: (employment.monthlyIncome || 0) * 12,
+          ssn: borrower.ssn,
+          startDate: employment.startDate,
+          employmentType: 'W2'
+        })
+      })
+      if (!res.ok) throw new Error('Income verification failed')
+      const result = await res.json()
+      setUnderwriting(prev => ({
+        ...prev,
+        income: { result, verifiedAt: new Date().toISOString() }
+      }))
+    } catch (err: any) {
+      alert(err?.message || 'Income verification failed')
+    } finally {
+      setUwLoading(prev => ({ ...prev, income: false }))
+    }
+  }
+
+  async function handlePropertyValue() {
+    if (!property.address) {
+      alert('Property address is required for valuation')
+      return
+    }
+    setUwLoading(prev => ({ ...prev, property: true }))
+    try {
+      const res = await fetch('/api/integrations/property-value', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          address: property.address.street || '',
+          city: property.address.city || '',
+          state: property.address.state || '',
+          zip: property.address.zip || '',
+          propertyType: property.propertyType || 'single_family',
+          squareFeet: property.squareFeet,
+          bedrooms: property.bedrooms,
+          bathrooms: property.bathrooms
+        })
+      })
+      if (!res.ok) throw new Error('Property valuation failed')
+      const result = await res.json()
+      setUnderwriting(prev => ({
+        ...prev,
+        property: { result, valuedAt: new Date().toISOString() }
+      }))
+    } catch (err: any) {
+      alert(err?.message || 'Property valuation failed')
+    } finally {
+      setUwLoading(prev => ({ ...prev, property: false }))
+    }
+  }
+
+  async function handlePricing() {
+    if (!underwriting.credit) {
+      alert('Run credit pull first to get pricing')
+      return
+    }
+    setUwLoading(prev => ({ ...prev, pricing: true }))
+    try {
+      const loanAmount = loan.loanAmount || 0
+      const propertyValue = underwriting.property?.result.valuation.estimatedValue || property.propertyValue || 0
+
+      // Map snake_case to PascalCase for API
+      const occupancyMap: Record<string, string> = {
+        primary_residence: 'PrimaryResidence',
+        second_home: 'SecondHome',
+        investment: 'Investment'
+      }
+      const propertyTypeMap: Record<string, string> = {
+        single_family: 'SingleFamily',
+        condo: 'Condo',
+        townhouse: 'Townhouse',
+        multi_family: 'MultiFamily',
+        manufactured: 'Manufactured'
+      }
+
+      const res = await fetch('/api/integrations/pricing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          loanAmount,
+          propertyValue,
+          creditScore: underwriting.credit.result.averageScore,
+          loanType: loan.loanType || 'Conventional',
+          termMonths: loan.loanTermMonths || 360,
+          propertyOccupancy: occupancyMap[property.occupancy] || 'PrimaryResidence',
+          propertyType: propertyTypeMap[property.propertyType] || 'SingleFamily'
+        })
+      })
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Pricing failed')
+      }
+      const result = await res.json()
+      setUnderwriting(prev => ({
+        ...prev,
+        pricing: { result, pricedAt: new Date().toISOString() }
+      }))
+    } catch (err: any) {
+      alert(err?.message || 'Pricing failed')
+    } finally {
+      setUwLoading(prev => ({ ...prev, pricing: false }))
+    }
+  }
+
   if (loading) {
     return <main className="p-6"><p>Loading...</p></main>
   }
@@ -187,6 +361,290 @@ export default function AdminAppDetail() {
               Edit Application
             </Link>
           </div>
+        </div>
+
+        {/* Underwriting Panel */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Underwriting</h2>
+
+          {/* Qualification Summary Banner */}
+          {(() => {
+            const qual = calculateQualification(underwriting, loan.loanAmount, property.propertyValue)
+            const badge = getQualificationBadge(qual.status)
+            const creditScore = underwriting.credit?.result.averageScore
+            const monthlyIncome = underwriting.income?.result.income.verifiedAnnual
+              ? underwriting.income.result.income.verifiedAnnual / 12
+              : 0
+            const monthlyPayment = underwriting.pricing?.result.monthlyBreakdown.total || 0
+            const dti = monthlyIncome > 0 ? (monthlyPayment / monthlyIncome) * 100 : 0
+            const estimatedValue = underwriting.property?.result.valuation.estimatedValue || property.propertyValue || 0
+            const ltv = estimatedValue > 0 ? ((loan.loanAmount || 0) / estimatedValue) * 100 : 0
+
+            return (
+              <div className="mb-6">
+                <div className={`rounded-lg p-4 ${
+                  qual.status === 'qualified' ? 'bg-green-50 border border-green-200' :
+                  qual.status === 'conditionally_qualified' ? 'bg-yellow-50 border border-yellow-200' :
+                  qual.status === 'not_qualified' ? 'bg-red-50 border border-red-200' :
+                  'bg-gray-50 border border-gray-200'
+                }`}>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${badge.colorClass}`}>
+                      {badge.label.toUpperCase()}
+                    </span>
+                    {creditScore && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Credit:</span>
+                        <span className={`px-2 py-0.5 rounded text-sm font-medium ${getCreditRiskBadge(creditScore).colorClass}`}>
+                          {creditScore}
+                        </span>
+                      </div>
+                    )}
+                    {dti > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">DTI:</span>
+                        <span className={`px-2 py-0.5 rounded text-sm font-medium ${getDTIRiskBadge(dti).colorClass}`}>
+                          {formatPercent(dti)}
+                        </span>
+                      </div>
+                    )}
+                    {ltv > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">LTV:</span>
+                        <span className={`px-2 py-0.5 rounded text-sm font-medium ${getLTVRiskBadge(ltv).colorClass}`}>
+                          {formatPercent(ltv)}
+                        </span>
+                      </div>
+                    )}
+                    {monthlyPayment > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Payment:</span>
+                        <span className="text-sm font-medium">{formatCurrency(monthlyPayment)}/mo</span>
+                      </div>
+                    )}
+                  </div>
+                  {qual.reasons.length > 0 && (
+                    <div className="mt-3 text-sm">
+                      {qual.reasons.map((reason, i) => (
+                        <p key={i} className={`${
+                          qual.status === 'not_qualified' ? 'text-red-700' :
+                          qual.status === 'conditionally_qualified' ? 'text-yellow-700' :
+                          'text-gray-600'
+                        }`}>
+                          {qual.status === 'not_qualified' ? '✗' : qual.status === 'conditionally_qualified' ? '⚠' : '✓'} {reason}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-3 mb-6">
+            <button
+              onClick={handleCreditPull}
+              disabled={uwLoading.credit}
+              className="btn bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {uwLoading.credit ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Running...
+                </span>
+              ) : underwriting.credit ? 'Re-Pull Credit' : 'Run Credit Pull'}
+            </button>
+            <button
+              onClick={handleIncomeVerify}
+              disabled={uwLoading.income}
+              className="btn bg-teal-600 hover:bg-teal-700 disabled:opacity-50"
+            >
+              {uwLoading.income ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Verifying...
+                </span>
+              ) : underwriting.income ? 'Re-Verify Income' : 'Verify Income'}
+            </button>
+            <button
+              onClick={handlePropertyValue}
+              disabled={uwLoading.property}
+              className="btn bg-amber-600 hover:bg-amber-700 disabled:opacity-50"
+            >
+              {uwLoading.property ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Valuating...
+                </span>
+              ) : underwriting.property ? 'Re-Value Property' : 'Get Appraisal'}
+            </button>
+            <button
+              onClick={handlePricing}
+              disabled={uwLoading.pricing || !underwriting.credit}
+              className="btn bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
+              title={!underwriting.credit ? 'Run credit pull first' : ''}
+            >
+              {uwLoading.pricing ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Pricing...
+                </span>
+              ) : underwriting.pricing ? 'Re-Price Loan' : 'Get Pricing'}
+            </button>
+          </div>
+
+          {/* Results Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Credit Results */}
+            {underwriting.credit && (
+              <div className="border rounded-lg p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-semibold text-gray-900">Credit Report</h3>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${getCreditRiskBadge(underwriting.credit.result.averageScore).colorClass}`}>
+                    {getCreditRiskBadge(underwriting.credit.result.averageScore).label}
+                  </span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Average Score</span>
+                    <span className="font-semibold text-lg">{underwriting.credit.result.averageScore}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 border-t pt-2 mt-2">
+                    {underwriting.credit.result.scores.map((s) => (
+                      <p key={s.bureau}>{s.bureau}: {s.score}</p>
+                    ))}
+                  </div>
+                  <div className="text-xs text-gray-400 pt-2 border-t">
+                    Pulled: {formatDateTime(underwriting.credit.pulledAt)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Income Results */}
+            {underwriting.income && (
+              <div className="border rounded-lg p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-semibold text-gray-900">Income Verification</h3>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${getIncomeRiskBadge(underwriting.income.result.employment.status).colorClass}`}>
+                    {getIncomeRiskBadge(underwriting.income.result.employment.status).label}
+                  </span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Verified Annual</span>
+                    <span className="font-semibold">{formatCurrency(underwriting.income.result.income.verifiedAnnual)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Employer</span>
+                    <span>{underwriting.income.result.employer.name}</span>
+                  </div>
+                  {underwriting.income.result.income.variancePercent !== 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Variance</span>
+                      <span className={underwriting.income.result.income.variancePercent > 0 ? 'text-green-600' : 'text-red-600'}>
+                        {underwriting.income.result.income.variancePercent > 0 ? '+' : ''}{underwriting.income.result.income.variancePercent}%
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-xs text-gray-400 pt-2 border-t">
+                    Verified: {formatDateTime(underwriting.income.verifiedAt)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Property Results */}
+            {underwriting.property && (
+              <div className="border rounded-lg p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-semibold text-gray-900">Property Valuation</h3>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${getPropertyConfidenceRiskBadge(underwriting.property.result.valuation.confidence).colorClass}`}>
+                    {getPropertyConfidenceRiskBadge(underwriting.property.result.valuation.confidence).label}
+                  </span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Estimated Value</span>
+                    <span className="font-semibold text-lg">{formatCurrency(underwriting.property.result.valuation.estimatedValue)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>Range</span>
+                    <span>{formatCurrency(underwriting.property.result.valuation.lowRange)} - {formatCurrency(underwriting.property.result.valuation.highRange)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Price/SqFt</span>
+                    <span>${underwriting.property.result.valuation.pricePerSqFt}/sqft</span>
+                  </div>
+                  <div className="text-xs text-gray-400 pt-2 border-t">
+                    Valued: {formatDateTime(underwriting.property.valuedAt)}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Pricing Results */}
+            {underwriting.pricing && underwriting.pricing.result.scenarios?.[0] && (
+              <div className="border rounded-lg p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-semibold text-gray-900">Loan Pricing</h3>
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                    {underwriting.pricing.result.scenarios[0].rate?.toFixed(3) || '0.000'}% Rate
+                  </span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Monthly Payment</span>
+                    <span className="font-semibold text-lg">{formatCurrency(underwriting.pricing.result.monthlyBreakdown.total)}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 border-t pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span>Principal & Interest</span>
+                      <span>{formatCurrency(underwriting.pricing.result.monthlyBreakdown.principal + underwriting.pricing.result.monthlyBreakdown.interest)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Est. Taxes</span>
+                      <span>{formatCurrency(underwriting.pricing.result.monthlyBreakdown.taxes)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Est. Insurance</span>
+                      <span>{formatCurrency(underwriting.pricing.result.monthlyBreakdown.insurance)}</span>
+                    </div>
+                    {underwriting.pricing.result.monthlyBreakdown.pmi > 0 && (
+                      <div className="flex justify-between">
+                        <span>PMI</span>
+                        <span>{formatCurrency(underwriting.pricing.result.monthlyBreakdown.pmi)}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-400 pt-2 border-t">
+                    Priced: {formatDateTime(underwriting.pricing.pricedAt)}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Empty State */}
+          {!underwriting.credit && !underwriting.income && !underwriting.property && !underwriting.pricing && (
+            <div className="text-center py-8 text-gray-500">
+              <p>No underwriting checks have been run yet.</p>
+              <p className="text-sm mt-1">Click the buttons above to run credit, income, property, and pricing checks.</p>
+            </div>
+          )}
         </div>
 
         {/* Summary Cards */}

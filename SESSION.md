@@ -6,11 +6,87 @@ This file tracks the current development session progress. Claude updates this f
 
 ## Last Updated
 **Date**: 2026-02-03
-**Time**: PDF-01 completed
+**Time**: ADMIN-UW-01 Phase 2 Complete
 
 ---
 
-## Current Session Summary
+## NEXT TASK: Admin Underwriting Panel (ADMIN-UW-01)
+
+### Goal
+Add an interactive Underwriting section to the admin app detail page that allows admins to run credit pulls, income verification, property appraisals, and pricing - with results displayed using risk badges.
+
+### Why This Matters
+- Integration APIs already exist and work, but results aren't visible to admins
+- This makes the demo interactive and impressive
+- Shows the full underwriting workflow
+
+### Implementation Progress
+
+**Phase 1: Foundation - COMPLETE**
+- Created `src/types/underwriting.ts` - Type definitions for underwriting data
+- Created `src/lib/underwriting-utils.ts` - Risk calculation helpers
+
+**Phase 2: UI Structure + Handlers + Results - COMPLETE**
+- Modified `src/pages/admin/apps/[id].tsx`:
+  - Added Qualification Summary banner with risk badges
+  - Added Action Buttons (Credit Pull, Verify Income, Get Appraisal, Get Pricing)
+  - Added Results Grid with cards for each integration result
+  - Implemented integration handlers calling the API endpoints
+  - Added loading states with spinner animations
+
+**Remaining Phases:**
+- All phases complete! Feature is ready to test.
+
+### Original Implementation Plan
+
+**Implementation Phases:**
+1. **Foundation** - Create types and risk calculation helpers ✓
+2. **UI Structure** - Add Underwriting Panel with Qualification Summary, Action Buttons, Results Grid ✓
+3. **Integration Handlers** - Implement handlers for credit, income, property, pricing APIs ✓
+4. **Results Display** - Create cards for each integration result with expandable details ✓
+5. **Polish** - Add qualification status calculation, error handling, timestamps ✓
+
+**UI Layout:**
+```
++-- Qualification Summary ------------------------------------------+
+| [QUALIFIED] | Credit: 750 | DTI: 32% | LTV: 80% | Payment: $2,450 |
++------------------------------------------------------------------+
+
++-- Action Buttons ------------------------------------------------+
+| [Run Credit Pull] [Verify Income] [Get Appraisal] [Get Pricing] |
++------------------------------------------------------------------+
+
++-- Credit Results --+    +-- Income Results ---+
+| Score: 750         |    | Status: Verified    |
+| Excellent          |    | Annual: $120,000    |
++-------------------+    +--------------------+
+
++-- Property Results -+   +-- Pricing Results --+
+| Value: $450,000     |    | Rate: 6.75%        |
+| Confidence: High    |    | Payment: $2,450    |
++--------------------+   +--------------------+
+```
+
+**Risk Badge Logic:**
+| Metric | Green | Yellow | Red |
+|--------|-------|--------|-----|
+| Credit Score | >= 740 | 680-739 | < 680 |
+| Back-End DTI | <= 36% | 37-43% | > 43% |
+| LTV | <= 80% | 81-95% | > 95% |
+| Income Status | Verified | Discrepancy | Unable to Verify |
+
+**Demo Testing Tips:**
+- SSN ending in 7-9: Excellent credit, verified income (all green)
+- SSN ending in 0-2: Poor credit, verification issues (shows warnings/errors)
+
+### To Start Implementation
+```
+Read SESSION.md and implement ADMIN-UW-01 (Admin Underwriting Panel)
+```
+
+---
+
+## Previous Session Summary
 
 ### PDF-01: URLA PDF Export - COMPLETED
 
@@ -275,13 +351,13 @@ Returns: PricingResult
 
 ### Quick Start
 ```
-Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with PDF-01
+Read SESSION.md and implement ADMIN-UW-01 (Admin Underwriting Panel)
 ```
 
 ### Example Prompts
-- "Read the docs and implement URLA PDF export (PDF-01)"
+- "Read SESSION.md and implement the Admin Underwriting Panel"
+- "Continue with ADMIN-UW-01"
 - "Run tests to verify everything works"
-- "Add co-borrower support to the wizard"
 
 ---
 
@@ -312,20 +388,21 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with PDF-01
 ## Notes for Claude
 
 When starting a new session:
-1. Read this file first to understand current state
-2. Check TASKS.md for task status overview
-3. Check REQUIREMENTS.md for detailed specs on pending tasks
-4. Run `npm test` to verify everything works
-5. Continue with next priority task (currently TEST-01)
+1. Read this file first - especially the "NEXT TASK" section at the top
+2. The next task is ADMIN-UW-01 (Admin Underwriting Panel)
+3. Implementation plan is detailed above - follow the 5 phases
+4. Run `npm test` to verify everything works before starting
 
 Key files to know:
-- `src/components/ApplicationWizard.tsx` - Main wizard controller
-- `src/lib/form-validator.ts` - Validation logic
-- `src/lib/mismo-mapper.ts` - MISMO export
-- `src/lib/pdf-generator.ts` - URLA PDF generation
-- `src/lib/integrations/` - Mock integration modules
-- `prisma/schema.prisma` - Database schema
+- `src/pages/admin/apps/[id].tsx` - THIS IS THE FILE TO MODIFY for ADMIN-UW-01
+- `src/lib/integrations/` - Integration APIs that already work
+- `src/lib/integrations/credit.ts` - CreditReport types
+- `src/lib/integrations/income.ts` - IncomeVerification types
+- `src/lib/integrations/avm.ts` - AVMResult types
+- `src/lib/integrations/pricing.ts` - PricingResult types
 
 Task completion status:
 - 11 tasks DONE (DM-1, FE-01, BE-01, DM-2, ADMIN-01, FE-02, AUTH-01, DOC-01, UI-01, INTEG-01, PDF-01)
-- 1 task remaining (TEST-01) - CO-BORROWER-01 was skipped
+- ADMIN-UW-01 next (Admin Underwriting Panel)
+- TEST-01 after that
+- CO-BORROWER-01 was skipped
