@@ -5,7 +5,7 @@
 |-------|-------|
 | **Task ID** | ANALYTICS-01 |
 | **Title** | Admin Analytics Dashboard |
-| **Status** | TODO |
+| **Status** | DONE |
 | **Priority** | Medium |
 | **Estimated Complexity** | Medium |
 | **Dependencies** | None |

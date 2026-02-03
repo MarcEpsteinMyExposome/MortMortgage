@@ -5,7 +5,7 @@
 |-------|-------|
 | **Task ID** | DASH-01 |
 | **Title** | Borrower Dashboard |
-| **Status** | TODO |
+| **Status** | DONE |
 | **Priority** | High |
 | **Estimated Complexity** | Medium |
 | **Dependencies** | None |

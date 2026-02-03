@@ -51,7 +51,7 @@ App runs at http://localhost:3000
 
 ### Verify Everything Works
 ```bash
-npm test              # Run all unit tests (147 tests should pass)
+npm test              # Run all unit tests (149+ tests should pass)
 npm run test:schemas  # Run schema validation tests
 ```
 
@@ -82,27 +82,27 @@ npm run test:schemas  # Run schema validation tests
 | PDF-01 | URLA PDF Export | DONE |
 | ADMIN-UW-01 | Admin Underwriting Panel | DONE |
 | TEST-02 | Unit Test Suite Expansion | DONE |
+| DASH-01 | Borrower Dashboard | DONE |
+| PREQUAL-01 | Pre-Qualification Calculator | DONE |
+| ANALYTICS-01 | Admin Analytics Dashboard | DONE |
+| COMPARE-01 | Loan Comparison Tool | DONE |
 | CO-BORROWER-01 | Co-Borrower UI | SKIPPED |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
-| DASH-01 | Borrower Dashboard | TODO |
-| PREQUAL-01 | Pre-Qualification Calculator | TODO |
-| ANALYTICS-01 | Admin Analytics Dashboard | TODO |
-| COMPARE-01 | Loan Comparison Tool | TODO |
 
 ---
 
-## Planned Tasks (Parallel-Ready)
+## Recently Completed Tasks (2026-02-03)
 
-Four independent tasks ready for parallel development. Each has a detailed spec in `.claude/tasks/`.
+Four features implemented in parallel:
 
-| ID | Task | New Page | Details |
-|----|------|----------|---------|
-| DASH-01 | Borrower Dashboard | `/dashboard` | [.claude/tasks/DASH-01.md](.claude/tasks/DASH-01.md) |
-| PREQUAL-01 | Pre-Qualification Calculator | `/prequalify` | [.claude/tasks/PREQUAL-01.md](.claude/tasks/PREQUAL-01.md) |
-| ANALYTICS-01 | Admin Analytics Dashboard | `/admin/analytics` | [.claude/tasks/ANALYTICS-01.md](.claude/tasks/ANALYTICS-01.md) |
-| COMPARE-01 | Loan Comparison Tool | `/compare` | [.claude/tasks/COMPARE-01.md](.claude/tasks/COMPARE-01.md) |
+| ID | Task | Page | Files |
+|----|------|------|-------|
+| DASH-01 | Borrower Dashboard | `/dashboard` | `dashboard.tsx`, `ApplicationCard.tsx` |
+| PREQUAL-01 | Pre-Qualification Calculator | `/prequalify` | `prequalify.tsx`, `lib/prequalify.ts` |
+| ANALYTICS-01 | Admin Analytics Dashboard | `/admin/analytics` | `analytics.tsx`, `charts/`, API endpoint |
+| COMPARE-01 | Loan Comparison Tool | `/compare` | `compare.tsx`, `lib/loan-calculator.ts` |
 
-**Note**: These tasks have no file dependencies and can be worked on simultaneously.
+Task specs archived in `.claude/tasks/` for reference.
 
 ---
 
@@ -253,6 +253,64 @@ Four independent tasks ready for parallel development. Each has a detailed spec 
 - `src/__tests__/underwriting-utils.test.ts`
 - `src/__tests__/integrations.test.ts`
 
+### DASH-01: Borrower Dashboard — Completed 2026-02-03
+**Status**: DONE
+**Goal**: Personal dashboard for borrowers to manage applications
+**Completed**:
+- [x] Application list with status badges
+- [x] Status summary cards (Total, Draft, Submitted, etc.)
+- [x] Continue/View actions for applications
+- [x] Empty state with CTA
+
+**Files created:**
+- `src/pages/dashboard.tsx`
+- `src/components/ApplicationCard.tsx`
+
+### PREQUAL-01: Pre-Qualification Calculator — Completed 2026-02-03
+**Status**: DONE
+**Goal**: Quick affordability calculator for borrowers
+**Completed**:
+- [x] Input fields (income, debts, credit tier, down payment, term)
+- [x] Real-time max loan calculation (43% DTI)
+- [x] Monthly payment with taxes/insurance estimate
+- [x] Session storage for application pre-fill
+
+**Files created:**
+- `src/pages/prequalify.tsx`
+- `src/lib/prequalify.ts`
+- `src/__tests__/prequalify.test.ts`
+
+### ANALYTICS-01: Admin Analytics Dashboard — Completed 2026-02-03
+**Status**: DONE
+**Goal**: Charts and metrics for administrators
+**Completed**:
+- [x] Summary metrics (total, this month, approval rate, avg loan)
+- [x] Volume chart (applications over time)
+- [x] Status pie chart
+- [x] Loan type breakdown
+- [x] Recent activity feed
+
+**Files created:**
+- `src/pages/admin/analytics.tsx`
+- `src/pages/api/admin/analytics.ts`
+- `src/components/charts/StatusPieChart.tsx`
+- `src/components/charts/VolumeChart.tsx`
+
+### COMPARE-01: Loan Comparison Tool — Completed 2026-02-03
+**Status**: DONE
+**Goal**: Side-by-side loan scenario comparison
+**Completed**:
+- [x] 2-3 scenario comparison
+- [x] Preset buttons (15yr vs 30yr, 5% vs 20% down, Conv vs FHA)
+- [x] Monthly payment, total interest, LTV calculations
+- [x] Best value highlighting (green)
+
+**Files created:**
+- `src/pages/compare.tsx`
+- `src/lib/loan-calculator.ts`
+- `src/components/LoanScenarioCard.tsx`
+- `src/__tests__/loan-calculator.test.ts`
+
 ---
 
 ## Future Tasks (TBD/Skipped)
@@ -375,6 +433,12 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 - 2026-02-03: Fixed bug - oversized icons (added postcss.config.js, downgraded Tailwind to v3)
 - 2026-02-03: Fixed bug - employment.find crash (added Array.isArray checks in form-validator)
 - 2026-02-03: Fixed CSS import order (moved @import before @tailwind directives)
+- 2026-02-03: Completed DASH-01 (borrower dashboard with application list)
+- 2026-02-03: Completed PREQUAL-01 (pre-qualification calculator)
+- 2026-02-03: Completed ANALYTICS-01 (admin analytics with charts)
+- 2026-02-03: Completed COMPARE-01 (loan comparison tool)
+- 2026-02-03: Fixed sign-out redirect bug (uses window.location.origin)
+- 2026-02-03: Created CLAUDE.md as project entry point
 
 ---
 
@@ -404,7 +468,7 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 ---
 
 ## Test Coverage
-- **147 unit tests** covering:
+- **149+ unit tests** covering:
   - Schema validation (URLA core, full, extended)
   - MISMO mapper (mapping, validation, XML generation)
   - React component testing (IdentityForm)
@@ -416,6 +480,6 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 
 ## Contact & Notes
 - All demo data must remain synthetic
-- Tests: `npm test` (147 unit tests)
+- Tests: `npm test` (149+ unit tests)
 - Database: SQLite at `prisma/dev.db`
 - Auth: NextAuth.js with JWT sessions

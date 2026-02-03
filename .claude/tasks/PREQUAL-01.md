@@ -5,7 +5,7 @@
 |-------|-------|
 | **Task ID** | PREQUAL-01 |
 | **Title** | Pre-Qualification Calculator |
-| **Status** | TODO |
+| **Status** | DONE |
 | **Priority** | High |
 | **Estimated Complexity** | Medium |
 | **Dependencies** | None |

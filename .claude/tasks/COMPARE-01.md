@@ -5,7 +5,7 @@
 |-------|-------|
 | **Task ID** | COMPARE-01 |
 | **Title** | Loan Comparison Tool |
-| **Status** | TODO |
+| **Status** | DONE |
 | **Priority** | Medium |
 | **Estimated Complexity** | Medium |
 | **Dependencies** | None |
