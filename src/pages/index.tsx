@@ -99,26 +99,36 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/prequalify"
+                className="btn btn-lg bg-white text-primary-700 hover:bg-primary-50 shadow-lg"
+              >
+                <svg width="20" height="20" className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Get Pre-Qualified
+              </Link>
+
               {session ? (
                 <Link
                   href="/apply/new"
-                  className="btn btn-lg bg-white text-primary-700 hover:bg-primary-50 shadow-lg"
+                  className="btn btn-lg bg-primary-500 bg-opacity-30 text-white border border-primary-300 hover:bg-opacity-50"
                 >
                   <svg width="20" height="20" className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Start New Application
+                  Start Full Application
                 </Link>
               ) : (
                 <Link
                   href="/auth/signin?callbackUrl=/apply/new"
-                  className="btn btn-lg bg-white text-primary-700 hover:bg-primary-50 shadow-lg"
+                  className="btn btn-lg bg-primary-500 bg-opacity-30 text-white border border-primary-300 hover:bg-opacity-50"
                 >
                   Sign In to Apply
                 </Link>
               )}
 
-              {user?.role === 'ADMIN' ? (
+              {user?.role === 'ADMIN' && (
                 <Link
                   href="/admin"
                   className="btn btn-lg bg-primary-500 bg-opacity-30 text-white border border-primary-300 hover:bg-opacity-50"
@@ -127,13 +137,6 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                   Admin Portal
-                </Link>
-              ) : (
-                <Link
-                  href="/auth/signin?callbackUrl=/admin"
-                  className="btn btn-lg bg-primary-500 bg-opacity-30 text-white border border-primary-300 hover:bg-opacity-50"
-                >
-                  Admin Access
                 </Link>
               )}
             </div>

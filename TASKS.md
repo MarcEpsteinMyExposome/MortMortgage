@@ -84,6 +84,25 @@ npm run test:schemas  # Run schema validation tests
 | TEST-02 | Unit Test Suite Expansion | DONE |
 | CO-BORROWER-01 | Co-Borrower UI | SKIPPED |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
+| DASH-01 | Borrower Dashboard | TODO |
+| PREQUAL-01 | Pre-Qualification Calculator | TODO |
+| ANALYTICS-01 | Admin Analytics Dashboard | TODO |
+| COMPARE-01 | Loan Comparison Tool | TODO |
+
+---
+
+## Planned Tasks (Parallel-Ready)
+
+Four independent tasks ready for parallel development. Each has a detailed spec in `.claude/tasks/`.
+
+| ID | Task | New Page | Details |
+|----|------|----------|---------|
+| DASH-01 | Borrower Dashboard | `/dashboard` | [.claude/tasks/DASH-01.md](.claude/tasks/DASH-01.md) |
+| PREQUAL-01 | Pre-Qualification Calculator | `/prequalify` | [.claude/tasks/PREQUAL-01.md](.claude/tasks/PREQUAL-01.md) |
+| ANALYTICS-01 | Admin Analytics Dashboard | `/admin/analytics` | [.claude/tasks/ANALYTICS-01.md](.claude/tasks/ANALYTICS-01.md) |
+| COMPARE-01 | Loan Comparison Tool | `/compare` | [.claude/tasks/COMPARE-01.md](.claude/tasks/COMPARE-01.md) |
+
+**Note**: These tasks have no file dependencies and can be worked on simultaneously.
 
 ---
 

@@ -6,7 +6,7 @@ This file tracks the current development session progress. Claude updates this f
 
 ## Last Updated
 **Date**: 2026-02-03
-**Status**: All core tasks complete, unit test suite expanded
+**Status**: Core tasks complete, 4 new parallel tasks planned
 
 ---
 
@@ -35,6 +35,14 @@ This file tracks the current development session progress. Claude updates this f
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 | CO-BORROWER-01 | Co-Borrower UI | Skipped |
 
+### Planned (Ready for Parallel Work)
+| ID | Task | Spec File |
+|----|------|-----------|
+| DASH-01 | Borrower Dashboard | `.claude/tasks/DASH-01.md` |
+| PREQUAL-01 | Pre-Qualification Calculator | `.claude/tasks/PREQUAL-01.md` |
+| ANALYTICS-01 | Admin Analytics Dashboard | `.claude/tasks/ANALYTICS-01.md` |
+| COMPARE-01 | Loan Comparison Tool | `.claude/tasks/COMPARE-01.md` |
+
 ### Test Coverage
 - **147 unit tests** all passing
 - Run with: `npm test`
@@ -42,6 +50,15 @@ This file tracks the current development session progress. Claude updates this f
 ---
 
 ## Latest Session Work (2026-02-03)
+
+### New Feature Planning - COMPLETED
+Created 4 independent task specifications for parallel development:
+- **DASH-01**: Borrower Dashboard (`/dashboard`)
+- **PREQUAL-01**: Pre-Qualification Calculator (`/prequalify`)
+- **ANALYTICS-01**: Admin Analytics Dashboard (`/admin/analytics`)
+- **COMPARE-01**: Loan Comparison Tool (`/compare`)
+
+Task specs located in `.claude/tasks/` with full requirements, acceptance criteria, and technical notes.
 
 ### TEST-02: Unit Test Suite Expansion - COMPLETED
 
@@ -163,7 +180,17 @@ npm test  # Verify 147 tests pass
 When starting a new session:
 1. Read TASKS.md, REQUIREMENTS.md, and SESSION.md
 2. Run `npm test` to verify everything works
-3. All core features are complete - ask user what they want to work on
+3. Check `.claude/tasks/` for planned task specifications
+
+### To Work on a Specific Task
+```
+Read .claude/tasks/DASH-01.md and implement it
+```
+
+### To Work on Multiple Tasks in Parallel
+```
+Read .claude/tasks/ and implement DASH-01 and PREQUAL-01 in parallel
+```
 
 ### Potential Future Work
 - E2E tests with Cypress (requires browser automation)

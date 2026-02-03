@@ -20,6 +20,20 @@ export default function UserMenu() {
 
   return (
     <div className="flex items-center gap-4">
+      <Link
+        href="/dashboard"
+        className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+      >
+        Dashboard
+      </Link>
+      {user.role === 'ADMIN' && (
+        <Link
+          href="/admin"
+          className="text-sm text-gray-600 hover:text-gray-700 font-medium"
+        >
+          Admin
+        </Link>
+      )}
       <div className="text-sm">
         <div className="font-medium">{user.name || user.email}</div>
         <div className="text-gray-500 text-xs capitalize">
