@@ -34,7 +34,8 @@
       "Bash(powershell:*)",
       "Bash(cmd /c \"del /f /q \\\\?\\\\C:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul\")",
       "Bash(cmd /c \"dir /a c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul 2>&1\")",
-      "Bash(cmd /c \"dir /a c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul*\")"
+      "Bash(cmd /c \"dir /a c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul*\")",
+      "Bash(git reset:*)"
     ],
     "deny": [
       "Bash(rm:*)",
