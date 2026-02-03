@@ -41,7 +41,7 @@ export default function UserMenu() {
         </div>
       </div>
       <button
-        onClick={() => signOut({ callbackUrl: '/' })}
+        onClick={() => signOut({ callbackUrl: window.location.origin })}
         className="text-sm text-red-600 hover:underline"
       >
         Sign Out
