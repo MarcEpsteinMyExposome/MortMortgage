@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeLoan, randomChoice } from '../../lib/fake-data'
 
 const LOAN_PURPOSES = [
   { value: 'purchase', label: 'Purchase' },
@@ -47,6 +48,17 @@ export default function LoanForm({ data, onUpdate, onNext, onBack }: StepProps) 
 
   const propertyValue = data.property?.propertyValue || 0
 
+  function populateWithFakeData() {
+    const fake = fakeLoan(propertyValue || undefined)
+    setLoanPurpose(fake.loanPurpose)
+    setLoanType(fake.loanType)
+    setLoanAmount(String(fake.loanAmount))
+    setLoanTermMonths(fake.loanTermMonths)
+    setInterestRateType(fake.interestRateType)
+    setDownPaymentAmount(String(fake.downPayment.amount || ''))
+    setDownPaymentSource(fake.downPayment.source || '')
+  }
+
   function validate(): boolean {
     const newErrors: Record<string, string> = {}
     if (!loanPurpose) newErrors.loanPurpose = 'Loan purpose is required'
@@ -84,7 +96,16 @@ export default function LoanForm({ data, onUpdate, onNext, onBack }: StepProps) 
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Loan Information</h3>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">Loan Information</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         Specify the loan details for your mortgage application.
       </p>

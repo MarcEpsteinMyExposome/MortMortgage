@@ -82,6 +82,31 @@ export default function AdminAppDetail() {
     }
   }
 
+  async function handleExportPdf() {
+    setExporting(true)
+    try {
+      const res = await fetch(`/api/apps/${id}/pdf`)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'PDF export failed')
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `URLA-${id}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err: any) {
+      alert(err?.message || 'PDF export failed')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return <main className="p-6"><p>Loading...</p></main>
   }
@@ -136,7 +161,14 @@ export default function AdminAppDetail() {
         {/* Export Buttons */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <h3 className="font-semibold mb-3">Export Application</h3>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => handleExportPdf()}
+              disabled={exporting}
+              className="btn bg-red-600"
+            >
+              {exporting ? 'Exporting...' : 'Export URLA PDF'}
+            </button>
             <button
               onClick={() => handleExport('json')}
               disabled={exporting}

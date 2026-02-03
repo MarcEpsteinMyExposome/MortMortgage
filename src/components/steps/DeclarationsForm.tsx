@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeDeclarations } from '../../lib/fake-data'
 
 type Declarations = {
   outstandingJudgments: boolean
@@ -62,6 +63,27 @@ export default function DeclarationsForm({ data, borrowerIndex, onUpdate, onNext
     setDeclarations({ ...declarations, [key]: value })
   }
 
+  function populateWithFakeData() {
+    const fake = fakeDeclarations()
+    setDeclarations({
+      outstandingJudgments: fake.outstandingJudgments,
+      delinquentFederalDebt: fake.delinquentFederalDebt,
+      partyToLawsuit: fake.partyToLawsuit,
+      conveyedTitleInLieu: false,
+      preForeclosureOrShortSale: false,
+      propertyForeclosed: fake.propertyForeclosed,
+      declaredBankruptcy: fake.declaredBankruptcy,
+      borrowingDownPayment: fake.borrowingDownPayment,
+      coMakerOnNote: fake.coMakerOnNote,
+      primaryResidenceIntent: fake.primaryResidenceIntent,
+      ownershipInterestPast3Years: fake.ownershipInterestPast3Years,
+      applyingForOtherMortgage: false,
+      applyingForNewCredit: false,
+      subjectToLien: false,
+      alimonyChildSupport: fake.alimonyChildSupport
+    })
+  }
+
   function handleSave() {
     onUpdate('declarations', { declarations })
     onNext()
@@ -72,7 +94,16 @@ export default function DeclarationsForm({ data, borrowerIndex, onUpdate, onNext
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Declarations</h3>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">Declarations</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         Please answer the following questions truthfully. These declarations are required by federal law.
       </p>

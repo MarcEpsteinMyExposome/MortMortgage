@@ -79,8 +79,8 @@ npm run test:schemas  # Run schema validation tests
 | DOC-01 | Document Upload | DONE |
 | UI-01 | Front-End Design Refresh | DONE |
 | INTEG-01 | Mock Integrations | DONE |
-| PDF-01 | URLA PDF Export | NOT STARTED |
-| CO-BORROWER-01 | Co-Borrower UI | PARTIAL |
+| PDF-01 | URLA PDF Export | DONE |
+| CO-BORROWER-01 | Co-Borrower UI | SKIPPED |
 | TEST-01 | E2E Tests | NOT STARTED |
 
 ---
@@ -187,33 +187,34 @@ npm run test:schemas  # Run schema validation tests
 - POST `/api/integrations/property-value` - Get AVM valuation
 - POST `/api/integrations/pricing` - Calculate loan pricing
 
+### PDF-01: URLA PDF Export — Completed 2026-02-03
+- [x] Generate PDF from application data using pdfmake
+- [x] Structured layout matching URLA 1003 sections
+- [x] Download from admin portal via "Export URLA PDF" button
+- [x] SSN masking for security (shows only last 4 digits)
+
+**PDF Files**:
+- `src/lib/pdf-generator.ts` - PDF generation logic with section builders
+- `src/pages/api/apps/[id]/pdf.ts` - API endpoint for PDF download
+
+**API Endpoint**:
+- GET `/api/apps/:id/pdf` - Download URLA PDF
+
 ---
 
 ## Next Tasks (Priority Order)
 
-### 1. PDF-01: URLA PDF Export
-**Status**: Not started
-**Goal**: Generate filled URLA 1003 PDF
-**Acceptance**:
-- [ ] Generate PDF from application data
-- [ ] Match official URLA form layout
-- [ ] Download from admin portal
-
-### 2. CO-BORROWER-01: Co-Borrower Support
-**Status**: Partial (schema supports, UI doesn't)
-**Goal**: Full UI support for co-borrowers
-**Acceptance**:
-- [ ] Add co-borrower in wizard
-- [ ] Separate identity/address/employment for each
-- [ ] Joint asset/liability handling
-
-### 3. TEST-01: E2E Tests
+### 1. TEST-01: E2E Tests
 **Status**: Not started
 **Goal**: Cypress E2E test suite
 **Acceptance**:
 - [ ] Complete application flow test
 - [ ] Admin portal test
-- [ ] Export functionality test
+- [ ] Export functionality test (including PDF)
+
+### 2. CO-BORROWER-01: Co-Borrower Support (Skipped)
+**Status**: Skipped per user request
+**Notes**: Schema supports co-borrowers, UI implementation deferred
 
 ---
 

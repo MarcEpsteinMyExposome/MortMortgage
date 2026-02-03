@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeAddress, fakeMonthlyRent, randomChoice } from '../../lib/fake-data'
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
@@ -23,6 +24,20 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
   const [durationMonths, setDurationMonths] = useState(currentAddress.durationMonths || '')
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  function populateWithFakeData() {
+    const fakeAddr = fakeAddress()
+    setStreet(fakeAddr.street)
+    setUnit(fakeAddr.unit)
+    setCity(fakeAddr.city)
+    setState(fakeAddr.state)
+    setZip(fakeAddr.zip)
+    const housing = randomChoice(['own', 'rent', 'no_primary_expense'] as const)
+    setHousingType(housing)
+    setMonthlyRent(housing === 'rent' ? String(fakeMonthlyRent()) : '')
+    setDurationYears(String(Math.floor(Math.random() * 10)))
+    setDurationMonths(String(Math.floor(Math.random() * 12)))
+  }
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {}
@@ -55,6 +70,7 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
         },
         housingType,
         monthlyRent: housingType === 'rent' ? Number(monthlyRent) : undefined,
+        monthlyPayment: housingType !== 'no_primary_expense' ? Number(monthlyRent) || 0 : 0,
         durationYears: durationYears ? Number(durationYears) : undefined,
         durationMonths: durationMonths ? Number(durationMonths) : undefined
       }
@@ -66,7 +82,16 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Current Address</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Current Address</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col col-span-2">

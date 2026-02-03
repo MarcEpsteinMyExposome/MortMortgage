@@ -5,7 +5,9 @@ import ApplicationWizard, { WizardStep } from '../../components/ApplicationWizar
 import {
   IdentityStep,
   AddressForm,
+  MilitaryServiceForm,
   EmploymentForm,
+  RealEstateOwnedForm,
   AssetsForm,
   LiabilitiesForm,
   PropertyForm,
@@ -18,7 +20,9 @@ import {
 const WIZARD_STEPS: WizardStep[] = [
   { id: 'identity', title: 'Identity', component: IdentityStep },
   { id: 'address', title: 'Address', component: AddressForm },
+  { id: 'military', title: 'Military', component: MilitaryServiceForm },
   { id: 'employment', title: 'Employment', component: EmploymentForm },
+  { id: 'realEstate', title: 'Real Estate', component: RealEstateOwnedForm },
   { id: 'assets', title: 'Assets', component: AssetsForm },
   { id: 'liabilities', title: 'Liabilities', component: LiabilitiesForm },
   { id: 'property', title: 'Property', component: PropertyForm },
@@ -66,7 +70,8 @@ export default function Apply() {
           assets: data.assets,
           liabilities: data.liabilities,
           declarations: data.declarations,
-          demographics: data.demographics
+          demographics: data.demographics,
+          realEstate: data.realEstate
         },
         borrowers: data.borrowers
       })
@@ -106,7 +111,8 @@ export default function Apply() {
     assets: appData.data?.assets || {},
     liabilities: appData.data?.liabilities || {},
     declarations: appData.data?.declarations || {},
-    demographics: appData.data?.demographics || {}
+    demographics: appData.data?.demographics || {},
+    realEstate: appData.data?.realEstate || { propertiesOwned: [] }
   }
 
   return (

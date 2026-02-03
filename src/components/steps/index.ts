@@ -1,6 +1,8 @@
 export { default as IdentityStep } from './IdentityStep'
 export { default as AddressForm } from './AddressForm'
+export { default as MilitaryServiceForm } from './MilitaryServiceForm'
 export { default as EmploymentForm } from './EmploymentForm'
+export { default as RealEstateOwnedForm } from './RealEstateOwnedForm'
 export { default as AssetsForm } from './AssetsForm'
 export { default as LiabilitiesForm } from './LiabilitiesForm'
 export { default as PropertyForm } from './PropertyForm'

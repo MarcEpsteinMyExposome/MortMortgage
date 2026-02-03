@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeAssets } from '../../lib/fake-data'
 
 const ASSET_TYPES = [
   { value: 'checking', label: 'Checking Account' },
@@ -23,6 +24,10 @@ export default function AssetsForm({ data, onUpdate, onNext, onBack }: StepProps
   const [assets, setAssets] = useState<Asset[]>(
     existingAssets.length > 0 ? existingAssets : []
   )
+
+  function populateWithFakeData() {
+    setAssets(fakeAssets())
+  }
 
   function addAsset() {
     setAssets([...assets, {
@@ -61,7 +66,16 @@ export default function AssetsForm({ data, onUpdate, onNext, onBack }: StepProps
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Assets</h3>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">Assets</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         List your bank accounts, investments, and other assets.
       </p>

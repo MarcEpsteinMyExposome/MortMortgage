@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeDemographics } from '../../lib/fake-data'
 
 const ETHNICITY_OPTIONS = [
   { value: 'hispanic_or_latino', label: 'Hispanic or Latino' },
@@ -42,6 +43,13 @@ export default function DemographicsForm({ data, borrowerIndex, onUpdate, onNext
     }
   }
 
+  function populateWithFakeData() {
+    const fake = fakeDemographics()
+    setEthnicity(fake.ethnicity)
+    setRace(fake.race)
+    setSex(fake.sex)
+  }
+
   function handleSave() {
     onUpdate('demographics', {
       ethnicity: ethnicity || undefined,
@@ -53,7 +61,16 @@ export default function DemographicsForm({ data, borrowerIndex, onUpdate, onNext
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Demographic Information</h3>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">Demographic Information</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         The following information is requested by the Federal Government for certain types of loans
         in order to monitor the lender's compliance with equal credit opportunity, fair housing, and

@@ -55,6 +55,23 @@ export function validateAddressStep(data: any): ValidationResult {
   return { valid: errors.length === 0, errors, warnings }
 }
 
+export function validateMilitaryStep(data: any): ValidationResult {
+  const errors: string[] = []
+  const warnings: string[] = []
+  const borrower = data.borrowers?.[0] || {}
+  const military = borrower.militaryService || {}
+
+  if (!military.status) {
+    errors.push('Military service status is required')
+  }
+
+  if (military.status === 'expired_less_than_90_days' && !military.expectedCompletionDate) {
+    warnings.push('Expected completion date recommended for active duty expiring soon')
+  }
+
+  return { valid: errors.length === 0, errors, warnings }
+}
+
 export function validateEmploymentStep(data: any): ValidationResult {
   const errors: string[] = []
   const warnings: string[] = []
@@ -216,11 +233,34 @@ export function validateDocumentsStep(data: any): ValidationResult {
   return { valid: true, errors: [], warnings: [] }
 }
 
+export function validateRealEstateStep(data: any): ValidationResult {
+  const errors: string[] = []
+  const warnings: string[] = []
+  const properties = data.realEstate?.propertiesOwned || []
+
+  // Real estate owned is optional, but if provided should have valid data
+  properties.forEach((prop: any, index: number) => {
+    if (prop.address && !prop.address.street?.trim()) {
+      errors.push(`Property ${index + 1}: Street address required`)
+    }
+    if (!prop.propertyValue || prop.propertyValue <= 0) {
+      errors.push(`Property ${index + 1}: Property value required`)
+    }
+    if (!prop.status) {
+      errors.push(`Property ${index + 1}: Status required`)
+    }
+  })
+
+  return { valid: errors.length === 0, errors, warnings }
+}
+
 // Map step IDs to validators
 const STEP_VALIDATORS: Record<string, (data: any) => ValidationResult> = {
   identity: validateIdentityStep,
   address: validateAddressStep,
+  military: validateMilitaryStep,
   employment: validateEmploymentStep,
+  realEstate: validateRealEstateStep,
   assets: validateAssetsStep,
   liabilities: validateLiabilitiesStep,
   property: validatePropertyStep,

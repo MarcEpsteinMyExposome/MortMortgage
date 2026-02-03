@@ -1,9 +1,20 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import {
+  fakeName,
+  fakeSSN,
+  fakeDOB,
+  fakeEmail,
+  fakePhone,
+  fakeDependents,
+  fakeAlternateNames,
+  randomChoice
+} from '../../lib/fake-data'
 
 export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, onBack, isFirst }: StepProps) {
   const borrower = data.borrowers?.[borrowerIndex] || {}
   const name = borrower.name || {}
+  const deps = borrower.dependents || { count: 0, ages: [] }
 
   const [firstName, setFirstName] = useState(name.firstName || '')
   const [middleName, setMiddleName] = useState(name.middleName || '')
@@ -16,7 +27,64 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
   const [email, setEmail] = useState(borrower.contact?.email || '')
   const [cellPhone, setCellPhone] = useState(borrower.contact?.cellPhone || '')
 
+  // Dependents
+  const [dependentCount, setDependentCount] = useState(deps.count || 0)
+  const [dependentAges, setDependentAges] = useState<number[]>(deps.ages || [])
+
+  // Alternate names (maiden name, aliases)
+  const [alternateNames, setAlternateNames] = useState<string[]>(borrower.alternateNames || [])
+
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  function populateWithFakeData() {
+    const fakeName_ = fakeName()
+    setFirstName(fakeName_.firstName)
+    setMiddleName(fakeName_.middleName)
+    setLastName(fakeName_.lastName)
+    setSuffix(fakeName_.suffix)
+    setSsn(fakeSSN())
+    setDob(fakeDOB())
+    setCitizenship(randomChoice(['us_citizen', 'permanent_resident', 'non_permanent_resident'] as const))
+    setMaritalStatus(randomChoice(['married', 'separated', 'unmarried'] as const))
+    setEmail(fakeEmail(fakeName_.firstName, fakeName_.lastName))
+    setCellPhone(fakePhone())
+
+    const fakeDeps = fakeDependents()
+    setDependentCount(fakeDeps.count)
+    setDependentAges(fakeDeps.ages)
+
+    setAlternateNames(fakeAlternateNames())
+  }
+
+  function handleDependentCountChange(count: number) {
+    setDependentCount(count)
+    // Adjust ages array to match count
+    if (count > dependentAges.length) {
+      setDependentAges([...dependentAges, ...Array(count - dependentAges.length).fill(0)])
+    } else {
+      setDependentAges(dependentAges.slice(0, count))
+    }
+  }
+
+  function handleDependentAgeChange(index: number, age: number) {
+    const updated = [...dependentAges]
+    updated[index] = age
+    setDependentAges(updated)
+  }
+
+  function addAlternateName() {
+    setAlternateNames([...alternateNames, ''])
+  }
+
+  function removeAlternateName(index: number) {
+    setAlternateNames(alternateNames.filter((_, i) => i !== index))
+  }
+
+  function updateAlternateName(index: number, value: string) {
+    const updated = [...alternateNames]
+    updated[index] = value
+    setAlternateNames(updated)
+  }
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {}
@@ -49,7 +117,14 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
       contact: {
         email: email.trim() || undefined,
         cellPhone: cellPhone.trim() || undefined
-      }
+      },
+      dependents: dependentCount > 0 ? {
+        count: dependentCount,
+        ages: dependentAges.slice(0, dependentCount)
+      } : undefined,
+      alternateNames: alternateNames.filter(n => n.trim()).length > 0
+        ? alternateNames.filter(n => n.trim())
+        : undefined
     }
 
     onUpdate('borrowers', updatedBorrowers)
@@ -58,7 +133,16 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Borrower Identity</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Borrower Identity</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col">
@@ -175,6 +259,81 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
             placeholder="555-123-4567"
           />
         </label>
+      </div>
+
+      {/* Dependents Section */}
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="text-md font-medium mb-3">Dependents</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <label className="flex flex-col">
+            <span className="text-sm font-medium">Number of Dependents</span>
+            <input
+              type="number"
+              min="0"
+              max="10"
+              value={dependentCount}
+              onChange={(e) => handleDependentCountChange(parseInt(e.target.value) || 0)}
+              className="input"
+            />
+          </label>
+        </div>
+        {dependentCount > 0 && (
+          <div className="mt-3">
+            <span className="text-sm font-medium">Ages of Dependents</span>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {Array.from({ length: dependentCount }).map((_, index) => (
+                <input
+                  key={index}
+                  type="number"
+                  min="0"
+                  max="99"
+                  value={dependentAges[index] || 0}
+                  onChange={(e) => handleDependentAgeChange(index, parseInt(e.target.value) || 0)}
+                  className="input w-20"
+                  placeholder={`Age ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Alternate Names Section */}
+      <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+        <div className="flex justify-between items-center mb-3">
+          <h4 className="text-md font-medium">Alternate Names</h4>
+          <button
+            type="button"
+            onClick={addAlternateName}
+            className="text-sm px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+          >
+            + Add Name
+          </button>
+        </div>
+        <p className="text-xs text-gray-500 mb-2">Maiden name, aliases, or other names used</p>
+        {alternateNames.length === 0 ? (
+          <p className="text-sm text-gray-400 italic">No alternate names added</p>
+        ) : (
+          <div className="space-y-2">
+            {alternateNames.map((altName, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  value={altName}
+                  onChange={(e) => updateAlternateName(index, e.target.value)}
+                  className="input flex-1"
+                  placeholder="Enter alternate name"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeAlternateName(index)}
+                  className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mt-6 flex justify-between">

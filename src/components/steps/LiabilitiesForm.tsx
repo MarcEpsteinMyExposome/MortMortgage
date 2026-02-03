@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeLiabilities } from '../../lib/fake-data'
 
 const LIABILITY_TYPES = [
   { value: 'mortgage', label: 'Mortgage' },
@@ -25,6 +26,10 @@ export default function LiabilitiesForm({ data, onUpdate, onNext, onBack }: Step
   const [liabilities, setLiabilities] = useState<Liability[]>(
     existingLiabilities.length > 0 ? existingLiabilities : []
   )
+
+  function populateWithFakeData() {
+    setLiabilities(fakeLiabilities())
+  }
 
   function addLiability() {
     setLiabilities([...liabilities, {
@@ -70,7 +75,16 @@ export default function LiabilitiesForm({ data, onUpdate, onNext, onBack }: Step
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2">Liabilities</h3>
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">Liabilities</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         List your debts including mortgages, credit cards, and loans.
       </p>

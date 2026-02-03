@@ -94,10 +94,11 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
       setCurrentStep(currentStep + 1)
     } else {
       // Final step - check if all required fields are complete
-      const allValid = Object.values(stepValidation).every(v => v.valid)
-      if (!allValid) {
+      const invalidSteps = steps.filter(s => !stepValidation[s.id]?.valid)
+      if (invalidSteps.length > 0) {
         setShowValidationPanel(true)
-        alert('Please complete all required fields before submitting.')
+        const stepNames = invalidSteps.map(s => s.title).join(', ')
+        alert(`Please complete all required fields before submitting.\n\nIncomplete steps: ${stepNames}`)
         return
       }
       onComplete()

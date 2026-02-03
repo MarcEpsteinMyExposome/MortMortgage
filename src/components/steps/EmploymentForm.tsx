@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import { fakeEmployment } from '../../lib/fake-data'
 
 type Employment = {
   current: boolean
@@ -27,6 +28,18 @@ export default function EmploymentForm({ data, borrowerIndex, onUpdate, onNext, 
   )
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  function populateWithFakeData() {
+    const fake = fakeEmployment()
+    setEmployments([{
+      current: true,
+      employerName: fake.employerName,
+      position: fake.position,
+      startDate: fake.startDate,
+      selfEmployed: fake.selfEmployed,
+      monthlyIncome: fake.monthlyIncome
+    }])
+  }
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {}
@@ -86,7 +99,16 @@ export default function EmploymentForm({ data, borrowerIndex, onUpdate, onNext, 
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Employment & Income</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Employment & Income</h3>
+        <button
+          type="button"
+          onClick={populateWithFakeData}
+          className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded border transition-colors"
+        >
+          Populate with Fake Data
+        </button>
+      </div>
       <p className="text-sm text-gray-600 mb-4">
         Provide your current employment and any previous employers if less than 2 years at current job.
       </p>

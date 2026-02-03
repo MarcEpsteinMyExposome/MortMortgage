@@ -22,6 +22,7 @@
     "@testing-library/react": "*",
     "@types/jest": "*",
     "@types/node": "*",
+    "@types/pdfmake": "^0.3.0",
     "@types/react": "*",
     "autoprefixer": "^10.4.24",
     "cypress": "*",
@@ -43,6 +44,7 @@
     "json-schema-to-typescript": "*",
     "next": "*",
     "next-auth": "^4.24.13",
+    "pdfmake": "^0.3.3",
     "react": "*",
     "react-dom": "*",
     "swr": "^2.4.0"
