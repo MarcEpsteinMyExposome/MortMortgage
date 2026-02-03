@@ -1,0 +1,22 @@
+{
+  "$id": "http://example.com/schemas/urla-assets.json",
+  "title": "URLA Assets",
+  "type": "object",
+  "properties": {
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {"type":"string","enum":["checking","savings","investment","property","vehicle","other"]},
+          "institution": {"type":"string"},
+          "accountNumber": {"type":"string"},
+          "balance": {"type":"number"},
+          "value": {"type":"number"},
+          "description": {"type":"string"}
+        },
+        "required": ["type"]
+      }
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-borrower.json",
+  "title": "URLA Borrower (Section 1)",
+  "description": "Borrower information per URLA 2020 Section 1",
+  "type": "object",
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "unit": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" },
+        "country": { "type": "string", "default": "US" }
+      },
+      "required": ["street", "city", "state", "zip"]
+    },
+    "residency": {
+      "type": "object",
+      "properties": {
+        "address": { "$ref": "#/definitions/address" },
+        "housingType": {
+          "type": "string",
+          "enum": ["own", "rent", "no_primary_expense"]
+        },
+        "monthlyRent": { "type": "number" },
+        "durationYears": { "type": "integer", "minimum": 0 },
+        "durationMonths": { "type": "integer", "minimum": 0, "maximum": 11 }
+      },
+      "required": ["address", "housingType"]
+    }
+  },
+  "properties": {
+    "borrowerType": {
+      "type": "string",
+      "enum": ["borrower", "co_borrower"],
+      "description": "Primary borrower or co-borrower"
+    },
+    "name": {
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string", "minLength": 1 },
+        "middleName": { "type": "string" },
+        "lastName": { "type": "string", "minLength": 1 },
+        "suffix": { "type": "string", "enum": ["Jr", "Sr", "II", "III", "IV"] }
+      },
+      "required": ["firstName", "lastName"]
+    },
+    "alternateNames": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Aliases, maiden name, or other names used"
+    },
+    "ssn": {
+      "type": "string",
+      "pattern": "^\\d{3}-\\d{2}-\\d{4}$",
+      "description": "Social Security Number (XXX-XX-XXXX)"
+    },
+    "dob": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth (YYYY-MM-DD)"
+    },
+    "citizenship": {
+      "type": "string",
+      "enum": ["us_citizen", "permanent_resident", "non_permanent_resident"],
+      "description": "Citizenship status"
+    },
+    "maritalStatus": {
+      "type": "string",
+      "enum": ["married", "separated", "unmarried"],
+      "description": "Marital status (unmarried includes single, divorced, widowed)"
+    },
+    "dependents": {
+      "type": "object",
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "ages": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "homePhone": { "type": "string" },
+        "cellPhone": { "type": "string" },
+        "workPhone": { "type": "string" },
+        "email": { "type": "string", "format": "email" }
+      }
+    },
+    "currentAddress": { "$ref": "#/definitions/residency" },
+    "formerAddresses": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/residency" },
+      "description": "Former addresses if at current address < 2 years"
+    },
+    "mailingAddress": {
+      "allOf": [{ "$ref": "#/definitions/address" }],
+      "description": "Mailing address if different from current residence"
+    },
+    "militaryService": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["currently_serving", "expired_less_than_90_days", "retired_discharged_separated", "surviving_spouse", "never_served"]
+        },
+        "expectedCompletionDate": { "type": "string", "format": "date" }
+      }
+    },
+    "employment": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "current": { "type": "boolean", "default": true },
+          "employerName": { "type": "string" },
+          "employerPhone": { "type": "string" },
+          "employerAddress": { "$ref": "#/definitions/address" },
+          "position": { "type": "string" },
+          "startDate": { "type": "string", "format": "date" },
+          "endDate": { "type": "string", "format": "date" },
+          "yearsInProfession": { "type": "number" },
+          "selfEmployed": { "type": "boolean", "default": false },
+          "ownershipShare": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Ownership percentage if self-employed (25% or more)"
+          },
+          "monthlyIncome": { "type": "number" }
+        },
+        "required": ["employerName"]
+      },
+      "description": "Employment history (current and previous if < 2 years)"
+    }
+  },
+  "required": ["borrowerType", "name", "citizenship", "currentAddress"]
+}

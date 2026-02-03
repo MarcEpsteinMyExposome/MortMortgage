@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-demographics.json",
+  "title": "URLA Demographics (Section 8 - HMDA)",
+  "description": "Government Monitoring Information per URLA 2020 Section 8",
+  "type": "object",
+  "properties": {
+    "ethnicity": {
+      "type": "object",
+      "properties": {
+        "hispanicOrLatino": { "type": "boolean" },
+        "notHispanicOrLatino": { "type": "boolean" },
+        "doNotWishToProvide": { "type": "boolean" },
+        "subcategories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "mexican",
+              "puerto_rican",
+              "cuban",
+              "other_hispanic_or_latino"
+            ]
+          }
+        },
+        "otherDescription": { "type": "string" }
+      }
+    },
+    "race": {
+      "type": "object",
+      "properties": {
+        "americanIndianOrAlaskaNative": { "type": "boolean" },
+        "tribeName": { "type": "string" },
+        "asian": { "type": "boolean" },
+        "asianSubcategories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "asian_indian",
+              "chinese",
+              "filipino",
+              "japanese",
+              "korean",
+              "vietnamese",
+              "other_asian"
+            ]
+          }
+        },
+        "otherAsianDescription": { "type": "string" },
+        "blackOrAfricanAmerican": { "type": "boolean" },
+        "nativeHawaiianOrPacificIslander": { "type": "boolean" },
+        "pacificIslanderSubcategories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "native_hawaiian",
+              "guamanian_or_chamorro",
+              "samoan",
+              "other_pacific_islander"
+            ]
+          }
+        },
+        "otherPacificIslanderDescription": { "type": "string" },
+        "white": { "type": "boolean" },
+        "doNotWishToProvide": { "type": "boolean" }
+      }
+    },
+    "sex": {
+      "type": "object",
+      "properties": {
+        "female": { "type": "boolean" },
+        "male": { "type": "boolean" },
+        "doNotWishToProvide": { "type": "boolean" }
+      }
+    },
+    "collectionMethod": {
+      "type": "string",
+      "enum": [
+        "face_to_face",
+        "telephone",
+        "fax_mail",
+        "email",
+        "internet"
+      ],
+      "description": "How the demographic information was collected"
+    }
+  }
+}

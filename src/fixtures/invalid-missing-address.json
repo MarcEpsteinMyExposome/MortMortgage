@@ -1,0 +1,22 @@
+{
+  "id": "app-invalid-001",
+  "loan": {
+    "loanPurpose": "purchase",
+    "loanType": "conventional",
+    "loanAmount": 150000
+  },
+  "property": {
+    "propertyType": "condominium",
+    "numberOfUnits": 1,
+    "propertyValue": 200000,
+    "occupancy": "primary_residence"
+  },
+  "borrowers": [
+    {
+      "borrowerType": "borrower",
+      "name": { "firstName": "Invalid", "lastName": "NoAddr" },
+      "citizenship": "us_citizen"
+    }
+  ],
+  "createdAt": "2026-02-02T00:00:00Z"
+}

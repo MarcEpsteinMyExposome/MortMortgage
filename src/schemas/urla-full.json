@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-full.json",
+  "title": "URLA 2020 Full Application",
+  "description": "Complete URLA 2020 schema with all sections",
+  "type": "object",
+  "definitions": {
+    "borrower": { "$ref": "./urla-borrower.json" },
+    "property": { "$ref": "./urla-property.json" },
+    "loan": { "$ref": "./urla-loan.json" },
+    "income": { "$ref": "./urla-income.json" },
+    "assets": { "$ref": "./urla-assets.json" },
+    "liabilities": { "$ref": "./urla-liabilities.json" },
+    "realEstate": { "$ref": "./urla-real-estate.json" },
+    "declarations": { "$ref": "./urla-declarations.json" },
+    "demographics": { "$ref": "./urla-demographics.json" }
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Application identifier"
+    },
+    "loan": {
+      "$ref": "http://example.com/schemas/urla-loan.json",
+      "description": "Section 4a: Loan and Property Information - Loan"
+    },
+    "property": {
+      "$ref": "http://example.com/schemas/urla-property.json",
+      "description": "Section 4b: Loan and Property Information - Property"
+    },
+    "borrowers": {
+      "type": "array",
+      "items": { "$ref": "http://example.com/schemas/urla-borrower.json" },
+      "minItems": 1,
+      "description": "Section 1: Borrower Information (primary + co-borrowers)"
+    },
+    "income": {
+      "$ref": "http://example.com/schemas/urla-income.json",
+      "description": "Section 1b: Employment/Income from Borrower section"
+    },
+    "assets": {
+      "$ref": "http://example.com/schemas/urla-assets.json",
+      "description": "Section 2a: Assets"
+    },
+    "liabilities": {
+      "$ref": "http://example.com/schemas/urla-liabilities.json",
+      "description": "Section 2b: Liabilities"
+    },
+    "realEstate": {
+      "$ref": "http://example.com/schemas/urla-real-estate.json",
+      "description": "Section 3: Real Estate Owned"
+    },
+    "declarations": {
+      "$ref": "http://example.com/schemas/urla-declarations.json",
+      "description": "Section 5: Declarations"
+    },
+    "demographics": {
+      "$ref": "http://example.com/schemas/urla-demographics.json",
+      "description": "Section 8: Demographic Information (HMDA)"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Application creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "submitted", "in_review", "approved", "denied", "withdrawn"],
+      "description": "Application status"
+    }
+  },
+  "required": ["loan", "property", "borrowers"]
+}

@@ -1,0 +1,20 @@
+{
+  "$id": "http://example.com/schemas/urla-liabilities.json",
+  "title": "URLA Liabilities",
+  "type": "object",
+  "properties": {
+    "liabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {"type":"string","enum":["mortgage","credit_card","auto_loan","student_loan","other"]},
+          "creditor": {"type":"string"},
+          "monthlyPayment": {"type":"number"},
+          "balance": {"type":"number"}
+        },
+        "required": ["type","monthlyPayment"]
+      }
+    }
+  }
+}

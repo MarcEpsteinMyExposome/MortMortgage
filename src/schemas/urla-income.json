@@ -1,0 +1,22 @@
+{
+  "$id": "http://example.com/schemas/urla-income.json",
+  "title": "URLA Income",
+  "type": "object",
+  "properties": {
+    "incomeSources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {"type":"string","enum":["employment","self_employed","rental","social_security","other"]},
+          "employerName": {"type":"string"},
+          "amount": {"type":"number"},
+          "frequency": {"type":"string","enum":["monthly","biweekly","weekly","annual"]},
+          "yearsOnJob": {"type":"number"},
+          "details": {"type":"string"}
+        },
+        "required": ["type","amount"]
+      }
+    }
+  }
+}

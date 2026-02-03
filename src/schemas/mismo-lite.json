@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MISMO Lite (demo)",
+  "type": "object",
+  "properties": {
+    "version": {"type":"string"},
+    "loan": {
+      "type":"object",
+      "properties": {
+        "id": {"type":"string"},
+        "product": {"type":"string"},
+        "loanAmount": {"type":"number"}
+      },
+      "required": ["id","product"]
+    },
+    "borrowers": {"type":"array"}
+  },
+  "required": ["version","loan"]
+}

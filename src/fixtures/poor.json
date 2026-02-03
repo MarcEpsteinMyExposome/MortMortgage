@@ -1,0 +1,23 @@
+{
+  "id": "app-poor-001",
+  "product": "Conventional",
+  "loanAmount": 200000,
+  "loanPurpose": "Purchase",
+  "property": {
+    "propertyType": "Multi-Family",
+    "address": {"street":"789 Poor Rd","city":"Roughsville","state":"FL","zip":"32003"},
+    "estimatedValue": 220000
+  },
+  "borrowers": [
+    {
+      "borrowerType": "primary",
+      "name": {"firstName":"Pat","lastName":"Poor"},
+      "ssn": "222-22-2222",
+      "dob": "1980-03-04",
+      "employment": {"status":"Self-Employed","employer":"Pat's Shop","income":32000},
+      "assets": [],
+      "liabilities": [{"type":"student_loan","monthlyPayment":300,"balance":20000}]
+    }
+  ],
+  "createdAt": "2026-02-02T00:00:00Z"
+}

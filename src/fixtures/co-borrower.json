@@ -1,0 +1,60 @@
+{
+  "id": "app-coborrower-001",
+  "loan": {
+    "loanPurpose": "purchase",
+    "loanType": "conventional",
+    "loanAmount": 425000,
+    "loanTermMonths": 360,
+    "interestRateType": "fixed",
+    "product": "30-Year Fixed"
+  },
+  "property": {
+    "address": {
+      "street": "321 Pair St",
+      "city": "Buddy",
+      "state": "NY",
+      "zip": "10001"
+    },
+    "numberOfUnits": 1,
+    "propertyValue": 500000,
+    "occupancy": "primary_residence",
+    "propertyType": "single_family"
+  },
+  "borrowers": [
+    {
+      "borrowerType": "borrower",
+      "name": { "firstName": "Anna", "lastName": "Pair" },
+      "ssn": "333-33-3333",
+      "dob": "1988-05-12",
+      "citizenship": "us_citizen",
+      "currentAddress": {
+        "address": { "street": "100 Current St", "city": "Buddy", "state": "NY", "zip": "10002" },
+        "housingType": "rent",
+        "monthlyRent": 1800,
+        "durationYears": 2,
+        "durationMonths": 0
+      },
+      "employment": [
+        { "current": true, "employerName": "Pair Inc", "monthlyIncome": 7500 }
+      ]
+    },
+    {
+      "borrowerType": "co_borrower",
+      "name": { "firstName": "Brian", "lastName": "Pair" },
+      "ssn": "444-44-4444",
+      "dob": "1990-07-01",
+      "citizenship": "us_citizen",
+      "currentAddress": {
+        "address": { "street": "100 Current St", "city": "Buddy", "state": "NY", "zip": "10002" },
+        "housingType": "rent",
+        "monthlyRent": 1800,
+        "durationYears": 2,
+        "durationMonths": 0
+      },
+      "employment": [
+        { "current": true, "employerName": "Pair LLC", "monthlyIncome": 7083 }
+      ]
+    }
+  ],
+  "createdAt": "2026-02-02T00:00:00Z"
+}

@@ -1,0 +1,56 @@
+{
+  "id": "app-assets-001",
+  "loan": {
+    "loanPurpose": "purchase",
+    "loanType": "conventional",
+    "loanAmount": 225000,
+    "loanTermMonths": 360,
+    "interestRateType": "fixed",
+    "product": "30-Year Fixed"
+  },
+  "property": {
+    "address": {
+      "street": "42 Asset Ave",
+      "city": "Holdings",
+      "state": "TX",
+      "zip": "73301"
+    },
+    "numberOfUnits": 1,
+    "propertyValue": 300000,
+    "occupancy": "primary_residence",
+    "propertyType": "condominium"
+  },
+  "borrowers": [
+    {
+      "borrowerType": "borrower",
+      "name": { "firstName": "Asset", "lastName": "Holder" },
+      "ssn": "666-66-6666",
+      "dob": "1982-04-04",
+      "citizenship": "us_citizen",
+      "currentAddress": {
+        "address": { "street": "10 Renter Rd", "city": "Holdings", "state": "TX", "zip": "73302" },
+        "housingType": "rent",
+        "monthlyRent": 1500,
+        "durationYears": 3,
+        "durationMonths": 6
+      },
+      "employment": [
+        { "current": true, "employerName": "Assets Inc", "monthlyIncome": 7083 }
+      ]
+    }
+  ],
+  "assets": {
+    "assets": [
+      { "type": "checking", "institution": "Local Bank", "balance": 5000 },
+      { "type": "property", "value": 75000, "description": "Rental property" },
+      { "type": "investment", "institution": "Broker Co", "value": 20000 }
+    ]
+  },
+  "liabilities": {
+    "liabilities": [
+      { "type": "mortgage", "creditor": "Lender A", "monthlyPayment": 1200, "balance": 120000 },
+      { "type": "auto_loan", "creditor": "AutoLend", "monthlyPayment": 400, "balance": 20000 }
+    ]
+  },
+  "createdAt": "2026-02-02T00:00:00Z"
+}

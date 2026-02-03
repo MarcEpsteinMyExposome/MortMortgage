@@ -1,0 +1,379 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/mismo-v3.json",
+  "title": "MISMO v3.x Loan Application (Simplified)",
+  "description": "Simplified MISMO v3.x format for mortgage loan applications",
+  "type": "object",
+  "properties": {
+    "ABOUT_VERSIONS": {
+      "type": "object",
+      "properties": {
+        "MISMOVersionIdentifier": { "type": "string", "const": "3.4" }
+      }
+    },
+    "DEAL_SETS": {
+      "type": "object",
+      "properties": {
+        "DEAL_SET": {
+          "type": "object",
+          "properties": {
+            "DEALS": {
+              "type": "object",
+              "properties": {
+                "DEAL": {
+                  "type": "object",
+                  "properties": {
+                    "LOANS": { "$ref": "#/definitions/LOANS" },
+                    "PARTIES": { "$ref": "#/definitions/PARTIES" },
+                    "COLLATERALS": { "$ref": "#/definitions/COLLATERALS" },
+                    "LIABILITIES": { "$ref": "#/definitions/LIABILITIES_SECTION" },
+                    "ASSETS": { "$ref": "#/definitions/ASSETS_SECTION" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "LOANS": {
+      "type": "object",
+      "properties": {
+        "LOAN": {
+          "type": "object",
+          "properties": {
+            "LOAN_IDENTIFIERS": {
+              "type": "object",
+              "properties": {
+                "LOAN_IDENTIFIER": {
+                  "type": "object",
+                  "properties": {
+                    "LoanIdentifier": { "type": "string" },
+                    "LoanIdentifierType": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "TERMS_OF_LOAN": {
+              "type": "object",
+              "properties": {
+                "BaseLoanAmount": { "type": "number" },
+                "LoanPurposeType": { "type": "string" },
+                "MortgageType": { "type": "string" },
+                "LienPriorityType": { "type": "string" }
+              }
+            },
+            "AMORTIZATION": {
+              "type": "object",
+              "properties": {
+                "AmortizationType": { "type": "string" },
+                "LoanAmortizationPeriodCount": { "type": "integer" },
+                "LoanAmortizationPeriodType": { "type": "string" }
+              }
+            },
+            "INTEREST_RATE": {
+              "type": "object",
+              "properties": {
+                "InterestRatePercent": { "type": "number" },
+                "InterestRateType": { "type": "string" }
+              }
+            },
+            "LOAN_PRODUCT": {
+              "type": "object",
+              "properties": {
+                "LOAN_PRODUCT_DATA": {
+                  "type": "object",
+                  "properties": {
+                    "LoanProductDescription": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "PARTIES": {
+      "type": "object",
+      "properties": {
+        "PARTY": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ROLES": {
+                "type": "object",
+                "properties": {
+                  "ROLE": {
+                    "type": "object",
+                    "properties": {
+                      "ROLE_DETAIL": {
+                        "type": "object",
+                        "properties": {
+                          "PartyRoleType": { "type": "string" }
+                        }
+                      },
+                      "BORROWER": {
+                        "type": "object",
+                        "properties": {
+                          "DECLARATION": { "$ref": "#/definitions/DECLARATION" },
+                          "GOVERNMENT_MONITORING": { "$ref": "#/definitions/GOVERNMENT_MONITORING" },
+                          "RESIDENCES": { "$ref": "#/definitions/RESIDENCES" },
+                          "EMPLOYERS": { "$ref": "#/definitions/EMPLOYERS" }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "INDIVIDUAL": {
+                "type": "object",
+                "properties": {
+                  "NAME": {
+                    "type": "object",
+                    "properties": {
+                      "FirstName": { "type": "string" },
+                      "MiddleName": { "type": "string" },
+                      "LastName": { "type": "string" },
+                      "SuffixName": { "type": "string" }
+                    }
+                  },
+                  "CONTACT_POINTS": {
+                    "type": "object",
+                    "properties": {
+                      "CONTACT_POINT": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "CONTACT_POINT_EMAIL": {
+                              "type": "object",
+                              "properties": {
+                                "ContactPointEmailValue": { "type": "string" }
+                              }
+                            },
+                            "CONTACT_POINT_TELEPHONE": {
+                              "type": "object",
+                              "properties": {
+                                "ContactPointTelephoneValue": { "type": "string" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "TAXPAYER_IDENTIFIERS": {
+                "type": "object",
+                "properties": {
+                  "TAXPAYER_IDENTIFIER": {
+                    "type": "object",
+                    "properties": {
+                      "TaxpayerIdentifierType": { "type": "string" },
+                      "TaxpayerIdentifierValue": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "COLLATERALS": {
+      "type": "object",
+      "properties": {
+        "COLLATERAL": {
+          "type": "object",
+          "properties": {
+            "SUBJECT_PROPERTY": {
+              "type": "object",
+              "properties": {
+                "ADDRESS": { "$ref": "#/definitions/ADDRESS" },
+                "PROPERTY_DETAIL": {
+                  "type": "object",
+                  "properties": {
+                    "PropertyEstimatedValueAmount": { "type": "number" },
+                    "PropertyUsageType": { "type": "string" },
+                    "FinancedUnitCount": { "type": "integer" },
+                    "PropertyType": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ADDRESS": {
+      "type": "object",
+      "properties": {
+        "AddressLineText": { "type": "string" },
+        "AddressUnitIdentifier": { "type": "string" },
+        "CityName": { "type": "string" },
+        "StateCode": { "type": "string" },
+        "PostalCode": { "type": "string" },
+        "CountryCode": { "type": "string" }
+      }
+    },
+    "RESIDENCES": {
+      "type": "object",
+      "properties": {
+        "RESIDENCE": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ADDRESS": { "$ref": "#/definitions/ADDRESS" },
+              "RESIDENCE_DETAIL": {
+                "type": "object",
+                "properties": {
+                  "BorrowerResidencyType": { "type": "string" },
+                  "BorrowerResidencyDurationMonthsCount": { "type": "integer" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "EMPLOYERS": {
+      "type": "object",
+      "properties": {
+        "EMPLOYER": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "EMPLOYMENT": {
+                "type": "object",
+                "properties": {
+                  "EmploymentStatusType": { "type": "string" },
+                  "EmploymentStartDate": { "type": "string" },
+                  "EmploymentEndDate": { "type": "string" },
+                  "EmploymentMonthlyIncomeAmount": { "type": "number" },
+                  "EmploymentPositionDescription": { "type": "string" },
+                  "SpecialBorrowerEmployerRelationshipIndicator": { "type": "boolean" }
+                }
+              },
+              "LEGAL_ENTITY": {
+                "type": "object",
+                "properties": {
+                  "LEGAL_ENTITY_DETAIL": {
+                    "type": "object",
+                    "properties": {
+                      "FullName": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "DECLARATION": {
+      "type": "object",
+      "properties": {
+        "DECLARATION_DETAIL": {
+          "type": "object",
+          "properties": {
+            "BankruptcyIndicator": { "type": "boolean" },
+            "OutstandingJudgmentsIndicator": { "type": "boolean" },
+            "PartyToLawsuitIndicator": { "type": "boolean" },
+            "PresentlyDelinquentIndicator": { "type": "boolean" },
+            "PropertyForeclosedPastSevenYearsIndicator": { "type": "boolean" },
+            "IntentToOccupyIndicator": { "type": "boolean" },
+            "HomeownerPastThreeYearsIndicator": { "type": "boolean" },
+            "PriorPropertyUsageType": { "type": "string" },
+            "PriorPropertyTitleType": { "type": "string" },
+            "AlimonyChildSupportObligationIndicator": { "type": "boolean" },
+            "BorrowedDownPaymentIndicator": { "type": "boolean" },
+            "CoMakerEndorserOfNoteIndicator": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "GOVERNMENT_MONITORING": {
+      "type": "object",
+      "properties": {
+        "GOVERNMENT_MONITORING_DETAIL": {
+          "type": "object",
+          "properties": {
+            "HMDAEthnicityType": { "type": "string" },
+            "HMDARaceType": { "type": "array", "items": { "type": "string" } },
+            "HMDAGenderType": { "type": "string" }
+          }
+        }
+      }
+    },
+    "ASSETS_SECTION": {
+      "type": "object",
+      "properties": {
+        "ASSET": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ASSET_DETAIL": {
+                "type": "object",
+                "properties": {
+                  "AssetType": { "type": "string" },
+                  "AssetCashOrMarketValueAmount": { "type": "number" }
+                }
+              },
+              "ASSET_HOLDER": {
+                "type": "object",
+                "properties": {
+                  "NAME": {
+                    "type": "object",
+                    "properties": {
+                      "FullName": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "LIABILITIES_SECTION": {
+      "type": "object",
+      "properties": {
+        "LIABILITY": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "LIABILITY_DETAIL": {
+                "type": "object",
+                "properties": {
+                  "LiabilityType": { "type": "string" },
+                  "LiabilityMonthlyPaymentAmount": { "type": "number" },
+                  "LiabilityUnpaidBalanceAmount": { "type": "number" }
+                }
+              },
+              "LIABILITY_HOLDER": {
+                "type": "object",
+                "properties": {
+                  "NAME": {
+                    "type": "object",
+                    "properties": {
+                      "FullName": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["ABOUT_VERSIONS", "DEAL_SETS"]
+}

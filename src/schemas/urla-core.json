@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "URLA Core Schema (demo)",
+  "type": "object",
+  "properties": {
+    "id": {"type":"string"},
+    "product": {"type":"string"},
+    "loanAmount": {"type":"number"},
+    "loanPurpose": {"type":"string"},
+    "property": {
+      "type": "object",
+      "properties": {
+        "propertyType": {"type":"string"},
+        "address": {
+          "type": "object",
+          "properties": {
+            "street": {"type":"string"},
+            "city": {"type":"string"},
+            "state": {"type":"string"},
+            "zip": {"type":"string"}
+          },
+          "required": ["street","city","state","zip"]
+        },
+        "estimatedValue": {"type":"number"}
+      },
+      "required": ["propertyType","address"]
+    },
+    "borrowers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "borrowerType": {"type":"string"},
+          "name": {
+            "type": "object",
+            "properties": {
+              "firstName": {"type":"string"},
+              "lastName": {"type":"string"}
+            },
+            "required": ["firstName","lastName"]
+          },
+          "ssn": {"type":"string"},
+          "dob": {"type":"string","format":"date"},
+          "employment": {
+            "type": "object",
+            "properties": {
+              "status": {"type":"string"},
+              "employer": {"type":"string"},
+              "income": {"type":"number"}
+            }
+          },
+          "assets": {"type":"array"},
+          "liabilities": {"type":"array"}
+        },
+        "required": ["borrowerType","name"]
+      }
+    },
+    "createdAt": {"type":"string","format":"date-time"}
+  },
+  "required": ["product","loanAmount","property","borrowers"]
+}

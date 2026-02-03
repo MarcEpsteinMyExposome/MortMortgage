@@ -1,0 +1,8 @@
+node_modules/
+.next/
+dev.db
+.env
+uploads/
+.DS_Store
+coverage/
+nul

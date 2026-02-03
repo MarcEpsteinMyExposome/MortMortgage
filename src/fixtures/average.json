@@ -1,0 +1,23 @@
+{
+  "id": "app-average-001",
+  "product": "Conventional",
+  "loanAmount": 275000,
+  "loanPurpose": "Refinance",
+  "property": {
+    "propertyType": "Condo",
+    "address": {"street":"456 Sample Ave","city":"Sampleton","state":"TX","zip":"75001"},
+    "estimatedValue": 300000
+  },
+  "borrowers": [
+    {
+      "borrowerType": "primary",
+      "name": {"firstName":"Sam","lastName":"Average"},
+      "ssn": "111-11-1111",
+      "dob": "1990-06-15",
+      "employment": {"status":"Employed","employer":"Avg Corp","income":75000},
+      "assets": [{"type":"savings","institution":"Sample Bank","balance":4000}],
+      "liabilities": [{"type":"credit_card","monthlyPayment":200,"balance":4000}]
+    }
+  ],
+  "createdAt": "2026-02-02T00:00:00Z"
+}

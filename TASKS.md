@@ -1,0 +1,364 @@
+# MortMortgage — Tasks, Decisions & Restart Guide
+
+## Project Decisions (recorded)
+- **Standards**: URLA 2020 (target); MISMO v3.x (demo) with MISMO JSON + sample XML output and a filled URLA PDF sample.
+- **Audience & Roles**: Primary users are **borrowers**; include **Admin** role for reviewer/demo staff. Multi-borrower (co-borrower) support required.
+- **Platforms**: Web-first (Next.js) + native iOS later (out-of-scope for MVP).
+- **Auth**: Borrowers & Admin: credential-based auth via NextAuth.js. Demo accounts provided.
+- **Loan products**: **Conventional** first, then **FHA**.
+- **Property types**: Support all residential types (SFR, condo, 2-4 units, multi-family).
+- **Field depth**: **Full URLA** (Phase-by-phase approach; Phase A = core subset validated).
+- **Integrations**: Stubbed/mocked for demo (credit bureau, ID, bank verification, AVM, pricing, eSign). Provide deterministic scenarios (good/avg/poor).
+- **Documents**: Accept PDF/JPG/PNG, 10MB max. Document upload stubbed and tested with fake fixtures.
+- **Tech stack**: Next.js (TypeScript), Tailwind CSS, Prisma 5.x (SQLite), NextAuth.js, Ajv for JSON Schema validation, Jest + React Testing Library, Cypress for E2E.
+- **Hosting**: Optional Vercel deployment for demo (config in CI if desired).
+- **Privacy**: US-only demo; use synthetic PII (do not store real SSNs).
+
+---
+
+## Related Documentation
+
+| File | Purpose |
+|------|---------|
+| `TASKS.md` | Simple task list with status (this file) |
+| `REQUIREMENTS.md` | Detailed task specifications and requirements |
+| `SESSION.md` | Current session notes for continuity |
+
+**To resume work**: Read all three files, then continue with the next priority task.
+
+---
+
+## Restart / Reproducibility Instructions
+
+### Quick Start (new session)
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Initialize database (creates .env if missing, sets up SQLite)
+npx prisma db push
+
+# 3. Start dev server
+npm run dev
+```
+App runs at http://localhost:3000
+
+### Demo Accounts
+| Role | Email | Password |
+|------|-------|----------|
+| Borrower | borrower@demo.com | demo123 |
+| Admin | admin@demo.com | admin123 |
+
+### Verify Everything Works
+```bash
+npm test              # Run all unit tests (26 tests should pass)
+npm run test:schemas  # Run schema validation tests
+```
+
+### Notes
+- `.env` file should exist with `DATABASE_URL="file:./dev.db"`
+- Prisma is pinned to v5.22.0 (v7+ has breaking changes)
+- Tailwind CSS is pinned to v3.4.19 (v4 has breaking changes)
+- SQLite stores JSON as strings — API handles serialization
+- NextAuth.js handles authentication with JWT sessions
+- `postcss.config.js` is required for Tailwind to work
+
+---
+
+## Task Status Summary
+
+| ID | Task | Status |
+|----|------|--------|
+| DM-1 | Full URLA 2020 Schema | DONE |
+| FE-01 | Multi-Step Wizard (10 steps) | DONE |
+| BE-01 | Application CRUD API | DONE |
+| DM-2 | MISMO v3.4 Export | DONE |
+| ADMIN-01 | Admin Portal | DONE |
+| FE-02 | Form Validation (DTI/LTV) | DONE |
+| AUTH-01 | Authentication | DONE |
+| DOC-01 | Document Upload | DONE |
+| UI-01 | Front-End Design Refresh | DONE |
+| INTEG-01 | Mock Integrations | DONE |
+| PDF-01 | URLA PDF Export | NOT STARTED |
+| CO-BORROWER-01 | Co-Borrower UI | PARTIAL |
+| TEST-01 | E2E Tests | NOT STARTED |
+
+---
+
+## Completed Work
+
+### Phase A (Data Model)
+- URLA core JSON Schema created
+- MISMO lite schema created
+- Ajv validator and unit tests
+- Seed fixtures
+
+### Phase B (Full URLA) — Completed 2026-02-02
+- **DM-1: Full URLA 2020 schema expansion**
+  - 10 modular subschemas covering all URLA sections
+  - All tests passing (`npm test` = 26 tests)
+
+### Infrastructure Fixes — Completed 2026-02-02
+- Fixed Next.js 13+ Link component syntax
+- Fixed Prisma 7.x compatibility (pinned to 5.22.0)
+- Fixed SQLite JSON storage (API serialization)
+- Added SWR dependency
+- Created .env file with DATABASE_URL
+- Application create/save flow working
+
+### FE-01: Multi-step URLA Form — Completed 2026-02-02
+- [x] All 10 steps with complete field coverage
+- [x] Auto-save on each step update
+- [x] Progress indicator with validation status
+- [x] Review page before submission
+- [x] Confirmation page after submission
+
+### BE-01: Application CRUD — Completed 2026-02-02
+- [x] GET /api/apps/:id — fetch single app
+- [x] PUT /api/apps/:id — update app data
+- [x] DELETE /api/apps/:id — delete app
+- [x] JSON serialization for SQLite compatibility
+
+### DM-2: MISMO Mapping & Export — Completed 2026-02-02
+- [x] URLA → MISMO v3.4 mapping function
+- [x] Export validates against mismo-v3.json
+- [x] JSON export endpoint
+- [x] XML export with proper escaping
+- [x] 13 unit tests for mapper
+
+### ADMIN-01: Admin Portal — Completed 2026-02-02
+- [x] List all applications with status filters
+- [x] Stats dashboard (total, draft, submitted, approved, denied)
+- [x] View application details (full data display)
+- [x] Export as MISMO JSON/XML
+- [x] Change application status
+- [x] Delete applications
+
+### FE-02: Form Validation — Completed 2026-02-02
+- [x] Step-by-step validation with errors/warnings
+- [x] DTI ratio warning (>43%)
+- [x] LTV validation (max 97%, warning >80%)
+- [x] Progress bar with completion tracking
+- [x] Validation panel toggle
+
+### AUTH-01: Authentication — Completed 2026-02-02
+- [x] NextAuth.js with credentials provider
+- [x] Demo accounts (borrower/admin)
+- [x] JWT session strategy
+- [x] Sign in page with demo account helpers
+- [x] User menu component with sign out
+- [x] Role-based UI (admin features hidden from borrowers)
+
+### DOC-01: Document Upload — Completed 2026-02-02
+- [x] File upload component (PDF, JPG, PNG, max 10MB)
+- [x] Document type selection (W2, paystub, bank statement, etc.)
+- [x] Store files locally in uploads directory
+- [x] Documents step in wizard with required docs checklist
+- [x] API endpoints for upload, list, view, delete
+
+### UI-01: Front-End Design Refresh — Completed 2026-02-03
+- [x] Custom Tailwind color palette (primary, success, warning, danger)
+- [x] Inter font and modern typography
+- [x] Component classes (btn, card, badge, alert, table, stat-card)
+- [x] Home page redesign with hero section and features
+- [x] Sign-in page with split layout branding
+- [x] Admin portal with improved stats and table
+- [x] ApplicationWizard with modern step indicator
+- [x] Animations and transitions
+
+### INTEG-01: Mock Integrations — Completed 2026-02-03
+- [x] Credit pull simulation with deterministic scores (based on SSN pattern)
+- [x] Income verification stub with employment validation
+- [x] Property valuation (AVM) with comparables and market trends
+- [x] Mock pricing engine with rate adjustments and scenarios
+- [x] API endpoints for all integrations
+- [x] Comprehensive type definitions
+
+**Integration Files**:
+- `src/lib/integrations/credit.ts` - Credit bureau simulation
+- `src/lib/integrations/income.ts` - Income/employment verification
+- `src/lib/integrations/avm.ts` - Automated property valuation
+- `src/lib/integrations/pricing.ts` - Mortgage pricing engine
+- `src/lib/integrations/index.ts` - Module exports and demo SSN patterns
+
+**API Endpoints**:
+- POST `/api/integrations/credit-pull` - Run credit check
+- POST `/api/integrations/verify-income` - Verify employment/income
+- POST `/api/integrations/property-value` - Get AVM valuation
+- POST `/api/integrations/pricing` - Calculate loan pricing
+
+---
+
+## Next Tasks (Priority Order)
+
+### 1. PDF-01: URLA PDF Export
+**Status**: Not started
+**Goal**: Generate filled URLA 1003 PDF
+**Acceptance**:
+- [ ] Generate PDF from application data
+- [ ] Match official URLA form layout
+- [ ] Download from admin portal
+
+### 2. CO-BORROWER-01: Co-Borrower Support
+**Status**: Partial (schema supports, UI doesn't)
+**Goal**: Full UI support for co-borrowers
+**Acceptance**:
+- [ ] Add co-borrower in wizard
+- [ ] Separate identity/address/employment for each
+- [ ] Joint asset/liability handling
+
+### 3. TEST-01: E2E Tests
+**Status**: Not started
+**Goal**: Cypress E2E test suite
+**Acceptance**:
+- [ ] Complete application flow test
+- [ ] Admin portal test
+- [ ] Export functionality test
+
+---
+
+## Files & Contracts (source of truth)
+
+### JSON Schemas (Full URLA 2020)
+| File | Description |
+|------|-------------|
+| `src/schemas/urla-full.json` | Main schema with all section refs |
+| `src/schemas/urla-borrower.json` | Section 1: Borrower (addresses, employment, military) |
+| `src/schemas/urla-loan.json` | Section 4a: Loan (purpose, type, terms, down payment) |
+| `src/schemas/urla-property.json` | Section 4b: Property (address, occupancy, title) |
+| `src/schemas/urla-income.json` | Income sources |
+| `src/schemas/urla-assets.json` | Section 2a: Assets |
+| `src/schemas/urla-liabilities.json` | Section 2b: Liabilities |
+| `src/schemas/urla-real-estate.json` | Section 3: Real estate owned |
+| `src/schemas/urla-declarations.json` | Section 5: Declarations (15 questions) |
+| `src/schemas/urla-demographics.json` | Section 8: HMDA demographics |
+| `src/schemas/mismo-v3.json` | MISMO v3.4 export schema |
+
+### Form Step Components
+| File | Description |
+|------|-------------|
+| `src/components/ApplicationWizard.tsx` | Main wizard controller with validation |
+| `src/components/steps/IdentityStep.tsx` | Step 1: Borrower name, SSN, DOB, citizenship |
+| `src/components/steps/AddressForm.tsx` | Step 2: Current address & housing info |
+| `src/components/steps/EmploymentForm.tsx` | Step 3: Employment history & income |
+| `src/components/steps/AssetsForm.tsx` | Step 4: Bank accounts, investments |
+| `src/components/steps/LiabilitiesForm.tsx` | Step 5: Debts, loans, credit cards |
+| `src/components/steps/PropertyForm.tsx` | Step 6: Subject property details |
+| `src/components/steps/LoanForm.tsx` | Step 7: Loan purpose, amount, terms |
+| `src/components/steps/DeclarationsForm.tsx` | Step 8: 15 URLA declaration questions |
+| `src/components/steps/DemographicsForm.tsx` | Step 9: HMDA demographics (optional) |
+| `src/components/steps/DocumentsStep.tsx` | Step 10: Document upload |
+
+### API Endpoints
+| Endpoint | Methods | Description |
+|----------|---------|-------------|
+| `/api/apps` | GET, POST | List all / create new application |
+| `/api/apps/[id]` | GET, PUT, DELETE | Fetch, update, delete single application |
+| `/api/apps/[id]/export` | GET | Export to MISMO JSON or XML |
+| `/api/apps/[id]/documents` | GET, POST | List / upload documents |
+| `/api/apps/[id]/documents/[docId]` | GET, DELETE | View / delete document |
+| `/api/auth/[...nextauth]` | * | NextAuth.js authentication |
+
+### Key Library Files
+| File | Description |
+|------|-------------|
+| `src/lib/validator.ts` | Ajv schema validator functions |
+| `src/lib/mismo-mapper.ts` | URLA to MISMO v3.4 mapping & XML export |
+| `src/lib/form-validator.ts` | Form step validation with DTI/LTV checks |
+| `src/lib/auth.ts` | Auth helpers and middleware |
+
+### Styling Files
+| File | Description |
+|------|-------------|
+| `tailwind.config.js` | Custom colors, shadows, animations |
+| `src/styles/globals.css` | Component classes (btn, card, badge, etc.) |
+
+### Other Key Files
+- `src/schemas/urla-core.json` — Phase A simplified schema
+- `src/fixtures/*.json` — Test fixtures (good, average, poor, co-borrower)
+- `prisma/schema.prisma` — Database schema
+- `REQUIREMENTS.md` — Detailed task specifications
+- `SESSION.md` — Current session notes
+
+---
+
+## How to Resume Work with Claude
+
+### Starting a New Session
+```
+Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
+```
+
+### Recommended Prompts
+- "Read the docs and continue with INTEG-01 (mock integrations)"
+- "Implement URLA PDF export (PDF-01)"
+- "Add co-borrower support to the wizard"
+- "Run the tests and fix any failures"
+- "Check SESSION.md for current progress"
+
+### If Something Breaks
+- "Run `npm test` and show me the errors"
+- "Check the browser console for errors"
+- "Read src/pages/api/apps/index.ts and fix the issue"
+
+---
+
+## Decision Log
+- 2026-02-02: Completed DM-1 (full URLA schema expansion)
+- 2026-02-02: Fixed infrastructure issues (Prisma, Next.js Link, SQLite JSON)
+- 2026-02-02: Application create flow working end-to-end
+- 2026-02-02: Completed FE-01 (10-step multi-step wizard with all URLA sections)
+- 2026-02-02: Completed BE-01 (full CRUD API for applications)
+- 2026-02-02: Completed DM-2 (MISMO v3.4 mapping and JSON/XML export)
+- 2026-02-02: Completed ADMIN-01 (admin portal with details, export, status management)
+- 2026-02-02: Completed FE-02 (form validation with DTI/LTV checks)
+- 2026-02-02: Completed AUTH-01 (NextAuth.js authentication with demo accounts)
+- 2026-02-02: Completed DOC-01 (document upload with file storage and wizard step)
+- 2026-02-03: Completed UI-01 (front-end design refresh with modern styling)
+- 2026-02-03: Created documentation system (REQUIREMENTS.md, SESSION.md)
+- 2026-02-03: Completed INTEG-01 (mock integrations for credit, income, AVM, pricing)
+- 2026-02-03: Fixed bug - login redirect to wrong port (extracted pathname from NextAuth URL)
+- 2026-02-03: Fixed bug - oversized icons (added postcss.config.js, downgraded Tailwind to v3)
+- 2026-02-03: Fixed bug - employment.find crash (added Array.isArray checks in form-validator)
+- 2026-02-03: Fixed CSS import order (moved @import before @tailwind directives)
+
+---
+
+## Bug Fixes (2026-02-03)
+
+### Login Redirect to Wrong Port
+- **Problem**: After signin, NextAuth redirected to localhost:3000 even when app ran on different port
+- **Fix**: Modified signin handler to extract pathname only from NextAuth result URL
+- **File**: `src/pages/auth/signin.tsx`
+
+### Oversized Icons / Tailwind Not Loading
+- **Problem**: SVG icons rendered at massive sizes because Tailwind CSS wasn't processing
+- **Root Cause**: Missing `postcss.config.js` + Tailwind v4 incompatibility
+- **Fix**: Created `postcss.config.js`, downgraded Tailwind to v3.4.19
+- **Files**: `postcss.config.js` (new), `package.json`
+
+### Form Validator Crash (employment.find)
+- **Problem**: Validator crashed when employment/assets/liabilities were objects instead of arrays
+- **Fix**: Added `Array.isArray()` checks before calling array methods
+- **File**: `src/lib/form-validator.ts`
+
+### CSS Import Order Error
+- **Problem**: Build failed because @import was after @tailwind directives
+- **Fix**: Moved font @import to top of globals.css
+- **File**: `src/styles/globals.css`
+
+---
+
+## Test Coverage
+- **26 unit tests** covering:
+  - Schema validation (URLA core, full, extended)
+  - MISMO mapper (mapping, validation, XML generation)
+  - React component testing (IdentityForm)
+
+---
+
+## Contact & Notes
+- All demo data must remain synthetic
+- Tests: `npm test` (unit), `npm run e2e` (Cypress)
+- Database: SQLite at `prisma/dev.db`
+- Auth: NextAuth.js with JWT sessions

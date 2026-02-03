@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-loan.json",
+  "title": "URLA Loan Information (Section 4)",
+  "description": "Loan information per URLA 2020 Section 4",
+  "type": "object",
+  "properties": {
+    "loanPurpose": {
+      "type": "string",
+      "enum": ["purchase", "refinance", "other"],
+      "description": "Purpose of the loan"
+    },
+    "refinanceType": {
+      "type": "string",
+      "enum": ["no_cash_out", "cash_out", "limited_cash_out"],
+      "description": "If refinance, specify type"
+    },
+    "refinanceProgramType": {
+      "type": "string",
+      "enum": ["full_documentation", "interest_rate_reduction", "streamlined_without_appraisal"],
+      "description": "Refinance program details"
+    },
+    "otherPurpose": {
+      "type": "string",
+      "description": "Description if loan purpose is 'other'"
+    },
+    "loanType": {
+      "type": "string",
+      "enum": ["conventional", "fha", "va", "usda_rural_housing"],
+      "description": "Type of mortgage applied for"
+    },
+    "loanAmount": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Amount of mortgage applied for"
+    },
+    "loanTermMonths": {
+      "type": "integer",
+      "description": "Loan term in months (e.g., 360 for 30-year)"
+    },
+    "interestRate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Initial interest rate (if known)"
+    },
+    "interestRateType": {
+      "type": "string",
+      "enum": ["fixed", "adjustable"],
+      "description": "Fixed or adjustable rate"
+    },
+    "amortizationType": {
+      "type": "string",
+      "enum": ["fully_amortizing", "interest_only", "negative_amortization", "gpm", "balloon"],
+      "description": "How the loan amortizes"
+    },
+    "balloonTermMonths": {
+      "type": "integer",
+      "description": "If balloon, term before balloon payment"
+    },
+    "interestOnlyTermMonths": {
+      "type": "integer",
+      "description": "If interest-only, duration of interest-only period"
+    },
+    "product": {
+      "type": "string",
+      "description": "Specific loan product name"
+    },
+    "subordinateFinancing": {
+      "type": "object",
+      "properties": {
+        "hasSubordinateFinancing": { "type": "boolean" },
+        "amount": { "type": "number" },
+        "lienType": {
+          "type": "string",
+          "enum": ["second_lien", "heloc"]
+        },
+        "creditor": { "type": "string" }
+      }
+    },
+    "downPayment": {
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number" },
+        "source": {
+          "type": "string",
+          "enum": [
+            "checking_savings",
+            "gift",
+            "grant",
+            "equity_on_property_sold",
+            "equity_on_subject_property",
+            "employer_assistance",
+            "lot_equity",
+            "rent_credit",
+            "trade_equity",
+            "sweat_equity",
+            "cash_on_hand",
+            "other"
+          ]
+        },
+        "sourceDetails": { "type": "string" }
+      }
+    },
+    "credits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "creditType": {
+            "type": "string",
+            "enum": ["lender_credit", "seller_credit", "relocation_funds", "employer_assistance", "other"]
+          },
+          "amount": { "type": "number" },
+          "description": { "type": "string" }
+        }
+      },
+      "description": "Credits applied to closing costs"
+    }
+  },
+  "required": ["loanPurpose", "loanType", "loanAmount"]
+}

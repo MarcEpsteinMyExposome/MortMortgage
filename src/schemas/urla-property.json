@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-property.json",
+  "title": "URLA Property Information (Section 4)",
+  "description": "Subject property information per URLA 2020 Section 4",
+  "type": "object",
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "unit": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" },
+        "county": { "type": "string" }
+      },
+      "required": ["street", "city", "state", "zip"]
+    }
+  },
+  "properties": {
+    "address": { "$ref": "#/definitions/address" },
+    "numberOfUnits": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4,
+      "description": "Number of units (1-4 for residential)"
+    },
+    "propertyValue": {
+      "type": "number",
+      "description": "Estimated property value or purchase price"
+    },
+    "occupancy": {
+      "type": "string",
+      "enum": ["primary_residence", "second_home", "investment"],
+      "description": "Intended occupancy"
+    },
+    "propertyType": {
+      "type": "string",
+      "enum": [
+        "single_family",
+        "condominium",
+        "townhouse",
+        "cooperative",
+        "two_to_four_unit",
+        "manufactured_home",
+        "pud"
+      ],
+      "description": "Type of property"
+    },
+    "projectType": {
+      "type": "string",
+      "enum": ["condominium", "cooperative", "pud", "none"],
+      "description": "Project type for attached properties"
+    },
+    "attachmentType": {
+      "type": "string",
+      "enum": ["attached", "detached", "semi_detached"],
+      "description": "How the property is attached"
+    },
+    "constructionType": {
+      "type": "string",
+      "enum": ["existing", "new_construction", "construction_conversion"],
+      "description": "Construction status"
+    },
+    "yearBuilt": {
+      "type": "integer",
+      "minimum": 1800,
+      "description": "Year property was built"
+    },
+    "mixedUseProperty": {
+      "type": "boolean",
+      "description": "Will property be used for mixed purposes (residential + business)"
+    },
+    "manufacturedHome": {
+      "type": "object",
+      "properties": {
+        "isManufactured": { "type": "boolean" },
+        "widthType": {
+          "type": "string",
+          "enum": ["single_wide", "double_wide", "multi_wide"]
+        },
+        "landOwnership": {
+          "type": "string",
+          "enum": ["owned_fee_simple", "leasehold", "owned_with_leasehold"]
+        }
+      }
+    },
+    "titleHeldAs": {
+      "type": "object",
+      "properties": {
+        "names": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names on title"
+        },
+        "manner": {
+          "type": "string",
+          "enum": [
+            "sole_ownership",
+            "joint_tenants",
+            "tenants_in_common",
+            "tenants_by_entirety",
+            "community_property",
+            "trust",
+            "other"
+          ],
+          "description": "Manner in which title will be held"
+        },
+        "trustName": { "type": "string" },
+        "otherDescription": { "type": "string" }
+      }
+    },
+    "estate": {
+      "type": "string",
+      "enum": ["fee_simple", "leasehold"],
+      "description": "Estate will be held in"
+    },
+    "leasehold": {
+      "type": "object",
+      "properties": {
+        "expirationDate": { "type": "string", "format": "date" }
+      },
+      "description": "If leasehold, expiration date"
+    },
+    "nativeAmericanLands": {
+      "type": "boolean",
+      "description": "Is property on Native American Lands"
+    }
+  },
+  "required": ["address", "numberOfUnits", "propertyValue", "occupancy", "propertyType"]
+}

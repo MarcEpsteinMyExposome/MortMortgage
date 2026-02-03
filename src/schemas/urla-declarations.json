@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-declarations.json",
+  "title": "URLA Declarations (Section 5)",
+  "description": "Borrower declarations per URLA 2020 Section 5",
+  "type": "object",
+  "properties": {
+    "declarations": {
+      "type": "object",
+      "properties": {
+        "outstandingJudgments": {
+          "type": "boolean",
+          "description": "Are there any outstanding judgments against you?"
+        },
+        "delinquentFederalDebt": {
+          "type": "boolean",
+          "description": "Are you currently delinquent or in default on a federal debt?"
+        },
+        "partyToLawsuit": {
+          "type": "boolean",
+          "description": "Are you a party to a lawsuit?"
+        },
+        "conveyedTitleInLieu": {
+          "type": "boolean",
+          "description": "Have you conveyed title to any property in lieu of foreclosure in the past 7 years?"
+        },
+        "preForeclosureOrShortSale": {
+          "type": "boolean",
+          "description": "Within the past 7 years, have you completed a pre-foreclosure sale or short sale?"
+        },
+        "propertyForeclosed": {
+          "type": "boolean",
+          "description": "Have you had property foreclosed upon in the last 7 years?"
+        },
+        "declaredBankruptcy": {
+          "type": "boolean",
+          "description": "Have you declared bankruptcy within the past 7 years?"
+        },
+        "bankruptcyDetails": {
+          "type": "object",
+          "properties": {
+            "chapter7": { "type": "boolean" },
+            "chapter11": { "type": "boolean" },
+            "chapter12": { "type": "boolean" },
+            "chapter13": { "type": "boolean" }
+          },
+          "description": "If declared bankruptcy, which chapter(s)"
+        },
+        "borrowingDownPayment": {
+          "type": "boolean",
+          "description": "Are you borrowing any money for this transaction (e.g., down payment, closing costs)?"
+        },
+        "coMakerOnNote": {
+          "type": "boolean",
+          "description": "Are you a co-signer or guarantor on any debt not disclosed?"
+        },
+        "primaryResidenceIntent": {
+          "type": "boolean",
+          "description": "Will you occupy the property as your primary residence?"
+        },
+        "ownershipInterestPast3Years": {
+          "type": "boolean",
+          "description": "Have you had an ownership interest in another property in the last 3 years?"
+        },
+        "priorPropertyType": {
+          "type": "string",
+          "enum": ["primary_residence", "second_home", "investment", "fha_primary"],
+          "description": "If yes to ownership interest, what type of property?"
+        },
+        "priorPropertyTitle": {
+          "type": "string",
+          "enum": ["sole", "jointly_with_spouse", "jointly_with_other"],
+          "description": "How did you hold title to the prior property?"
+        },
+        "applyingForOtherMortgage": {
+          "type": "boolean",
+          "description": "Are you applying for any other mortgage that will remain outstanding?"
+        },
+        "applyingForNewCredit": {
+          "type": "boolean",
+          "description": "Are you applying for any new credit not disclosed?"
+        },
+        "subjectToLien": {
+          "type": "boolean",
+          "description": "Will this property be subject to a lien not disclosed?"
+        },
+        "alimonyChildSupport": {
+          "type": "boolean",
+          "description": "Are you obligated to pay alimony, child support, or separate maintenance?"
+        },
+        "alimonyDetails": {
+          "type": "object",
+          "properties": {
+            "alimonyAmount": { "type": "number" },
+            "childSupportAmount": { "type": "number" },
+            "maintenanceAmount": { "type": "number" }
+          },
+          "description": "Monthly amounts if applicable"
+        }
+      }
+    },
+    "explanations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "questionId": { "type": "string" },
+          "explanation": { "type": "string" }
+        }
+      },
+      "description": "Additional explanations for any 'yes' answers"
+    }
+  }
+}

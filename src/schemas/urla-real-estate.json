@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/urla-real-estate.json",
+  "title": "URLA Real Estate Owned",
+  "description": "Properties owned by borrower(s) per URLA 2020 Section 3",
+  "type": "object",
+  "definitions": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "unit": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "zip": { "type": "string", "pattern": "^\\d{5}(-\\d{4})?$" }
+      },
+      "required": ["street", "city", "state", "zip"]
+    },
+    "propertyOwned": {
+      "type": "object",
+      "properties": {
+        "address": { "$ref": "#/definitions/address" },
+        "propertyValue": {
+          "type": "number",
+          "description": "Current market value"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["sold", "pending_sale", "retained"],
+          "description": "What will happen to this property"
+        },
+        "intendedOccupancy": {
+          "type": "string",
+          "enum": ["primary_residence", "second_home", "investment", "other"],
+          "description": "How property is/will be used"
+        },
+        "propertyType": {
+          "type": "string",
+          "enum": ["single_family", "condo", "townhouse", "cooperative", "two_to_four_unit", "manufactured", "other"]
+        },
+        "monthlyInsurance": { "type": "number" },
+        "monthlyTaxes": { "type": "number" },
+        "monthlyHOA": { "type": "number" },
+        "monthlyRentalIncome": {
+          "type": "number",
+          "description": "Gross monthly rental income (if investment property)"
+        },
+        "mortgages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "creditor": { "type": "string" },
+              "accountNumber": { "type": "string" },
+              "monthlyPayment": { "type": "number" },
+              "unpaidBalance": { "type": "number" },
+              "creditLimit": {
+                "type": "number",
+                "description": "For HELOCs only"
+              },
+              "lienType": {
+                "type": "string",
+                "enum": ["first_lien", "subordinate_lien"]
+              },
+              "toBePaidOff": {
+                "type": "boolean",
+                "default": false,
+                "description": "Will this be paid off at/before closing"
+              }
+            },
+            "required": ["creditor", "monthlyPayment", "unpaidBalance"]
+          }
+        }
+      },
+      "required": ["address", "propertyValue", "status", "intendedOccupancy"]
+    }
+  },
+  "properties": {
+    "propertiesOwned": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/propertyOwned" },
+      "description": "List of all properties owned by borrower(s)"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "mort-mortgage-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "dev:seed": "ts-node --transpile-only prisma/seed.ts",
+    "dev:reset": "node ./scripts/reset-db.js",
+    "resume": "npm run dev:reset && npm run dev:seed",
+    "test": "jest",
+    "test:schemas": "jest src/__tests__/schema*.test.ts --runInBand",
+    "e2e": "cypress open",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "generate:types": "node ./scripts/generate-types.js",
+    "gen:types": "npm run generate:types"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "*",
+    "@testing-library/react": "*",
+    "@types/jest": "*",
+    "@types/node": "*",
+    "@types/react": "*",
+    "autoprefixer": "^10.4.24",
+    "cypress": "*",
+    "jest": "*",
+    "jest-environment-jsdom": "*",
+    "postcss": "*",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.19",
+    "ts-jest": "*",
+    "ts-node": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "ajv": "*",
+    "ajv-formats": "*",
+    "bcryptjs": "^3.0.3",
+    "formidable": "^3.5.4",
+    "json-schema-to-typescript": "*",
+    "next": "*",
+    "next-auth": "^4.24.13",
+    "react": "*",
+    "react-dom": "*",
+    "swr": "^2.4.0"
+  }
+}

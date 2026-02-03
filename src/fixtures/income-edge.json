@@ -1,0 +1,71 @@
+{
+  "id": "app-income-edge-001",
+  "loan": {
+    "loanPurpose": "purchase",
+    "loanType": "conventional",
+    "loanAmount": 500000,
+    "loanTermMonths": 360,
+    "interestRateType": "fixed",
+    "product": "30-Year Fixed Jumbo"
+  },
+  "property": {
+    "address": {
+      "street": "100 Income St",
+      "city": "Earnsville",
+      "state": "CA",
+      "zip": "90210"
+    },
+    "numberOfUnits": 1,
+    "propertyValue": 650000,
+    "occupancy": "primary_residence",
+    "propertyType": "single_family"
+  },
+  "borrowers": [
+    {
+      "borrowerType": "borrower",
+      "name": { "firstName": "Rich", "lastName": "Earn" },
+      "ssn": "555-55-5555",
+      "dob": "1975-10-10",
+      "citizenship": "us_citizen",
+      "currentAddress": {
+        "address": { "street": "200 Money Lane", "city": "Earnsville", "state": "CA", "zip": "90211" },
+        "housingType": "own",
+        "durationYears": 5,
+        "durationMonths": 0
+      },
+      "employment": [
+        {
+          "current": true,
+          "employerName": "Earns LLC",
+          "selfEmployed": true,
+          "ownershipShare": 100,
+          "monthlyIncome": 25000
+        }
+      ]
+    }
+  ],
+  "income": {
+    "incomeSources": [
+      { "type": "self_employed", "amount": 25000, "frequency": "monthly", "details": "Business owner" },
+      { "type": "rental", "amount": 4166, "frequency": "monthly", "details": "Rental property income" }
+    ]
+  },
+  "assets": {
+    "assets": [
+      { "type": "investment", "institution": "Wealth Advisors", "value": 200000 }
+    ]
+  },
+  "liabilities": {
+    "liabilities": [
+      { "type": "credit_card", "creditor": "Bank A", "monthlyPayment": 500, "balance": 10000 }
+    ]
+  },
+  "declarations": {
+    "declarations": {
+      "declaredBankruptcy": false,
+      "propertyForeclosed": false,
+      "primaryResidenceIntent": true
+    }
+  },
+  "createdAt": "2026-02-02T00:00:00Z"
+}

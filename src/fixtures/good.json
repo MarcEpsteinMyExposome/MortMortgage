@@ -1,0 +1,146 @@
+{
+  "id": "app-good-001",
+  "loan": {
+    "loanPurpose": "purchase",
+    "loanType": "conventional",
+    "loanAmount": 350000,
+    "loanTermMonths": 360,
+    "interestRateType": "fixed",
+    "amortizationType": "fully_amortizing",
+    "product": "30-Year Fixed Conventional",
+    "downPayment": {
+      "amount": 100000,
+      "source": "checking_savings"
+    }
+  },
+  "property": {
+    "address": {
+      "street": "123 Demo St",
+      "city": "Demo City",
+      "state": "CA",
+      "zip": "90001",
+      "county": "Los Angeles"
+    },
+    "numberOfUnits": 1,
+    "propertyValue": 450000,
+    "occupancy": "primary_residence",
+    "propertyType": "single_family",
+    "attachmentType": "detached",
+    "constructionType": "existing",
+    "yearBuilt": 1998,
+    "estate": "fee_simple"
+  },
+  "borrowers": [
+    {
+      "borrowerType": "borrower",
+      "name": {
+        "firstName": "Jane",
+        "lastName": "Demo"
+      },
+      "ssn": "000-00-0000",
+      "dob": "1985-01-01",
+      "citizenship": "us_citizen",
+      "maritalStatus": "unmarried",
+      "contact": {
+        "cellPhone": "555-123-4567",
+        "email": "jane.demo@example.com"
+      },
+      "currentAddress": {
+        "address": {
+          "street": "456 Current Ave",
+          "city": "Demo City",
+          "state": "CA",
+          "zip": "90002"
+        },
+        "housingType": "rent",
+        "monthlyRent": 2000,
+        "durationYears": 3,
+        "durationMonths": 0
+      },
+      "militaryService": {
+        "status": "never_served"
+      },
+      "employment": [
+        {
+          "current": true,
+          "employerName": "Demo Corp",
+          "position": "Software Engineer",
+          "startDate": "2020-03-15",
+          "yearsInProfession": 6,
+          "selfEmployed": false,
+          "monthlyIncome": 10000
+        }
+      ]
+    }
+  ],
+  "income": {
+    "incomeSources": [
+      {
+        "type": "employment",
+        "employerName": "Demo Corp",
+        "amount": 10000,
+        "frequency": "monthly",
+        "yearsOnJob": 4
+      }
+    ]
+  },
+  "assets": {
+    "assets": [
+      {
+        "type": "checking",
+        "institution": "Demo Bank",
+        "accountNumber": "****1234",
+        "balance": 50000
+      },
+      {
+        "type": "savings",
+        "institution": "Demo Bank",
+        "accountNumber": "****5678",
+        "balance": 75000
+      }
+    ]
+  },
+  "liabilities": {
+    "liabilities": [
+      {
+        "type": "auto_loan",
+        "creditor": "Auto Finance Co",
+        "monthlyPayment": 350,
+        "balance": 12000
+      }
+    ]
+  },
+  "declarations": {
+    "declarations": {
+      "outstandingJudgments": false,
+      "delinquentFederalDebt": false,
+      "partyToLawsuit": false,
+      "conveyedTitleInLieu": false,
+      "preForeclosureOrShortSale": false,
+      "propertyForeclosed": false,
+      "declaredBankruptcy": false,
+      "borrowingDownPayment": false,
+      "coMakerOnNote": false,
+      "primaryResidenceIntent": true,
+      "ownershipInterestPast3Years": false,
+      "applyingForOtherMortgage": false,
+      "applyingForNewCredit": false,
+      "subjectToLien": false,
+      "alimonyChildSupport": false
+    }
+  },
+  "demographics": {
+    "ethnicity": {
+      "notHispanicOrLatino": true
+    },
+    "race": {
+      "white": true
+    },
+    "sex": {
+      "female": true
+    },
+    "collectionMethod": "internet"
+  },
+  "status": "draft",
+  "createdAt": "2026-02-02T00:00:00Z"
+}
