@@ -6,193 +6,93 @@ This file tracks the current development session progress. Claude updates this f
 
 ## Last Updated
 **Date**: 2026-02-03
-**Time**: ADMIN-UW-01 Phase 2 Complete
+**Status**: All core tasks complete, unit test suite expanded
 
 ---
 
-## NEXT TASK: Admin Underwriting Panel (ADMIN-UW-01)
+## Current Project Status
 
-### Goal
-Add an interactive Underwriting section to the admin app detail page that allows admins to run credit pulls, income verification, property appraisals, and pricing - with results displayed using risk badges.
+### Completed Tasks (14 total)
+| ID | Task | Status |
+|----|------|--------|
+| DM-1 | Full URLA 2020 Schema | DONE |
+| FE-01 | Multi-Step Wizard (10 steps) | DONE |
+| BE-01 | Application CRUD API | DONE |
+| DM-2 | MISMO v3.4 Export | DONE |
+| ADMIN-01 | Admin Portal | DONE |
+| FE-02 | Form Validation (DTI/LTV) | DONE |
+| AUTH-01 | Authentication | DONE |
+| DOC-01 | Document Upload | DONE |
+| UI-01 | Front-End Design Refresh | DONE |
+| INTEG-01 | Mock Integrations | DONE |
+| PDF-01 | URLA PDF Export | DONE |
+| ADMIN-UW-01 | Admin Underwriting Panel | DONE |
+| TEST-02 | Unit Test Suite Expansion | DONE |
 
-### Why This Matters
-- Integration APIs already exist and work, but results aren't visible to admins
-- This makes the demo interactive and impressive
-- Shows the full underwriting workflow
+### Pending/Skipped
+| ID | Task | Status |
+|----|------|--------|
+| TEST-01 | E2E Tests (Cypress) | TBD - Future |
+| CO-BORROWER-01 | Co-Borrower UI | Skipped |
 
-### Implementation Progress
-
-**Phase 1: Foundation - COMPLETE**
-- Created `src/types/underwriting.ts` - Type definitions for underwriting data
-- Created `src/lib/underwriting-utils.ts` - Risk calculation helpers
-
-**Phase 2: UI Structure + Handlers + Results - COMPLETE**
-- Modified `src/pages/admin/apps/[id].tsx`:
-  - Added Qualification Summary banner with risk badges
-  - Added Action Buttons (Credit Pull, Verify Income, Get Appraisal, Get Pricing)
-  - Added Results Grid with cards for each integration result
-  - Implemented integration handlers calling the API endpoints
-  - Added loading states with spinner animations
-
-**Remaining Phases:**
-- All phases complete! Feature is ready to test.
-
-### Original Implementation Plan
-
-**Implementation Phases:**
-1. **Foundation** - Create types and risk calculation helpers ✓
-2. **UI Structure** - Add Underwriting Panel with Qualification Summary, Action Buttons, Results Grid ✓
-3. **Integration Handlers** - Implement handlers for credit, income, property, pricing APIs ✓
-4. **Results Display** - Create cards for each integration result with expandable details ✓
-5. **Polish** - Add qualification status calculation, error handling, timestamps ✓
-
-**UI Layout:**
-```
-+-- Qualification Summary ------------------------------------------+
-| [QUALIFIED] | Credit: 750 | DTI: 32% | LTV: 80% | Payment: $2,450 |
-+------------------------------------------------------------------+
-
-+-- Action Buttons ------------------------------------------------+
-| [Run Credit Pull] [Verify Income] [Get Appraisal] [Get Pricing] |
-+------------------------------------------------------------------+
-
-+-- Credit Results --+    +-- Income Results ---+
-| Score: 750         |    | Status: Verified    |
-| Excellent          |    | Annual: $120,000    |
-+-------------------+    +--------------------+
-
-+-- Property Results -+   +-- Pricing Results --+
-| Value: $450,000     |    | Rate: 6.75%        |
-| Confidence: High    |    | Payment: $2,450    |
-+--------------------+   +--------------------+
-```
-
-**Risk Badge Logic:**
-| Metric | Green | Yellow | Red |
-|--------|-------|--------|-----|
-| Credit Score | >= 740 | 680-739 | < 680 |
-| Back-End DTI | <= 36% | 37-43% | > 43% |
-| LTV | <= 80% | 81-95% | > 95% |
-| Income Status | Verified | Discrepancy | Unable to Verify |
-
-**Demo Testing Tips:**
-- SSN ending in 7-9: Excellent credit, verified income (all green)
-- SSN ending in 0-2: Poor credit, verification issues (shows warnings/errors)
-
-### To Start Implementation
-```
-Read SESSION.md and implement ADMIN-UW-01 (Admin Underwriting Panel)
-```
+### Test Coverage
+- **147 unit tests** all passing
+- Run with: `npm test`
 
 ---
 
-## Previous Session Summary
+## Latest Session Work (2026-02-03)
+
+### TEST-02: Unit Test Suite Expansion - COMPLETED
+
+Expanded unit test coverage from 26 to 147 tests:
+
+**New Test Files Created:**
+| File | Tests | Coverage |
+|------|-------|----------|
+| `src/__tests__/form-validator.test.ts` | 45 | All wizard step validations |
+| `src/__tests__/underwriting-utils.test.ts` | 27 | Risk badges, qualification logic |
+| `src/__tests__/integrations.test.ts` | 49 | Credit, income, pricing calculations |
+
+**Test Categories:**
+- Form validation (identity, address, employment, assets, liabilities, property, loan, declarations)
+- Risk badge calculations (credit score, DTI, LTV, income status, property confidence)
+- Qualification status determination
+- Credit pull simulation (SSN-based deterministic scores)
+- Income verification (DTI calculations, stability scoring)
+- Pricing engine (rate adjustments, scenario comparison)
+
+**All 147 tests pass:** `npm test`
+
+---
+
+## Previous Session Work
+
+### ADMIN-UW-01: Admin Underwriting Panel - COMPLETED
+- Added Qualification Summary banner with risk badges
+- Added Action Buttons (Credit Pull, Verify Income, Get Appraisal, Get Pricing)
+- Added Results Grid with cards for each integration result
+- Implemented integration handlers calling the API endpoints
+- Added loading states with spinner animations
 
 ### PDF-01: URLA PDF Export - COMPLETED
+- PDF generation with pdfmake library
+- Structured layout matching URLA sections
+- SSN masking for security
+- API endpoint: GET `/api/apps/:id/pdf`
 
-Implemented PDF export functionality for mortgage applications:
+### UI-01: Front-End Design Refresh - COMPLETED
+- Custom Tailwind color palette
+- Inter font and modern typography
+- Card, button, badge component classes
+- Gradient hero sections
+- Animations and transitions
 
-1. **Installed pdfmake** - PDF generation library
-2. **Created PDF generator** (`src/lib/pdf-generator.ts`)
-   - Structured layout with URLA sections
-   - Section 1: Borrower Information (name, SSN masked, DOB, contact, addresses, employment)
-   - Section 2a: Assets with totals
-   - Section 2b: Liabilities with totals
-   - Section 4a: Loan Information
-   - Section 4b: Property Information
-   - Section 5: Declarations summary
-   - Header with application ID and footer with timestamp
-3. **Created API endpoint** (`src/pages/api/apps/[id]/pdf.ts`)
-   - GET `/api/apps/:id/pdf`
-   - Returns PDF with proper Content-Type and Content-Disposition headers
-4. **Added PDF export button** to admin portal
-   - Red "Export URLA PDF" button alongside JSON/XML exports
-
-**Security**: SSN is masked (shows only last 4 digits) in generated PDFs
-
----
-
-### Previous Bug Fixes This Session
-
-1. **BUG: Oversized Wave SVG** - FIXED
-   - **Problem**: The wave SVG decoration at the bottom of the hero section had no explicit dimensions, only a viewBox. This caused browsers to render it at unexpected sizes, pushing content down and making users scroll to see the main options.
-   - **Fix**: Added explicit container height (`h-[60px]`), `overflow-hidden`, and SVG classes (`w-full h-full`) with `preserveAspectRatio="none"` to constrain the wave to a fixed size.
-   - **File**: `src/pages/index.tsx` (lines 144-149)
-
-2. **BUG: Login Redirect to Wrong Port** - FIXED
-   - **Problem**: After signing in, NextAuth redirected to `localhost:3000` even when the app was running on a different port (e.g., `localhost:3001`). This happened because `NEXTAUTH_URL` wasn't set, so NextAuth defaulted to port 3000.
-   - **Fix**: Modified the signin handler to extract just the pathname from NextAuth's result URL instead of using the full URL. This makes the redirect port-agnostic.
-   - **File**: `src/pages/auth/signin.tsx` (lines 28-37)
-   - **Also**: Added commented `NEXTAUTH_URL` template to `.env` for reference
-
-3. **BUG: Oversized Icons / Tailwind Not Loading** - FIXED
-   - **Problem**: SVG icons rendered at massive sizes because Tailwind CSS classes weren't being processed. The `postcss.config.js` file was missing, preventing PostCSS from processing Tailwind.
-   - **Fix**: Created `postcss.config.js` with tailwindcss and autoprefixer plugins. Also added explicit width/height attributes to SVGs as defensive fallback.
-   - **Files**: `postcss.config.js` (new), `src/pages/index.tsx` (SVG attributes)
-
-4. **BUG: employment.find is not a function** - FIXED
-   - **Problem**: Form validator crashed when `borrower.employment` was not an array (could be object or undefined).
-   - **Fix**: Added `Array.isArray()` checks for employment, assets, and liabilities arrays before calling array methods.
-   - **File**: `src/lib/form-validator.ts`
-
-5. **BUG: Tailwind v4 Incompatibility** - FIXED
-   - **Problem**: Project had Tailwind v4 installed but used v3 syntax. Build failed with PostCSS errors.
-   - **Fix**: Downgraded Tailwind to v3.4.19, installed proper autoprefixer.
-   - **Files**: `package.json`, `postcss.config.js`
-
-6. **BUG: CSS @import Order** - FIXED
-   - **Problem**: Build failed because @import for Inter font was after @tailwind directives.
-   - **Fix**: Moved @import to top of globals.css (before @tailwind directives).
-   - **File**: `src/styles/globals.css`
-
----
-
-### Previous Work Completed This Session
-
-1. **UI-01: Front-End Design Refresh** - COMPLETED
-   - Created comprehensive Tailwind configuration with custom colors
-   - Added Inter font and modern component classes
-   - Redesigned home page with gradient hero, feature cards, CTA sections
-   - Redesigned sign-in page with split layout (branding panel + form)
-   - Redesigned admin portal with improved stats cards and table
-   - Enhanced ApplicationWizard with modern step indicator
-   - Added animations (fade-in, slide-up, shimmer loading)
-
-2. **Documentation System** - COMPLETED
-   - Created REQUIREMENTS.md with detailed task specifications
-   - Created SESSION.md (this file) for session continuity
-   - Updated TASKS.md with comprehensive task tracking
-
-3. **INTEG-01: Mock Integrations** - COMPLETED
-   - Created credit pull simulation with deterministic scoring
-   - Built income verification stub with employment validation
-   - Implemented AVM (property valuation) with comparables
-   - Built comprehensive pricing engine with rate adjustments
-   - Created API endpoints for all integrations
-
-### Files Created/Modified This Session
-
-| File | Changes |
-|------|---------|
-| `postcss.config.js` | **NEW** - PostCSS config for Tailwind |
-| `package.json` | Downgraded Tailwind to v3.4.19 |
-| `tailwind.config.js` | Custom colors, fonts, shadows, animations |
-| `src/styles/globals.css` | Component classes + fixed @import order |
-| `src/pages/index.tsx` | Home page redesign + SVG explicit dimensions |
-| `src/pages/auth/signin.tsx` | Split layout + port-agnostic redirect |
-| `src/pages/admin/index.tsx` | Improved admin portal |
-| `src/components/ApplicationWizard.tsx` | Modern step indicator |
-| `src/lib/form-validator.ts` | Array.isArray() safety checks |
-| `src/lib/integrations/credit.ts` | Credit bureau simulation |
-| `src/lib/integrations/income.ts` | Income verification |
-| `src/lib/integrations/avm.ts` | Property valuation |
-| `src/lib/integrations/pricing.ts` | Mortgage pricing |
-| `src/lib/integrations/index.ts` | Module exports |
-| `src/pages/api/integrations/*.ts` | 4 API endpoints |
-| `.env` | Added NEXTAUTH_URL comment |
-| `REQUIREMENTS.md` | Detailed task specs |
-| `SESSION.md` | Session tracking |
-| `TASKS.md` | Updated task list + bug fixes |
+### INTEG-01: Mock Integrations - COMPLETED
+- Credit pull simulation (SSN-based scoring)
+- Income verification stub
+- AVM property valuation
+- Pricing engine with rate adjustments
 
 ---
 
@@ -221,156 +121,72 @@ The integrations use deterministic patterns for demo reproducibility:
 
 ---
 
-## Next Steps (Recommended Order)
+## Quick Reference
 
-### 1. Run Tests
+### Demo Accounts
+| Role | Email | Password |
+|------|-------|----------|
+| Borrower | borrower@demo.com | demo123 |
+| Admin | admin@demo.com | admin123 |
+
+### Common Commands
 ```bash
-npm test  # Verify 26 tests still pass
+npm install          # Install dependencies
+npm run dev          # Start dev server
+npm test             # Run 147 unit tests
+npx prisma db push   # Initialize database
 ```
 
-### 2. Test Integrations
-```bash
-npm run dev
-# Test endpoints with curl or Postman:
-# POST /api/integrations/credit-pull
-# POST /api/integrations/verify-income
-# POST /api/integrations/property-value
-# POST /api/integrations/pricing
-```
-
-### 3. PDF-01: URLA PDF Export (Next Priority)
-Proposed approach:
-- Use pdf-lib library for PDF generation
-- Create template matching URLA 1003 layout
-- Map application data to PDF fields
-- Add endpoint: GET /api/apps/:id/pdf
-
-### 4. CO-BORROWER-01: Co-Borrower UI
-- Add borrower tabs to wizard
-- Duplicate identity/address/employment for each borrower
-- Handle joint vs separate assets
-
----
-
-## API Reference for Integrations
-
-### Credit Pull
-```typescript
-POST /api/integrations/credit-pull
-Body: {
-  ssn: string,
-  firstName: string,
-  lastName: string,
-  dateOfBirth?: string,
-  currentAddress?: { street, city, state, zip }
-}
-Returns: CreditReport
-```
-
-### Income Verification
-```typescript
-POST /api/integrations/verify-income
-Body: {
-  employerName: string,
-  jobTitle: string,
-  statedAnnualIncome: number,
-  ssn: string,
-  startDate?: string,
-  employmentType?: string
-}
-Returns: IncomeVerification
-```
-
-### Property Valuation
-```typescript
-POST /api/integrations/property-value
-Body: {
-  address: string,
-  city: string,
-  state: string,
-  zip: string,
-  propertyType?: string,
-  squareFeet?: number,
-  bedrooms?: number,
-  bathrooms?: number
-}
-Returns: AVMResult
-```
-
-### Pricing
-```typescript
-POST /api/integrations/pricing
-Body: {
-  loanAmount: number,
-  propertyValue: number,
-  creditScore: number,
-  loanType?: string,
-  termMonths?: number,
-  propertyOccupancy?: string,
-  propertyType?: string
-}
-Returns: PricingResult
-```
-
----
-
-## Code Snippets for Reference
-
-### New Button Classes
-```html
-<button class="btn btn-primary">Primary</button>
-<button class="btn btn-secondary">Secondary</button>
-<button class="btn btn-success">Success</button>
-<button class="btn btn-danger">Danger</button>
-<button class="btn btn-ghost">Ghost</button>
-```
-
-### Card Component
-```html
-<div class="card p-6">Card content</div>
-<div class="card card-hover p-6">With hover effect</div>
-```
-
-### Status Badges
-```html
-<span class="badge badge-draft">Draft</span>
-<span class="badge badge-approved">Approved</span>
-```
-
-### Alert Messages
-```html
-<div class="alert alert-info">Info</div>
-<div class="alert alert-success">Success</div>
-<div class="alert alert-warning">Warning</div>
-<div class="alert alert-error">Error</div>
-```
+### Key Files
+| File | Purpose |
+|------|---------|
+| `src/components/ApplicationWizard.tsx` | Main wizard controller |
+| `src/pages/admin/apps/[id].tsx` | Admin app detail with underwriting |
+| `src/lib/form-validator.ts` | Step validation logic |
+| `src/lib/underwriting-utils.ts` | Risk badge calculations |
+| `src/lib/integrations/` | Mock integration APIs |
+| `src/lib/mismo-mapper.ts` | URLA to MISMO mapping |
+| `src/lib/pdf-generator.ts` | PDF generation |
 
 ---
 
 ## How to Resume Work
 
 ### Quick Start
-```
-Read SESSION.md and implement ADMIN-UW-01 (Admin Underwriting Panel)
+```bash
+npm install
+npm run dev
+npm test  # Verify 147 tests pass
 ```
 
-### Example Prompts
-- "Read SESSION.md and implement the Admin Underwriting Panel"
-- "Continue with ADMIN-UW-01"
-- "Run tests to verify everything works"
+### For Claude
+When starting a new session:
+1. Read TASKS.md, REQUIREMENTS.md, and SESSION.md
+2. Run `npm test` to verify everything works
+3. All core features are complete - ask user what they want to work on
+
+### Potential Future Work
+- E2E tests with Cypress (requires browser automation)
+- Co-borrower UI (schema already supports it)
+- Real third-party integrations
+- Email notifications
+- Analytics dashboard
 
 ---
 
 ## Session History
 
-### Session 2026-02-03 (Current)
+### Session 2026-02-03 (Latest)
+- **TEST-02**: Expanded unit tests from 26 to 147
+- Updated all documentation files
+- E2E tests marked as TBD - Future (user preference)
+
+### Session 2026-02-03 (Earlier)
+- Completed ADMIN-UW-01: Admin Underwriting Panel
+- Completed PDF-01: URLA PDF export
 - Completed UI-01: Front-end design refresh
-- Created documentation system (REQUIREMENTS.md, SESSION.md)
-- Completed INTEG-01: All mock integrations with API endpoints
-- **Completed PDF-01**: URLA PDF export with pdfmake library
-- **Fixed 6 bugs**: port redirect, oversized icons, Tailwind v4, CSS import order, form validator crashes, wave SVG
-- **Infrastructure**: Added postcss.config.js, downgraded Tailwind v4→v3.4.19
-- **11 tasks complete, 1 remaining** (TEST-01) - CO-BORROWER-01 skipped
+- Completed INTEG-01: All mock integrations
+- Fixed 6 bugs (port redirect, Tailwind v4, CSS import order, etc.)
 
 ### Session 2026-02-02
 - Completed full URLA schema (DM-1)
@@ -381,28 +197,3 @@ Read SESSION.md and implement ADMIN-UW-01 (Admin Underwriting Panel)
 - Added form validation (FE-02)
 - Implemented auth system (AUTH-01)
 - Added document upload (DOC-01)
-- Fixed infrastructure issues (Prisma, Next.js Link)
-
----
-
-## Notes for Claude
-
-When starting a new session:
-1. Read this file first - especially the "NEXT TASK" section at the top
-2. The next task is ADMIN-UW-01 (Admin Underwriting Panel)
-3. Implementation plan is detailed above - follow the 5 phases
-4. Run `npm test` to verify everything works before starting
-
-Key files to know:
-- `src/pages/admin/apps/[id].tsx` - THIS IS THE FILE TO MODIFY for ADMIN-UW-01
-- `src/lib/integrations/` - Integration APIs that already work
-- `src/lib/integrations/credit.ts` - CreditReport types
-- `src/lib/integrations/income.ts` - IncomeVerification types
-- `src/lib/integrations/avm.ts` - AVMResult types
-- `src/lib/integrations/pricing.ts` - PricingResult types
-
-Task completion status:
-- 11 tasks DONE (DM-1, FE-01, BE-01, DM-2, ADMIN-01, FE-02, AUTH-01, DOC-01, UI-01, INTEG-01, PDF-01)
-- ADMIN-UW-01 next (Admin Underwriting Panel)
-- TEST-01 after that
-- CO-BORROWER-01 was skipped

@@ -248,10 +248,8 @@ This document provides detailed requirements for each task in the project. Use t
 
 ---
 
-## Pending Tasks
-
 ### PDF-01: URLA PDF Export
-**Status**: Not Started
+**Status**: Completed
 **Priority**: Medium
 
 **Description**: Generate filled URLA 1003 PDF from application data.
@@ -262,21 +260,64 @@ This document provides detailed requirements for each task in the project. Use t
 - Generate downloadable PDF
 - Include in admin portal export options
 
-**Proposed Approach**:
-- Use pdf-lib or pdfmake library
-- Create template matching URLA 1003
-- Add API endpoint for PDF generation
+**Files Created**:
+- `src/lib/pdf-generator.ts` - PDF generation with pdfmake
+- `src/pages/api/apps/[id]/pdf.ts` - API endpoint
 
-**Proposed Files**:
-- `src/lib/pdf-generator.ts`
-- `src/pages/api/apps/[id]/pdf.ts`
-- `public/templates/urla-1003-template.pdf`
+**Features**:
+- Structured layout matching URLA sections
+- SSN masking for security (shows only last 4 digits)
+- Header with application ID, footer with timestamp
+- Download via admin portal "Export URLA PDF" button
 
 ---
 
-### CO-BORROWER-01: Co-Borrower UI Support
-**Status**: Partial (schema ready, UI not)
+### ADMIN-UW-01: Admin Underwriting Panel
+**Status**: Completed
 **Priority**: Medium
+
+**Description**: Interactive underwriting section in admin app detail page.
+
+**Requirements**:
+- Action buttons: Run Credit Pull, Verify Income, Get Appraisal, Get Pricing
+- Results display with risk badges (green/yellow/red)
+- Qualification summary card (credit score, DTI, LTV, payment)
+- Expandable detail sections for each result
+
+**Files Created**:
+- `src/types/underwriting.ts` - Type definitions
+- `src/lib/underwriting-utils.ts` - Risk calculation helpers
+
+**Files Modified**:
+- `src/pages/admin/apps/[id].tsx` - UI implementation
+
+---
+
+### TEST-02: Unit Test Suite Expansion
+**Status**: Completed
+**Priority**: Medium
+
+**Description**: Comprehensive unit test coverage for business logic.
+
+**Requirements**:
+- Form validation tests (all wizard steps)
+- Underwriting utilities tests (risk badges, qualification)
+- Integration tests (credit, income, pricing calculations)
+
+**Files Created**:
+- `src/__tests__/form-validator.test.ts` - 45 tests
+- `src/__tests__/underwriting-utils.test.ts` - 27 tests
+- `src/__tests__/integrations.test.ts` - 49 tests
+
+**Result**: 147 total unit tests (up from 26)
+
+---
+
+## Pending/Future Tasks
+
+### CO-BORROWER-01: Co-Borrower UI Support
+**Status**: Skipped (schema ready, UI deferred)
+**Priority**: Low
 
 **Description**: Full UI support for adding and managing co-borrowers.
 
@@ -295,17 +336,17 @@ This document provides detailed requirements for each task in the project. Use t
 
 ---
 
-### TEST-01: E2E Test Suite
-**Status**: Not Started
+### TEST-01: E2E Test Suite (Cypress)
+**Status**: TBD - Future
 **Priority**: Low
 
-**Description**: Cypress end-to-end tests for critical flows.
+**Description**: Cypress end-to-end tests for critical flows. Requires browser automation.
 
 **Requirements**:
 - Complete application flow test (all 10 steps)
 - Admin portal test (view, status change, export)
 - Authentication test (sign in, sign out, protected routes)
-- Export functionality test (JSON, XML)
+- Export functionality test (JSON, XML, PDF)
 - Document upload test
 
 **Proposed Files**:

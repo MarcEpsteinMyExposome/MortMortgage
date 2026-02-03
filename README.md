@@ -2,46 +2,79 @@
 
 Demo web-first mortgage application (MVP) for industry demonstration.
 
-## Overview ✅
-- Next.js (TypeScript) + Tailwind CSS
+## Overview
+- Next.js (TypeScript) + Tailwind CSS v3
 - Backend: Next API routes + Prisma (SQLite) for local dev
-- Standards: URLA 2020 data model + MISMO v3.x exports (stubbed)
-- Mocked integrations: credit, ID, bank-verification, AVM/pricing, eSign
-- Auth: Magic-link for borrowers, email/password for admin
-- Docs: local file uploads with test fixtures
-- Tests: Jest + RTL and Cypress E2E
+- Standards: URLA 2020 data model + MISMO v3.x exports
+- Mocked integrations: credit, income verification, AVM/pricing
+- Auth: NextAuth.js with demo accounts (borrower/admin)
+- Docs: local file uploads with validation
+- Tests: Jest + React Testing Library (147 unit tests)
 
-## Quickstart (developer)
-1. Copy `.env.example` to `.env`
-2. Install dependencies: `npm install`
-3. Dev: `npm run dev`
-4. Seed demo data: `npm run dev:seed`
-5. Run E2E: `npm run e2e`
+## Quick Start
+```bash
+# 1. Install dependencies
+npm install
 
-## Resume / Reproducibility
-- Use `npm run resume` to reset DB and re-seed demo data.
-- A `scripts/resume.ps1` helper is provided for Windows environments.
+# 2. Initialize database
+npx prisma db push
+
+# 3. Start dev server
+npm run dev
+
+# 4. Run tests
+npm test
+```
+App runs at http://localhost:3000
+
+## Demo Accounts
+| Role | Email | Password |
+|------|-------|----------|
+| Borrower | borrower@demo.com | demo123 |
+| Admin | admin@demo.com | admin123 |
+
+## Completed Features
+- Full URLA 2020 form wizard (10 steps)
+- Admin portal with application management
+- MISMO JSON/XML export
+- URLA PDF export
+- Mock integrations (credit, income, AVM, pricing)
+- Admin underwriting panel with risk badges
+- Document upload system
+- Authentication with role-based access
+- 147 unit tests covering all business logic
+
+## Project Status
+| Category | Status |
+|----------|--------|
+| Core Features | 13 tasks complete |
+| Unit Tests | 147 tests passing |
+| E2E Tests | TBD - Future |
+| Co-Borrower UI | Skipped (schema ready) |
+
+## Documentation
+| File | Purpose |
+|------|---------|
+| `TASKS.md` | Task list with status and restart guide |
+| `REQUIREMENTS.md` | Detailed task specifications |
+| `SESSION.md` | Session notes for continuity |
 
 ## Working with Claude
 This project is developed with Claude Code. To resume work:
-1. Run `npm run resume` to reset and seed the database
-2. Open Claude Code and say: "Read TASKS.md and continue where we left off"
+1. Run `npm install` and `npm run dev`
+2. Open Claude Code and say: "Read TASKS.md, REQUIREMENTS.md, and SESSION.md"
 
-See `TASKS.md` for detailed Claude restart instructions and recommended prompts.
+## Tech Stack
+- **Frontend**: Next.js, React, Tailwind CSS v3.4.19
+- **Backend**: Next.js API routes, Prisma ORM
+- **Database**: SQLite (dev), JSON fields as strings
+- **Auth**: NextAuth.js with JWT sessions
+- **Validation**: Ajv (JSON Schema), custom form validators
+- **Testing**: Jest, React Testing Library
+- **PDF**: pdfmake
 
----
-
-## MVP Scope
-- Full borrower application (URLA 2020 fields) with multi-borrower support
-- Admin portal for reviewers
-- MISMO JSON/XML export and sample URLA PDF generation (stubbed)
-- Deterministic mock third-party responses for demo scenarios
-- Tests that fake document upload and application flows
-
-## Next Steps
-- Implement MISMO mapping and full URLA PDF builder
-- Add richer UI polish and branding
-- Integrate real 3rd-party providers if desired
-
-## Task list & Decisions 📋
-The full, versioned set of decisions and the detailed task plan are maintained in `TASKS.md`. This file includes restart instructions, sprint tasks, acceptance criteria, and fixtures used for seeding and tests. See `TASKS.md` for the single-source-of-truth for work and how to resume the demo at any time.
+## Key Constraints
+- Prisma pinned to v5.22.0 (v7+ has breaking changes)
+- Tailwind CSS pinned to v3.4.19 (v4 has breaking changes)
+- `postcss.config.js` is required for Tailwind
+- SQLite stores JSON as strings (API handles serialization)
