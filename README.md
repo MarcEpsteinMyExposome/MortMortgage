@@ -84,6 +84,7 @@ App runs at http://localhost:3000 (or next available port)
 | File | Purpose |
 |------|---------|
 | `CLAUDE.md` | Claude Code entry point (read this first) |
+| `CONTRIBUTING.md` | Setup guide and coding standards |
 | `TASKS.md` | Task list with status and restart guide |
 | `REQUIREMENTS.md` | Detailed task specifications |
 | `SESSION.md` | Session notes for continuity |
