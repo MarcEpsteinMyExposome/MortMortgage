@@ -5,14 +5,14 @@ This file tracks the current development session progress. Claude updates this f
 ---
 
 ## Last Updated
-**Date**: 2026-02-03
-**Status**: All 17 planned tasks complete
+**Date**: 2026-02-04
+**Status**: 20 tasks complete, 2 future tasks planned
 
 ---
 
 ## Current Project Status
 
-### Completed Tasks (17 total)
+### Completed Tasks (20 total)
 | ID | Task | Status |
 |----|------|--------|
 | DM-1 | Full URLA 2020 Schema | DONE |
@@ -32,15 +32,18 @@ This file tracks the current development session progress. Claude updates this f
 | PREQUAL-01 | Pre-Qualification Calculator | DONE |
 | ANALYTICS-01 | Admin Analytics Dashboard | DONE |
 | COMPARE-01 | Loan Comparison Tool | DONE |
+| UX-01 | Address Autocomplete | DONE |
+| INTEG-02 | Plaid Integration | DONE |
+| CO-BORROWER-02 | Co-Borrower UI | DONE |
 
-### Pending/Skipped
+### Future Tasks
 | ID | Task | Status |
 |----|------|--------|
+| INTEG-03 | eSign Integration (DocuSign) | TODO |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
-| CO-BORROWER-01 | Co-Borrower UI | Skipped |
 
 ### Test Coverage
-- **149+ unit tests** all passing
+- **217 tests all passing**
 - Run with: `npm test`
 
 ---
@@ -135,9 +138,12 @@ npx prisma db push   # Initialize database
 |------|---------|
 | `CLAUDE.md` | Project entry point for Claude Code |
 | `src/components/ApplicationWizard.tsx` | Main wizard controller |
+| `src/components/BorrowerTabs.tsx` | Co-borrower tab switching |
+| `src/components/PlaidLink.tsx` | Plaid bank connection |
+| `src/components/AddressAutocomplete.tsx` | Google Places autocomplete |
 | `src/pages/admin/apps/[id].tsx` | Admin app detail with underwriting |
 | `src/lib/form-validator.ts` | Step validation logic |
-| `src/lib/integrations/` | Mock integration APIs |
+| `src/lib/integrations/` | Mock integration APIs + Plaid |
 
 ---
 
@@ -178,9 +184,8 @@ When starting a new session, read `CLAUDE.md` first (should auto-load).
 For full context: Read `TASKS.md` and `SESSION.md`.
 
 ### Potential Future Work
-- E2E tests with Cypress
-- Co-borrower UI (schema already supports it)
-- Real third-party integrations
+- E2E tests with Cypress (TEST-01)
+- eSign Integration with DocuSign (INTEG-03 - spec ready)
 - Email notifications
 - Mobile app (React Native)
 
@@ -188,7 +193,43 @@ For full context: Read `TASKS.md` and `SESSION.md`.
 
 ## Session History
 
-### Session 2026-02-03 (Latest)
+### Session 2026-02-04 (Latest)
+- Implemented 3 features in parallel using Claude Code agents:
+  - **UX-01**: Address Autocomplete with Google Places API
+  - **INTEG-02**: Plaid Integration for bank/income verification
+  - **CO-BORROWER-02**: Co-Borrower UI with tabs in wizard
+- Created task spec for **INTEG-03**: eSign Integration (DocuSign)
+- Moved completed task files to `.claude/tasks/archive/`
+- Installed missing dependencies: `plaid`, `react-plaid-link`
+- Fixed null check bugs in PlaidLink.tsx and EmploymentForm.tsx
+
+**New Files Created:**
+- `src/components/AddressAutocomplete.tsx`
+- `src/components/BorrowerTabs.tsx`
+- `src/components/PlaidLink.tsx`
+- `src/hooks/useDebounce.ts`
+- `src/lib/integrations/plaid.ts`
+- `src/pages/api/places/autocomplete.ts`
+- `src/pages/api/places/details.ts`
+- `src/pages/api/plaid/create-link-token.ts`
+- `src/pages/api/plaid/exchange-token.ts`
+- `src/pages/api/plaid/get-accounts.ts`
+- `.claude/tasks/INTEG-03.md`
+
+**Where to find new features:**
+- Co-Borrower: `/apply/[id]` → Step 1 (Identity) → "Add Co-Borrower" toggle
+- Plaid: `/apply/[id]` → Step 3 (Employment) → "Connect Bank Account" button
+- Address Autocomplete: `/apply/[id]` → Step 2 (Address) or Step 6 (Property)
+
+**Environment Variables (optional):**
+```
+PLAID_CLIENT_ID=xxx
+PLAID_SECRET=xxx
+PLAID_ENV=sandbox
+GOOGLE_PLACES_API_KEY=xxx
+```
+
+### Session 2026-02-03 (Previous)
 - Implemented DASH-01, PREQUAL-01, ANALYTICS-01, COMPARE-01 in parallel
 - Fixed sign-out redirect bug
 - Updated apply page styling
