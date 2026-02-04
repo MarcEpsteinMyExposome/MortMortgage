@@ -1,0 +1,161 @@
+# MortMortgage — Product Overview
+
+> A modern mortgage platform that simplifies the home financing journey for borrowers while giving lenders powerful tools to make faster, smarter decisions.
+
+---
+
+## For Home Buyers
+
+### Know What You Can Afford — Instantly
+
+Our **Pre-Qualification Calculator** gives you a clear picture of your home buying power in seconds. Simply enter your income, debts, and down payment amount to see:
+
+- Your maximum purchase price
+- Estimated monthly payments
+- Whether you're likely to qualify
+
+No credit check required. No commitment. Just clarity.
+
+### A Guided Application Experience
+
+Applying for a mortgage doesn't have to be overwhelming. Our **10-step application wizard** walks you through every section of the Uniform Residential Loan Application (URLA 2020) with:
+
+- **Smart address lookup** — Start typing and we'll find your address
+- **Automatic saving** — Your progress is saved as you go, so you can complete it at your own pace
+- **Clear progress tracking** — Always know where you are and what's left
+- **Built-in validation** — Catch errors before submission, not after
+- **Co-borrower support** — Applying with a spouse or partner? We've got you covered
+
+### Connect Your Bank for Faster Verification
+
+Skip the paperwork. Link your bank account through Plaid to instantly verify your income and assets. It's secure, fast, and means fewer documents to track down.
+
+### Compare Your Options
+
+Not sure which loan is right for you? Our **Loan Comparison Tool** lets you compare up to three scenarios side-by-side:
+
+- 15-year vs. 30-year terms
+- Different down payment amounts
+- See total interest paid over the life of the loan
+- Understand the true cost of each option
+
+Make confident decisions with clear, visual comparisons.
+
+### Your Personal Dashboard
+
+Track all your applications in one place. See status updates, continue where you left off, and know exactly where you stand in the process.
+
+---
+
+## For Lenders & Administrators
+
+### A Complete View of Every Application
+
+The **Admin Portal** puts everything you need at your fingertips:
+
+- All applications in one centralized dashboard
+- Filter by status, search by borrower name
+- Quick access to application details
+- Status management from draft through approval
+
+### Underwriting Tools That Save Time
+
+Make informed decisions faster with integrated verification tools:
+
+**Credit Analysis**
+- Pull tri-bureau credit reports with a single click
+- View credit scores from all three bureaus
+- See detailed tradelines, utilization rates, and collections
+- Clear risk indicators at a glance
+
+**Income Verification**
+- Verify employment and income instantly
+- Compare stated income against verified amounts
+- Flag discrepancies automatically
+
+**Property Valuation**
+- Automated valuation model (AVM) results
+- Comparable sales from the area
+- Market trend data
+- Confidence scoring
+
+**Loan Pricing**
+- Multiple rate scenarios
+- Complete payment breakdowns
+- Fee estimates and closing costs
+- Points and APR comparisons
+
+### Qualification at a Glance
+
+Every application displays a clear qualification summary showing:
+
+- Credit score with risk assessment
+- Debt-to-income ratio
+- Loan-to-value ratio
+- Estimated monthly payment
+- Overall qualification status
+
+No more hunting through pages of data to understand an applicant's profile.
+
+### Analytics That Drive Decisions
+
+The **Analytics Dashboard** gives you visibility into your pipeline:
+
+- Application volume over time
+- Approval rates
+- Average loan amounts
+- Breakdown by loan type and property type
+- Recent activity feed
+
+Spot trends, identify bottlenecks, and optimize your operations.
+
+### Industry-Standard Exports
+
+Seamlessly integrate with your existing systems:
+
+- **MISMO v3.4** export in JSON or XML format for LOS integration
+- **URLA PDF** generation with proper SSN masking
+- All data mapped to industry standards
+
+---
+
+## Built for Compliance
+
+MortMortgage is designed around the **URLA 2020** standard, ensuring:
+
+- All required fields and sections are captured
+- HMDA-compliant demographic collection
+- Declaration questions match regulatory requirements
+- Proper handling of sensitive information
+
+---
+
+## Security & Privacy
+
+- Secure authentication with role-based access
+- Document uploads validated for type and size
+- Sensitive data (SSN) masked in exports
+- Bank connections through Plaid's secure infrastructure
+
+---
+
+## Why MortMortgage?
+
+| Challenge | Our Solution |
+|-----------|--------------|
+| Borrowers abandon complex applications | Guided wizard with auto-save and clear progress |
+| Manual income/asset verification takes days | Instant verification through Plaid integration |
+| Underwriters juggle multiple systems | All verification tools in one panel |
+| Difficult to compare loan options | Side-by-side comparison tool |
+| Integration with existing LOS | MISMO v3.4 export ready |
+| Compliance concerns | Built on URLA 2020 standards |
+
+---
+
+## Ready to Modernize Your Mortgage Process?
+
+MortMortgage brings together everything borrowers and lenders need in one streamlined platform. From the first "Can I afford this?" question through final underwriting decisions, we make the mortgage process clearer, faster, and more transparent for everyone involved.
+
+---
+
+*MortMortgage — Simplifying the path to homeownership.*

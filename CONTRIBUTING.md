@@ -48,13 +48,26 @@ npm install
 npx prisma db push
 ```
 
-### 4. Start Development Server
+### 4. Configure Optional Integrations
+
+The app works without these, but some features require API keys in `.env`:
+
+| Integration | Keys Required | Feature |
+|-------------|---------------|---------|
+| **Plaid** | `PLAID_CLIENT_ID`, `PLAID_SECRET`, `PLAID_ENV` | Bank account linking & income verification |
+| **Google Places** | `GOOGLE_PLACES_API_KEY` | Address autocomplete |
+
+Without these keys:
+- Plaid shows a demo mode with sample data
+- Address fields fall back to manual entry
+
+### 5. Start Development Server
 ```bash
 npm run dev
 ```
 App runs at http://localhost:3000 (or next available port)
 
-### 5. Verify Setup
+### 6. Verify Setup
 ```bash
 npm test  # Should pass 149+ tests
 ```
