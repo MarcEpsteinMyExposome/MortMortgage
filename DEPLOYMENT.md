@@ -65,12 +65,38 @@ Before deploying to production, address these areas:
 | `NEXTAUTH_URL` | `http://localhost:3000` | Your production URL |
 | `MOCK_MODE` | `true` | `false` (use real integrations) |
 | `NODE_ENV` | `development` | `production` |
-| `PLAID_ENV` | `sandbox` | `production` |
 
 **Generate a secure secret:**
 ```bash
 openssl rand -base64 32
 ```
+
+#### Third-Party Integrations
+
+**Plaid (Bank Account Linking & Income Verification)**
+
+| Variable | Development | Production |
+|----------|-------------|------------|
+| `PLAID_CLIENT_ID` | Your sandbox client ID | Your production client ID |
+| `PLAID_SECRET` | Your sandbox secret | Your production secret |
+| `PLAID_ENV` | `sandbox` | `production` |
+
+- **Sandbox**: Uses test credentials (`user_good` / `pass_good`), no real bank data
+- **Production**: Requires Plaid account approval and real credentials
+- Get keys at: [dashboard.plaid.com](https://dashboard.plaid.com)
+
+**Google Places (Address Autocomplete)**
+
+| Variable | Development | Production |
+|----------|-------------|------------|
+| `GOOGLE_PLACES_API_KEY` | Your API key | Your API key (restrict by domain) |
+
+- **Development**: Unrestricted key is fine for localhost
+- **Production**: Restrict the key to your domain in Google Cloud Console
+- Get keys at: [console.cloud.google.com](https://console.cloud.google.com)
+- Enable the "Places API" and "Maps JavaScript API"
+
+**Note:** Both integrations have graceful fallbacks — the app works without them (Plaid shows demo mode, addresses use manual entry).
 
 ---
 
