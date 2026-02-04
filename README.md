@@ -85,9 +85,15 @@ App runs at http://localhost:3000 (or next available port)
 |------|---------|
 | `CLAUDE.md` | Claude Code entry point (read this first) |
 | `CONTRIBUTING.md` | Setup guide and coding standards |
+| `FEATURES.md` | Product overview (non-technical) |
+| `DEPLOYMENT.md` | Production deployment guide |
 | `TASKS.md` | Task list with status and restart guide |
 | `REQUIREMENTS.md` | Detailed task specifications |
 | `SESSION.md` | Session notes for continuity |
+
+## CI/CD
+- **GitHub Actions**: Tests run automatically on push/PR (see `.github/workflows/ci.yml`)
+- **Deployment**: See `DEPLOYMENT.md` for production setup
 
 ## Working with Claude Code
 This project is developed with Claude Code. To resume work:
