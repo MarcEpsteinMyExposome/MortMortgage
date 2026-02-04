@@ -73,14 +73,16 @@ function getScoreCategory(ssn: string): { category: 'Excellent' | 'Good' | 'Fair
 
 /**
  * Generate credit scores with slight variation between bureaus
+ * Uses deterministic offsets for reproducible test results
  */
 function generateScores(baseScore: number): CreditScore[] {
   const today = new Date().toISOString().split('T')[0]
 
+  // Deterministic offsets for each bureau (no randomness)
   return [
-    { bureau: 'Equifax', score: baseScore + Math.floor(Math.random() * 20) - 10, date: today },
-    { bureau: 'Experian', score: baseScore + Math.floor(Math.random() * 20) - 10, date: today },
-    { bureau: 'TransUnion', score: baseScore + Math.floor(Math.random() * 20) - 10, date: today },
+    { bureau: 'Equifax', score: baseScore - 5, date: today },
+    { bureau: 'Experian', score: baseScore + 3, date: today },
+    { bureau: 'TransUnion', score: baseScore + 2, date: today },
   ]
 }
 
