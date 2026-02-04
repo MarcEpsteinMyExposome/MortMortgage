@@ -29,12 +29,7 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\" -Recurse -Include \"*.ico\",\"*.svg\" -ErrorAction SilentlyContinue)",
       "Bash(Select-Object FullName)",
       "Bash(npm uninstall:*)",
-      "Bash(cmd //c \"del \\\\?\\\\c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul\")",
-      "Bash(powershell -Command \"Remove-Item -LiteralPath ''\\\\?\\\\c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul'' -Force\")",
       "Bash(powershell:*)",
-      "Bash(cmd /c \"del /f /q \\\\?\\\\C:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul\")",
-      "Bash(cmd /c \"dir /a c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul 2>&1\")",
-      "Bash(cmd /c \"dir /a c:\\\\Users\\\\marce\\\\Documents\\\\Projects\\\\MortMortgage\\\\nul*\")",
       "Bash(git reset:*)"
     ],
     "deny": [
