@@ -312,6 +312,29 @@ Other notes:
 
 ---
 
+## Task Management
+
+We use `.claude/tasks/` to track detailed task specifications.
+
+### Task Lifecycle
+1. **Create**: New tasks go in `.claude/tasks/TASK-ID.md`
+2. **Work**: Update status to `in_progress` while working
+3. **Complete**: Mark status as `DONE` in the file
+4. **Archive**: Move completed tasks to `.claude/tasks/archive/`
+
+### Folder Structure
+```
+.claude/tasks/
+├── NEW-TASK.md        # Active/pending tasks
+├── archive/           # Completed tasks (for reference)
+│   ├── DASH-01.md
+│   └── ...
+```
+
+This keeps the main folder clean while preserving specs for future reference.
+
+---
+
 ## Questions?
 
 - Check `CLAUDE.md` for project overview

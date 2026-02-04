@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import type { StepProps } from '../ApplicationWizard'
 import { fakeAddress, fakePropertyValue, randomChoice } from '../../lib/fake-data'
+import AddressAutocomplete, { ParsedAddress } from '../AddressAutocomplete'
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
@@ -112,16 +113,23 @@ export default function PropertyForm({ data, onUpdate, onNext, onBack }: StepPro
 
       <h4 className="font-medium mb-3">Property Address</h4>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <label className="flex flex-col col-span-2">
+        <div className="flex flex-col col-span-2">
           <span className="text-sm font-medium">Street Address *</span>
-          <input
+          <AddressAutocomplete
             value={street}
-            onChange={(e) => setStreet(e.target.value)}
-            className={`input ${errors.street ? 'border-red-500' : ''}`}
-            placeholder="456 Oak Avenue"
+            onChange={setStreet}
+            onSelect={(addr: ParsedAddress) => {
+              setStreet(addr.street)
+              setCity(addr.city)
+              setState(addr.state)
+              setZip(addr.zip)
+              if (addr.county) setCounty(addr.county)
+            }}
+            placeholder="Start typing property address..."
+            error={errors.street}
           />
           {errors.street && <span className="text-red-500 text-xs">{errors.street}</span>}
-        </label>
+        </div>
 
         <label className="flex flex-col">
           <span className="text-sm font-medium">Unit/Apt</span>

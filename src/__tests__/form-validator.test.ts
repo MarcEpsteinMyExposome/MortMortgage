@@ -40,7 +40,7 @@ describe('Form Validator', () => {
       }
       const result = validateIdentityStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('First name is required')
+      expect(result.errors.some(e => e.includes('First name is required'))).toBe(true)
     })
 
     it('should fail when last name is missing', () => {
@@ -52,7 +52,7 @@ describe('Form Validator', () => {
       }
       const result = validateIdentityStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Last name is required')
+      expect(result.errors.some(e => e.includes('Last name is required'))).toBe(true)
     })
 
     it('should fail when citizenship is missing', () => {
@@ -63,7 +63,7 @@ describe('Form Validator', () => {
       }
       const result = validateIdentityStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Citizenship status is required')
+      expect(result.errors.some(e => e.includes('Citizenship status is required'))).toBe(true)
     })
 
     it('should fail with invalid SSN format', () => {
@@ -76,7 +76,7 @@ describe('Form Validator', () => {
       }
       const result = validateIdentityStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('SSN must be in XXX-XX-XXXX format')
+      expect(result.errors.some(e => e.includes('SSN must be in XXX-XX-XXXX format'))).toBe(true)
     })
 
     it('should warn when DOB is missing', () => {
@@ -89,7 +89,7 @@ describe('Form Validator', () => {
       }
       const result = validateIdentityStep(data)
       expect(result.valid).toBe(true)
-      expect(result.warnings).toContain('Date of birth not provided')
+      expect(result.warnings.some(w => w.includes('Date of birth not provided'))).toBe(true)
     })
 
     it('should warn when email is missing', () => {
@@ -102,7 +102,7 @@ describe('Form Validator', () => {
       }
       const result = validateIdentityStep(data)
       expect(result.valid).toBe(true)
-      expect(result.warnings).toContain('Email not provided')
+      expect(result.warnings.some(w => w.includes('Email not provided'))).toBe(true)
     })
 
     it('should handle empty borrowers array', () => {
@@ -151,7 +151,7 @@ describe('Form Validator', () => {
       }
       const result = validateAddressStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Street address is required')
+      expect(result.errors.some(e => e.includes('Street address is required'))).toBe(true)
     })
 
     it('should fail with invalid ZIP format', () => {
@@ -170,7 +170,7 @@ describe('Form Validator', () => {
       }
       const result = validateAddressStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Invalid ZIP format')
+      expect(result.errors.some(e => e.includes('Invalid ZIP format'))).toBe(true)
     })
 
     it('should accept ZIP+4 format', () => {
@@ -208,7 +208,7 @@ describe('Form Validator', () => {
       }
       const result = validateAddressStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Monthly rent is required')
+      expect(result.errors.some(e => e.includes('Monthly rent is required'))).toBe(true)
     })
 
     it('should warn when duration is less than 2 years', () => {
@@ -229,7 +229,7 @@ describe('Form Validator', () => {
       }
       const result = validateAddressStep(data)
       expect(result.valid).toBe(true)
-      expect(result.warnings).toContain('Less than 2 years at current address - previous address may be required')
+      expect(result.warnings.some(w => w.includes('Less than 2 years at current address'))).toBe(true)
     })
   })
 
@@ -254,7 +254,7 @@ describe('Form Validator', () => {
       }
       const result = validateEmploymentStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('At least one employment record is required')
+      expect(result.errors.some(e => e.includes('At least one employment record is required'))).toBe(true)
     })
 
     it('should fail when no current employment', () => {
@@ -269,7 +269,7 @@ describe('Form Validator', () => {
       }
       const result = validateEmploymentStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Current employment is required')
+      expect(result.errors.some(e => e.includes('Current employment is required'))).toBe(true)
     })
 
     it('should fail when employer name is missing', () => {
@@ -283,7 +283,7 @@ describe('Form Validator', () => {
       }
       const result = validateEmploymentStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Employer name is required')
+      expect(result.errors.some(e => e.includes('Employer name is required'))).toBe(true)
     })
 
     it('should fail when monthly income is zero or missing', () => {
@@ -298,7 +298,7 @@ describe('Form Validator', () => {
       }
       const result = validateEmploymentStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('Monthly income is required')
+      expect(result.errors.some(e => e.includes('Monthly income is required'))).toBe(true)
     })
 
     it('should warn when income is low', () => {
@@ -313,7 +313,7 @@ describe('Form Validator', () => {
       }
       const result = validateEmploymentStep(data)
       expect(result.valid).toBe(true)
-      expect(result.warnings).toContain('Monthly income appears low for mortgage qualification')
+      expect(result.warnings.some(w => w.includes('income appears low') || w.includes('Combined monthly income'))).toBe(true)
     })
 
     it('should handle employment as non-array (defensive)', () => {
@@ -324,7 +324,7 @@ describe('Form Validator', () => {
       }
       const result = validateEmploymentStep(data)
       expect(result.valid).toBe(false)
-      expect(result.errors).toContain('At least one employment record is required')
+      expect(result.errors.some(e => e.includes('At least one employment record is required'))).toBe(true)
     })
   })
 

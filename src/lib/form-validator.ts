@@ -9,47 +9,85 @@ export interface ValidationResult {
   warnings: string[]
 }
 
+function validateSingleBorrowerIdentity(borrower: any, label: string): { errors: string[], warnings: string[] } {
+  const errors: string[] = []
+  const warnings: string[] = []
+  const name = borrower.name || {}
+
+  if (!name.firstName?.trim()) errors.push(`${label}: First name is required`)
+  if (!name.lastName?.trim()) errors.push(`${label}: Last name is required`)
+  if (!borrower.citizenship) errors.push(`${label}: Citizenship status is required`)
+
+  if (borrower.ssn && !/^\d{3}-\d{2}-\d{4}$/.test(borrower.ssn)) {
+    errors.push(`${label}: SSN must be in XXX-XX-XXXX format`)
+  }
+
+  if (!borrower.dob) warnings.push(`${label}: Date of birth not provided`)
+  if (!borrower.contact?.email) warnings.push(`${label}: Email not provided`)
+
+  return { errors, warnings }
+}
+
 export function validateIdentityStep(data: any): ValidationResult {
   const errors: string[] = []
   const warnings: string[] = []
-  const borrower = data.borrowers?.[0] || {}
-  const name = borrower.name || {}
+  const hasCoBorrower = data.borrowers?.length > 1
 
-  if (!name.firstName?.trim()) errors.push('First name is required')
-  if (!name.lastName?.trim()) errors.push('Last name is required')
-  if (!borrower.citizenship) errors.push('Citizenship status is required')
+  // Validate primary borrower
+  const primary = validateSingleBorrowerIdentity(data.borrowers?.[0] || {}, hasCoBorrower ? 'Primary Borrower' : 'Borrower')
+  errors.push(...primary.errors)
+  warnings.push(...primary.warnings)
 
-  if (borrower.ssn && !/^\d{3}-\d{2}-\d{4}$/.test(borrower.ssn)) {
-    errors.push('SSN must be in XXX-XX-XXXX format')
+  // Validate co-borrower if present
+  if (hasCoBorrower) {
+    const coBorrowerResult = validateSingleBorrowerIdentity(data.borrowers?.[1] || {}, 'Co-Borrower')
+    errors.push(...coBorrowerResult.errors)
+    warnings.push(...coBorrowerResult.warnings)
   }
 
-  if (!borrower.dob) warnings.push('Date of birth not provided')
-  if (!borrower.contact?.email) warnings.push('Email not provided')
-
   return { valid: errors.length === 0, errors, warnings }
+}
+
+function validateSingleBorrowerAddress(borrower: any, label: string): { errors: string[], warnings: string[] } {
+  const errors: string[] = []
+  const warnings: string[] = []
+  const currentAddress = borrower.currentAddress || {}
+  const address = currentAddress.address || {}
+
+  if (!address.street?.trim()) errors.push(`${label}: Street address is required`)
+  if (!address.city?.trim()) errors.push(`${label}: City is required`)
+  if (!address.state) errors.push(`${label}: State is required`)
+  if (!address.zip?.trim()) errors.push(`${label}: ZIP code is required`)
+  else if (!/^\d{5}(-\d{4})?$/.test(address.zip)) errors.push(`${label}: Invalid ZIP format`)
+
+  if (!currentAddress.housingType) errors.push(`${label}: Housing type is required`)
+  if (currentAddress.housingType === 'rent' && !currentAddress.monthlyRent) {
+    errors.push(`${label}: Monthly rent is required`)
+  }
+
+  const totalMonths = ((currentAddress.durationYears || 0) * 12) + (currentAddress.durationMonths || 0)
+  if (totalMonths < 24) {
+    warnings.push(`${label}: Less than 2 years at current address - previous address may be required`)
+  }
+
+  return { errors, warnings }
 }
 
 export function validateAddressStep(data: any): ValidationResult {
   const errors: string[] = []
   const warnings: string[] = []
-  const borrower = data.borrowers?.[0] || {}
-  const currentAddress = borrower.currentAddress || {}
-  const address = currentAddress.address || {}
+  const hasCoBorrower = data.borrowers?.length > 1
 
-  if (!address.street?.trim()) errors.push('Street address is required')
-  if (!address.city?.trim()) errors.push('City is required')
-  if (!address.state) errors.push('State is required')
-  if (!address.zip?.trim()) errors.push('ZIP code is required')
-  else if (!/^\d{5}(-\d{4})?$/.test(address.zip)) errors.push('Invalid ZIP format')
+  // Validate primary borrower
+  const primary = validateSingleBorrowerAddress(data.borrowers?.[0] || {}, hasCoBorrower ? 'Primary Borrower' : 'Borrower')
+  errors.push(...primary.errors)
+  warnings.push(...primary.warnings)
 
-  if (!currentAddress.housingType) errors.push('Housing type is required')
-  if (currentAddress.housingType === 'rent' && !currentAddress.monthlyRent) {
-    errors.push('Monthly rent is required')
-  }
-
-  const totalMonths = ((currentAddress.durationYears || 0) * 12) + (currentAddress.durationMonths || 0)
-  if (totalMonths < 24) {
-    warnings.push('Less than 2 years at current address - previous address may be required')
+  // Validate co-borrower if present
+  if (hasCoBorrower) {
+    const coBorrowerResult = validateSingleBorrowerAddress(data.borrowers?.[1] || {}, 'Co-Borrower')
+    errors.push(...coBorrowerResult.errors)
+    warnings.push(...coBorrowerResult.warnings)
   }
 
   return { valid: errors.length === 0, errors, warnings }
@@ -72,25 +110,23 @@ export function validateMilitaryStep(data: any): ValidationResult {
   return { valid: errors.length === 0, errors, warnings }
 }
 
-export function validateEmploymentStep(data: any): ValidationResult {
+function validateSingleBorrowerEmployment(borrower: any, label: string): { errors: string[], warnings: string[], totalIncome: number } {
   const errors: string[] = []
   const warnings: string[] = []
-  const borrower = data.borrowers?.[0] || {}
-  // Ensure employment is always an array (could be object or undefined)
   const employment = Array.isArray(borrower.employment) ? borrower.employment : []
 
   if (employment.length === 0) {
-    errors.push('At least one employment record is required')
-    return { valid: false, errors, warnings }
+    errors.push(`${label}: At least one employment record is required`)
+    return { errors, warnings, totalIncome: 0 }
   }
 
   const currentEmployment = employment.find((e: any) => e.current)
   if (!currentEmployment) {
-    errors.push('Current employment is required')
+    errors.push(`${label}: Current employment is required`)
   } else {
-    if (!currentEmployment.employerName?.trim()) errors.push('Employer name is required')
+    if (!currentEmployment.employerName?.trim()) errors.push(`${label}: Employer name is required`)
     if (!currentEmployment.monthlyIncome || currentEmployment.monthlyIncome <= 0) {
-      errors.push('Monthly income is required')
+      errors.push(`${label}: Monthly income is required`)
     }
   }
 
@@ -98,8 +134,32 @@ export function validateEmploymentStep(data: any): ValidationResult {
     .filter((e: any) => e.current)
     .reduce((sum: number, e: any) => sum + (e.monthlyIncome || 0), 0)
 
-  if (totalIncome < 1000) {
-    warnings.push('Monthly income appears low for mortgage qualification')
+  return { errors, warnings, totalIncome }
+}
+
+export function validateEmploymentStep(data: any): ValidationResult {
+  const errors: string[] = []
+  const warnings: string[] = []
+  const hasCoBorrower = data.borrowers?.length > 1
+
+  // Validate primary borrower
+  const primary = validateSingleBorrowerEmployment(data.borrowers?.[0] || {}, hasCoBorrower ? 'Primary Borrower' : 'Borrower')
+  errors.push(...primary.errors)
+  warnings.push(...primary.warnings)
+
+  // Validate co-borrower if present
+  let coBorrowerIncome = 0
+  if (hasCoBorrower) {
+    const coBorrowerResult = validateSingleBorrowerEmployment(data.borrowers?.[1] || {}, 'Co-Borrower')
+    errors.push(...coBorrowerResult.errors)
+    warnings.push(...coBorrowerResult.warnings)
+    coBorrowerIncome = coBorrowerResult.totalIncome
+  }
+
+  // Combined income warning
+  const totalCombinedIncome = primary.totalIncome + coBorrowerIncome
+  if (totalCombinedIncome < 1000) {
+    warnings.push('Combined monthly income appears low for mortgage qualification')
   }
 
   return { valid: errors.length === 0, errors, warnings }

@@ -45,8 +45,10 @@
     "next": "*",
     "next-auth": "^4.24.13",
     "pdfmake": "^0.3.3",
+    "plaid": "^26.0.0",
     "react": "*",
     "react-dom": "*",
+    "react-plaid-link": "^3.6.1",
     "recharts": "^3.7.0",
     "swr": "^2.4.0"
   }

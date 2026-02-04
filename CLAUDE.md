@@ -98,7 +98,7 @@ npm run test:schemas        # Schema validation only
 3. Follow Tailwind component classes from `globals.css`
 4. Add tests for new business logic
 
-## Completed Features (17 tasks)
+## Completed Features (19 tasks)
 
 - DM-1: Full URLA 2020 Schema
 - FE-01: Multi-Step Wizard
@@ -117,6 +117,20 @@ npm run test:schemas        # Schema validation only
 - PREQUAL-01: Pre-Qualification Calculator
 - ANALYTICS-01: Admin Analytics
 - COMPARE-01: Loan Comparison Tool
+- UX-01: Address Autocomplete (Google Places)
+- INTEG-02: Plaid Integration (Bank/Income)
+
+## Task Management Protocol
+
+**When completing a task:**
+1. Mark status as `DONE` in the task file
+2. Update `TASKS.md` with completion details
+3. **Move the task file to `.claude/tasks/archive/`**
+4. Update `SESSION.md` with session notes
+
+Task specs live in `.claude/tasks/` (active) and `.claude/tasks/archive/` (completed).
+
+---
 
 ## Future Work
 

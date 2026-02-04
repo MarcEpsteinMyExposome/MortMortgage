@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import BorrowerTabs from '../BorrowerTabs'
 import {
   fakeName,
   fakeSSN,
@@ -11,7 +12,36 @@ import {
   randomChoice
 } from '../../lib/fake-data'
 
-export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, onBack, isFirst }: StepProps) {
+// Extended StepProps to include co-borrower state
+export interface IdentityStepProps extends StepProps {
+  hasCoBorrower?: boolean
+  activeBorrowerIndex?: number
+  onToggleCoBorrower?: (enabled: boolean) => void
+  onBorrowerIndexChange?: (index: number) => void
+}
+
+export default function IdentityStep({
+  data,
+  borrowerIndex: propBorrowerIndex,
+  onUpdate,
+  onNext,
+  onBack,
+  isFirst,
+  hasCoBorrower: propHasCoBorrower,
+  activeBorrowerIndex: propActiveBorrowerIndex,
+  onToggleCoBorrower,
+  onBorrowerIndexChange
+}: IdentityStepProps) {
+  // Use props if provided, otherwise manage state internally
+  const [internalHasCoBorrower, setInternalHasCoBorrower] = useState(
+    data.borrowers?.length > 1
+  )
+  const [internalActiveBorrowerIndex, setInternalActiveBorrowerIndex] = useState(0)
+
+  const hasCoBorrower = propHasCoBorrower !== undefined ? propHasCoBorrower : internalHasCoBorrower
+  const activeBorrowerIndex = propActiveBorrowerIndex !== undefined ? propActiveBorrowerIndex : internalActiveBorrowerIndex
+  const borrowerIndex = hasCoBorrower ? activeBorrowerIndex : 0
+
   const borrower = data.borrowers?.[borrowerIndex] || {}
   const name = borrower.name || {}
   const deps = borrower.dependents || { count: 0, ages: [] }
@@ -35,6 +65,71 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
   const [alternateNames, setAlternateNames] = useState<string[]>(borrower.alternateNames || [])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Reset form when switching between borrowers
+  useEffect(() => {
+    const currentBorrower = data.borrowers?.[borrowerIndex] || {}
+    const currentName = currentBorrower.name || {}
+    const currentDeps = currentBorrower.dependents || { count: 0, ages: [] }
+
+    setFirstName(currentName.firstName || '')
+    setMiddleName(currentName.middleName || '')
+    setLastName(currentName.lastName || '')
+    setSuffix(currentName.suffix || '')
+    setSsn(currentBorrower.ssn || '')
+    setDob(currentBorrower.dob || '')
+    setCitizenship(currentBorrower.citizenship || '')
+    setMaritalStatus(currentBorrower.maritalStatus || '')
+    setEmail(currentBorrower.contact?.email || '')
+    setCellPhone(currentBorrower.contact?.cellPhone || '')
+    setDependentCount(currentDeps.count || 0)
+    setDependentAges(currentDeps.ages || [])
+    setAlternateNames(currentBorrower.alternateNames || [])
+    setErrors({})
+  }, [borrowerIndex, data.borrowers])
+
+  function handleToggleCoBorrower(enabled: boolean) {
+    if (onToggleCoBorrower) {
+      onToggleCoBorrower(enabled)
+    } else {
+      setInternalHasCoBorrower(enabled)
+    }
+
+    // Initialize co-borrower data structure if enabling
+    if (enabled && (!data.borrowers || data.borrowers.length < 2)) {
+      const updatedBorrowers = [...(data.borrowers || [])]
+      // Ensure primary borrower exists
+      if (updatedBorrowers.length === 0) {
+        updatedBorrowers.push({ borrowerType: 'borrower' })
+      }
+      // Add co-borrower placeholder
+      updatedBorrowers.push({ borrowerType: 'co_borrower' })
+      onUpdate('borrowers', updatedBorrowers)
+    }
+
+    // Remove co-borrower data if disabling
+    if (!enabled && data.borrowers?.length > 1) {
+      const updatedBorrowers = [data.borrowers[0]]
+      onUpdate('borrowers', updatedBorrowers)
+      // Reset to primary borrower tab
+      if (onBorrowerIndexChange) {
+        onBorrowerIndexChange(0)
+      } else {
+        setInternalActiveBorrowerIndex(0)
+      }
+    }
+  }
+
+  function handleTabChange(index: number) {
+    // Save current borrower data before switching
+    saveCurrentBorrower()
+
+    if (onBorrowerIndexChange) {
+      onBorrowerIndexChange(index)
+    } else {
+      setInternalActiveBorrowerIndex(index)
+    }
+  }
 
   function populateWithFakeData() {
     const fakeName_ = fakeName()
@@ -97,10 +192,36 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
     return Object.keys(newErrors).length === 0
   }
 
-  function handleSave() {
-    if (!validate()) return
+  function validateBothBorrowers(): boolean {
+    if (!hasCoBorrower) return validate()
 
+    // Validate current borrower
+    const currentValid = validate()
+    if (!currentValid) return false
+
+    // Check if the other borrower has required data
+    const otherIndex = borrowerIndex === 0 ? 1 : 0
+    const otherBorrower = data.borrowers?.[otherIndex] || {}
+    const otherName = otherBorrower.name || {}
+
+    if (!otherName.firstName?.trim() || !otherName.lastName?.trim() || !otherBorrower.citizenship) {
+      // Switch to the other tab and show error
+      alert(`Please complete the required fields for the ${otherIndex === 0 ? 'Primary Borrower' : 'Co-Borrower'}`)
+      handleTabChange(otherIndex)
+      return false
+    }
+
+    return true
+  }
+
+  function saveCurrentBorrower() {
     const updatedBorrowers = [...(data.borrowers || [])]
+
+    // Ensure we have enough borrower slots
+    while (updatedBorrowers.length <= borrowerIndex) {
+      updatedBorrowers.push({ borrowerType: updatedBorrowers.length === 0 ? 'borrower' : 'co_borrower' })
+    }
+
     updatedBorrowers[borrowerIndex] = {
       ...updatedBorrowers[borrowerIndex],
       borrowerType: borrowerIndex === 0 ? 'borrower' : 'co_borrower',
@@ -128,7 +249,47 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
     }
 
     onUpdate('borrowers', updatedBorrowers)
-    onNext()
+  }
+
+  function handleSave() {
+    if (!validate()) return
+
+    saveCurrentBorrower()
+
+    // If we have a co-borrower, validate both before proceeding
+    if (hasCoBorrower) {
+      // We need to check the other borrower after saving current
+      setTimeout(() => {
+        if (validateBothBorrowers()) {
+          onNext()
+        }
+      }, 100)
+    } else {
+      onNext()
+    }
+  }
+
+  // Calculate validation status for both borrowers
+  function getBorrowerValidation() {
+    const primaryBorrower = data.borrowers?.[0] || {}
+    const coBorrower = data.borrowers?.[1] || {}
+
+    const isPrimaryValid = !!(
+      primaryBorrower.name?.firstName?.trim() &&
+      primaryBorrower.name?.lastName?.trim() &&
+      primaryBorrower.citizenship
+    )
+
+    const isCoBorrowerValid = !hasCoBorrower || !!(
+      coBorrower.name?.firstName?.trim() &&
+      coBorrower.name?.lastName?.trim() &&
+      coBorrower.citizenship
+    )
+
+    return {
+      primary: isPrimaryValid,
+      coBorrower: isCoBorrowerValid
+    }
   }
 
   return (
@@ -143,6 +304,16 @@ export default function IdentityStep({ data, borrowerIndex, onUpdate, onNext, on
           Populate with Fake Data
         </button>
       </div>
+
+      {/* Co-Borrower Toggle and Tabs */}
+      <BorrowerTabs
+        hasCoBorrower={hasCoBorrower}
+        activeBorrowerIndex={borrowerIndex}
+        onTabChange={handleTabChange}
+        onToggleCoBorrower={handleToggleCoBorrower}
+        showToggle={true}
+        borrowerValidation={getBorrowerValidation()}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label className="flex flex-col">

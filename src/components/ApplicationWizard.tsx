@@ -16,6 +16,11 @@ export type StepProps = {
   isFirst: boolean
   isLast: boolean
   validation?: ValidationResult
+  // Co-borrower props
+  hasCoBorrower?: boolean
+  activeBorrowerIndex?: number
+  onToggleCoBorrower?: (enabled: boolean) => void
+  onBorrowerIndexChange?: (index: number) => void
 }
 
 type Props = {
@@ -52,9 +57,20 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
   const [stepValidation, setStepValidation] = useState<Record<string, ValidationResult>>({})
   const [showValidationPanel, setShowValidationPanel] = useState(false)
 
+  // Co-borrower state
+  const [hasCoBorrower, setHasCoBorrower] = useState(initialData.borrowers?.length > 1)
+  const [activeBorrowerIndex, setActiveBorrowerIndex] = useState(0)
+
   const step = steps[currentStep]
   const StepComponent = step.component
   const currentValidation = stepValidation[step.id]
+
+  // Sync hasCoBorrower state with data
+  useEffect(() => {
+    if (data.borrowers?.length > 1) {
+      setHasCoBorrower(true)
+    }
+  }, [data.borrowers])
 
   // Validate all steps when data changes
   useEffect(() => {
@@ -82,6 +98,19 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
     }
   }
 
+  function handleToggleCoBorrower(enabled: boolean) {
+    setHasCoBorrower(enabled)
+
+    // Reset to primary borrower when disabling
+    if (!enabled) {
+      setActiveBorrowerIndex(0)
+    }
+  }
+
+  function handleBorrowerIndexChange(index: number) {
+    setActiveBorrowerIndex(index)
+  }
+
   function handleNext() {
     // Validate current step before allowing navigation
     const validation = validateStep(step.id, data)
@@ -89,6 +118,9 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
       // Still allow navigation but show warnings
       setShowValidationPanel(true)
     }
+
+    // Reset borrower index when moving to next step
+    setActiveBorrowerIndex(0)
 
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
@@ -107,11 +139,15 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
 
   function handleBack() {
     if (currentStep > 0) {
+      // Reset borrower index when going back
+      setActiveBorrowerIndex(0)
       setCurrentStep(currentStep - 1)
     }
   }
 
   function goToStep(index: number) {
+    // Reset borrower index when navigating to different step
+    setActiveBorrowerIndex(0)
     setCurrentStep(index)
   }
 
@@ -126,6 +162,10 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
   const completedSteps = Object.values(stepValidation).filter(v => v.valid).length
   const totalSteps = steps.length
   const progressPercent = (completedSteps / totalSteps) * 100
+
+  // Determine which steps need borrower-specific UI (identity, address, employment, military)
+  const borrowerSteps = ['identity', 'address', 'employment', 'military']
+  const isBorrowerStep = borrowerSteps.includes(step.id)
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -207,6 +247,11 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
             <span className="text-sm text-gray-500">
               {step.title}
             </span>
+            {hasCoBorrower && isBorrowerStep && (
+              <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">
+                Co-Borrower Added
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
@@ -301,6 +346,11 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
           isFirst={currentStep === 0}
           isLast={currentStep === steps.length - 1}
           validation={currentValidation}
+          // Pass co-borrower props to borrower-specific steps
+          hasCoBorrower={hasCoBorrower}
+          activeBorrowerIndex={activeBorrowerIndex}
+          onToggleCoBorrower={handleToggleCoBorrower}
+          onBorrowerIndexChange={handleBorrowerIndexChange}
         />
       </div>
     </div>

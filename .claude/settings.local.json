@@ -6,6 +6,8 @@
       "Write(*)",
       "Glob(*)",
       "Grep(*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git status:*)",
@@ -30,8 +32,7 @@
       "Bash(Select-Object FullName)",
       "Bash(npm uninstall:*)",
       "Bash(powershell:*)",
-      "Bash(git reset:*)"
-    ],
+      "Bash(git reset:*)"    ],
     "deny": [
       "Bash(rm:*)",
       "Bash(git push:*)",

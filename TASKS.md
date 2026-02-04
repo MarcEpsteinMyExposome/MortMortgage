@@ -86,7 +86,9 @@ npm run test:schemas  # Run schema validation tests
 | PREQUAL-01 | Pre-Qualification Calculator | DONE |
 | ANALYTICS-01 | Admin Analytics Dashboard | DONE |
 | COMPARE-01 | Loan Comparison Tool | DONE |
-| CO-BORROWER-01 | Co-Borrower UI | SKIPPED |
+| UX-01 | Address Autocomplete (Google Places) | DONE |
+| INTEG-02 | Plaid Integration (Bank/Income) | DONE |
+| CO-BORROWER-02 | Co-Borrower UI | DONE |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 
 ---
@@ -102,7 +104,7 @@ Four features implemented in parallel:
 | ANALYTICS-01 | Admin Analytics Dashboard | `/admin/analytics` | `analytics.tsx`, `charts/`, API endpoint |
 | COMPARE-01 | Loan Comparison Tool | `/compare` | `compare.tsx`, `lib/loan-calculator.ts` |
 
-Task specs archived in `.claude/tasks/` for reference.
+Task specs archived in `.claude/tasks/archive/` for reference.
 
 ---
 
@@ -311,9 +313,103 @@ Task specs archived in `.claude/tasks/` for reference.
 - `src/components/LoanScenarioCard.tsx`
 - `src/__tests__/loan-calculator.test.ts`
 
+### UX-01: Address Autocomplete — Completed 2026-02-04
+**Status**: DONE
+**Goal**: Google Places autocomplete for address fields
+**Completed**:
+- [x] Autocomplete dropdown with US address suggestions
+- [x] Auto-fill street, city, state, zip on selection
+- [x] Keyboard navigation (up/down/enter/escape)
+- [x] Loading indicator while fetching
+- [x] Graceful fallback to manual entry if no API key
+- [x] Works on AddressForm (current residence)
+- [x] Works on PropertyForm (subject property)
+- [x] Mobile-friendly with proper ARIA attributes
+
+**Files created:**
+- `src/components/AddressAutocomplete.tsx` - Reusable autocomplete component
+- `src/hooks/useDebounce.ts` - Debounce hook for API calls (300ms)
+- `src/pages/api/places/autocomplete.ts` - Proxy API (hides API key)
+- `src/pages/api/places/details.ts` - Place details for address parsing
+
+**Files modified:**
+- `src/components/steps/AddressForm.tsx` - Uses AddressAutocomplete
+- `src/components/steps/PropertyForm.tsx` - Uses AddressAutocomplete
+- `.env.example` - Added GOOGLE_PLACES_API_KEY template
+
+**Setup:**
+Add to `.env.local`:
+```
+GOOGLE_PLACES_API_KEY=your_api_key_here
+```
+Get API key at: https://console.cloud.google.com/apis/credentials
+Enable: Places API, Geocoding API
+
+### INTEG-02: Plaid Integration — Completed 2026-02-04
+**Status**: DONE
+**Goal**: Bank account linking and income verification via Plaid
+**Completed**:
+- [x] Plaid Link integration with "Connect Bank Account" button
+- [x] Bank account display (masked numbers, institution name, balances)
+- [x] Income verification with verified annual/monthly income
+- [x] Sandbox mode with test credentials (user_good / pass_good)
+- [x] Demo mode fallback when Plaid is not configured
+- [x] Manual entry fallback with toggle
+- [x] Loading states and error handling
+- [x] Auto-populate monthly income from verified data
+
+**Files created:**
+- `src/lib/integrations/plaid.ts` - Plaid client and helpers
+- `src/pages/api/plaid/create-link-token.ts` - API to create link token
+- `src/pages/api/plaid/exchange-token.ts` - API to exchange public token
+- `src/pages/api/plaid/get-accounts.ts` - API to fetch/disconnect accounts
+- `src/components/PlaidLink.tsx` - Plaid Link button and account display components
+
+**Files modified:**
+- `src/components/steps/EmploymentForm.tsx` - Added Plaid connect option
+- `package.json` - Added `plaid` and `react-plaid-link` dependencies
+- `.env.example` - Added Plaid env vars template
+
+**Setup:**
+Add to `.env.local`:
+```
+PLAID_CLIENT_ID=your_client_id_here
+PLAID_SECRET=your_sandbox_secret_here
+PLAID_ENV=sandbox
+```
+Get credentials at: https://dashboard.plaid.com/signup (free)
+
+**Sandbox Test Credentials:**
+- Username: `user_good`
+- Password: `pass_good`
+- MFA code: `1234`
+
 ---
 
 ## Future Tasks (TBD/Skipped)
+
+### INTEG-03: eSign Integration (DocuSign)
+**Status**: TODO
+**Priority**: Medium
+**Complexity**: Medium-High
+**Dependencies**: PDF-01 (URLA PDF Export)
+**Goal**: Electronic document signing via DocuSign
+**Would include**:
+- Sign Application button on review step
+- DocuSign envelope creation with PDF
+- Embedded signing flow (sign within app)
+- Co-borrower signatures (sequential)
+- Webhook handling for status updates
+- Signed document storage
+- Sandbox mode for demos
+
+**Implementation Phases**:
+1. Basic Integration (JWT auth, create envelope, redirect signing)
+2. Embedded Signing (sign within app, status UI)
+3. Webhooks & Status (auto-updates, store signed docs)
+4. Co-Borrower Support (multi-signer, sequential routing)
+
+**Task Spec**: `.claude/tasks/INTEG-03.md`
 
 ### TEST-01: E2E Tests (Cypress)
 **Status**: TBD - Future
@@ -323,9 +419,29 @@ Task specs archived in `.claude/tasks/` for reference.
 - Admin portal test
 - Export functionality test (including PDF)
 
-### CO-BORROWER-01: Co-Borrower Support
-**Status**: Skipped per user request
-**Notes**: Schema supports co-borrowers, UI implementation deferred
+### CO-BORROWER-02: Co-Borrower UI — Completed 2026-02-04
+**Status**: DONE
+**Goal**: Add co-borrower support to mortgage application wizard
+**Completed**:
+- [x] BorrowerTabs component for switching between Primary/Co-Borrower
+- [x] "Add Co-Borrower" toggle on Identity step
+- [x] Tab-based UI for Identity, Address, Employment steps
+- [x] Form state resets when switching between borrowers
+- [x] Validation for both borrowers before proceeding
+- [x] Admin detail page shows co-borrower information
+- [x] PDF export already supports multiple borrowers (via buildBorrowerSection)
+- [x] Remove co-borrower functionality
+
+**Files created:**
+- `src/components/BorrowerTabs.tsx` - Reusable tabs component with validation indicators
+
+**Files modified:**
+- `src/components/ApplicationWizard.tsx` - Added hasCoBorrower and activeBorrowerIndex state
+- `src/components/steps/IdentityStep.tsx` - Added toggle and tabs support
+- `src/components/steps/AddressForm.tsx` - Added tabs support
+- `src/components/steps/EmploymentForm.tsx` - Added tabs support
+- `src/pages/admin/apps/[id].tsx` - Display co-borrower details
+- `src/lib/form-validator.ts` - Validate both borrowers when co-borrower exists
 
 ---
 
@@ -439,6 +555,7 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 - 2026-02-03: Completed COMPARE-01 (loan comparison tool)
 - 2026-02-03: Fixed sign-out redirect bug (uses window.location.origin)
 - 2026-02-03: Created CLAUDE.md as project entry point
+- 2026-02-04: Completed UX-01 (address autocomplete with Google Places API)
 
 ---
 

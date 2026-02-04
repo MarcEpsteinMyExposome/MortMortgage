@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { StepProps } from '../ApplicationWizard'
+import BorrowerTabs from '../BorrowerTabs'
 import { fakeAddress, fakeMonthlyRent, randomChoice } from '../../lib/fake-data'
+import AddressAutocomplete, { ParsedAddress } from '../AddressAutocomplete'
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
@@ -8,7 +10,35 @@ const US_STATES = [
   'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'
 ]
 
-export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onBack, isFirst }: StepProps) {
+// Extended StepProps to include co-borrower state
+export interface AddressFormProps extends StepProps {
+  hasCoBorrower?: boolean
+  activeBorrowerIndex?: number
+  onBorrowerIndexChange?: (index: number) => void
+}
+
+export default function AddressForm({
+  data,
+  borrowerIndex: propBorrowerIndex,
+  onUpdate,
+  onNext,
+  onBack,
+  isFirst,
+  hasCoBorrower: propHasCoBorrower,
+  activeBorrowerIndex: propActiveBorrowerIndex,
+  onBorrowerIndexChange
+}: AddressFormProps) {
+  // Determine if co-borrower exists from data
+  const hasCoBorrower = propHasCoBorrower !== undefined
+    ? propHasCoBorrower
+    : (data.borrowers?.length > 1)
+
+  const [internalActiveBorrowerIndex, setInternalActiveBorrowerIndex] = useState(0)
+  const activeBorrowerIndex = propActiveBorrowerIndex !== undefined
+    ? propActiveBorrowerIndex
+    : internalActiveBorrowerIndex
+  const borrowerIndex = hasCoBorrower ? activeBorrowerIndex : 0
+
   const borrower = data.borrowers?.[borrowerIndex] || {}
   const currentAddress = borrower.currentAddress || {}
   const address = currentAddress.address || {}
@@ -24,6 +54,35 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
   const [durationMonths, setDurationMonths] = useState(currentAddress.durationMonths || '')
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Reset form when switching between borrowers
+  useEffect(() => {
+    const currentBorrower = data.borrowers?.[borrowerIndex] || {}
+    const currentAddressData = currentBorrower.currentAddress || {}
+    const addressData = currentAddressData.address || {}
+
+    setStreet(addressData.street || '')
+    setUnit(addressData.unit || '')
+    setCity(addressData.city || '')
+    setState(addressData.state || '')
+    setZip(addressData.zip || '')
+    setHousingType(currentAddressData.housingType || '')
+    setMonthlyRent(currentAddressData.monthlyRent || '')
+    setDurationYears(currentAddressData.durationYears || '')
+    setDurationMonths(currentAddressData.durationMonths || '')
+    setErrors({})
+  }, [borrowerIndex, data.borrowers])
+
+  function handleTabChange(index: number) {
+    // Save current borrower data before switching
+    saveCurrentBorrower()
+
+    if (onBorrowerIndexChange) {
+      onBorrowerIndexChange(index)
+    } else {
+      setInternalActiveBorrowerIndex(index)
+    }
+  }
 
   function populateWithFakeData() {
     const fakeAddr = fakeAddress()
@@ -53,10 +112,37 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
     return Object.keys(newErrors).length === 0
   }
 
-  function handleSave() {
-    if (!validate()) return
+  function validateBothBorrowers(): boolean {
+    if (!hasCoBorrower) return validate()
 
+    // Validate current borrower
+    const currentValid = validate()
+    if (!currentValid) return false
+
+    // Check if the other borrower has required address data
+    const otherIndex = borrowerIndex === 0 ? 1 : 0
+    const otherBorrower = data.borrowers?.[otherIndex] || {}
+    const otherAddress = otherBorrower.currentAddress?.address || {}
+
+    if (!otherAddress.street?.trim() || !otherAddress.city?.trim() ||
+        !otherAddress.state || !otherAddress.zip?.trim() ||
+        !otherBorrower.currentAddress?.housingType) {
+      alert(`Please complete the address for the ${otherIndex === 0 ? 'Primary Borrower' : 'Co-Borrower'}`)
+      handleTabChange(otherIndex)
+      return false
+    }
+
+    return true
+  }
+
+  function saveCurrentBorrower() {
     const updatedBorrowers = [...(data.borrowers || [])]
+
+    // Ensure we have enough borrower slots
+    while (updatedBorrowers.length <= borrowerIndex) {
+      updatedBorrowers.push({ borrowerType: updatedBorrowers.length === 0 ? 'borrower' : 'co_borrower' })
+    }
+
     updatedBorrowers[borrowerIndex] = {
       ...updatedBorrowers[borrowerIndex],
       currentAddress: {
@@ -77,7 +163,50 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
     }
 
     onUpdate('borrowers', updatedBorrowers)
-    onNext()
+  }
+
+  function handleSave() {
+    if (!validate()) return
+
+    saveCurrentBorrower()
+
+    // If we have a co-borrower, validate both before proceeding
+    if (hasCoBorrower) {
+      setTimeout(() => {
+        if (validateBothBorrowers()) {
+          onNext()
+        }
+      }, 100)
+    } else {
+      onNext()
+    }
+  }
+
+  // Calculate validation status for both borrowers
+  function getBorrowerValidation() {
+    const primaryBorrower = data.borrowers?.[0] || {}
+    const coBorrower = data.borrowers?.[1] || {}
+
+    const isPrimaryValid = !!(
+      primaryBorrower.currentAddress?.address?.street?.trim() &&
+      primaryBorrower.currentAddress?.address?.city?.trim() &&
+      primaryBorrower.currentAddress?.address?.state &&
+      primaryBorrower.currentAddress?.address?.zip?.trim() &&
+      primaryBorrower.currentAddress?.housingType
+    )
+
+    const isCoBorrowerValid = !hasCoBorrower || !!(
+      coBorrower.currentAddress?.address?.street?.trim() &&
+      coBorrower.currentAddress?.address?.city?.trim() &&
+      coBorrower.currentAddress?.address?.state &&
+      coBorrower.currentAddress?.address?.zip?.trim() &&
+      coBorrower.currentAddress?.housingType
+    )
+
+    return {
+      primary: isPrimaryValid,
+      coBorrower: isCoBorrowerValid
+    }
   }
 
   return (
@@ -93,17 +222,35 @@ export default function AddressForm({ data, borrowerIndex, onUpdate, onNext, onB
         </button>
       </div>
 
+      {/* Borrower Tabs - no toggle here, just tabs for switching */}
+      {hasCoBorrower && (
+        <BorrowerTabs
+          hasCoBorrower={hasCoBorrower}
+          activeBorrowerIndex={borrowerIndex}
+          onTabChange={handleTabChange}
+          onToggleCoBorrower={() => {}} // No toggle on address step
+          showToggle={false}
+          borrowerValidation={getBorrowerValidation()}
+        />
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <label className="flex flex-col col-span-2">
+        <div className="flex flex-col col-span-2">
           <span className="text-sm font-medium">Street Address *</span>
-          <input
+          <AddressAutocomplete
             value={street}
-            onChange={(e) => setStreet(e.target.value)}
-            className={`input ${errors.street ? 'border-red-500' : ''}`}
-            placeholder="123 Main St"
+            onChange={setStreet}
+            onSelect={(addr: ParsedAddress) => {
+              setStreet(addr.street)
+              setCity(addr.city)
+              setState(addr.state)
+              setZip(addr.zip)
+            }}
+            placeholder="Start typing address..."
+            error={errors.street}
           />
           {errors.street && <span className="text-red-500 text-xs">{errors.street}</span>}
-        </label>
+        </div>
 
         <label className="flex flex-col">
           <span className="text-sm font-medium">Unit/Apt</span>

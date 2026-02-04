@@ -295,6 +295,8 @@ export default function AdminAppDetail() {
   }
 
   const borrower = app.borrowers?.[0] || {}
+  const coBorrower = app.borrowers?.[1] || null
+  const hasCoBorrower = app.borrowers?.length > 1
   const loan = app.data?.loan || {}
   const property = app.data?.property || {}
   const assets = app.data?.assets?.assets || []
@@ -672,7 +674,16 @@ export default function AdminAppDetail() {
 
         {/* Borrower Information */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Borrower Information</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">
+              {hasCoBorrower ? 'Primary Borrower' : 'Borrower Information'}
+            </h2>
+            {hasCoBorrower && (
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                Co-Borrower Application
+              </span>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="text-sm text-gray-500">Name</h4>
@@ -717,26 +728,98 @@ export default function AdminAppDetail() {
               </div>
             )}
           </div>
-        </div>
 
-        {/* Employment */}
-        {borrower.employment && borrower.employment.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">Employment</h2>
-            {borrower.employment.map((emp: any, i: number) => (
-              <div key={i} className={`${i > 0 ? 'mt-4 pt-4 border-t' : ''}`}>
-                <div className="flex justify-between">
-                  <div>
-                    <p className="font-medium">{emp.employerName}</p>
-                    <p className="text-sm text-gray-600">{emp.position}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">${(emp.monthlyIncome || 0).toLocaleString()}/mo</p>
-                    <p className="text-sm text-gray-600">{emp.current ? 'Current' : 'Previous'}</p>
+          {/* Primary Borrower Employment */}
+          {borrower.employment && borrower.employment.length > 0 && (
+            <div className="mt-6 pt-6 border-t">
+              <h3 className="text-md font-semibold mb-3">Employment</h3>
+              {borrower.employment.map((emp: any, i: number) => (
+                <div key={i} className={`${i > 0 ? 'mt-4 pt-4 border-t border-gray-100' : ''}`}>
+                  <div className="flex justify-between">
+                    <div>
+                      <p className="font-medium">{emp.employerName}</p>
+                      <p className="text-sm text-gray-600">{emp.position}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">${(emp.monthlyIncome || 0).toLocaleString()}/mo</p>
+                      <p className="text-sm text-gray-600">{emp.current ? 'Current' : 'Previous'}</p>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Co-Borrower Information */}
+        {hasCoBorrower && coBorrower && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6 border-l-4 border-blue-500">
+            <h2 className="text-lg font-semibold mb-4">Co-Borrower</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm text-gray-500">Name</h4>
+                <p>{coBorrower.name?.firstName} {coBorrower.name?.middleName} {coBorrower.name?.lastName} {coBorrower.name?.suffix}</p>
               </div>
-            ))}
+              <div>
+                <h4 className="text-sm text-gray-500">SSN</h4>
+                <p className="font-mono">{coBorrower.ssn || '-'}</p>
+              </div>
+              <div>
+                <h4 className="text-sm text-gray-500">Date of Birth</h4>
+                <p>{coBorrower.dob || '-'}</p>
+              </div>
+              <div>
+                <h4 className="text-sm text-gray-500">Citizenship</h4>
+                <p className="capitalize">{coBorrower.citizenship?.replace(/_/g, ' ') || '-'}</p>
+              </div>
+              <div>
+                <h4 className="text-sm text-gray-500">Email</h4>
+                <p>{coBorrower.contact?.email || '-'}</p>
+              </div>
+              <div>
+                <h4 className="text-sm text-gray-500">Phone</h4>
+                <p>{coBorrower.contact?.cellPhone || '-'}</p>
+              </div>
+              {coBorrower.currentAddress?.address && (
+                <div className="col-span-2">
+                  <h4 className="text-sm text-gray-500">Current Address</h4>
+                  <p>
+                    {coBorrower.currentAddress.address.street}
+                    {coBorrower.currentAddress.address.unit && `, ${coBorrower.currentAddress.address.unit}`}
+                    <br />
+                    {coBorrower.currentAddress.address.city}, {coBorrower.currentAddress.address.state} {coBorrower.currentAddress.address.zip}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {coBorrower.currentAddress.housingType === 'own' ? 'Owns' :
+                     coBorrower.currentAddress.housingType === 'rent' ? `Rents ($${coBorrower.currentAddress.monthlyRent}/mo)` :
+                     'Living rent-free'}
+                    {' - '}
+                    {coBorrower.currentAddress.durationYears || 0} years, {coBorrower.currentAddress.durationMonths || 0} months
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Co-Borrower Employment */}
+            {coBorrower.employment && coBorrower.employment.length > 0 && (
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="text-md font-semibold mb-3">Employment</h3>
+                {coBorrower.employment.map((emp: any, i: number) => (
+                  <div key={i} className={`${i > 0 ? 'mt-4 pt-4 border-t border-gray-100' : ''}`}>
+                    <div className="flex justify-between">
+                      <div>
+                        <p className="font-medium">{emp.employerName}</p>
+                        <p className="text-sm text-gray-600">{emp.position}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">${(emp.monthlyIncome || 0).toLocaleString()}/mo</p>
+                        <p className="text-sm text-gray-600">{emp.current ? 'Current' : 'Previous'}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
