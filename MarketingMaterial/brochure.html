@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MortMortgage - Product Overview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+        
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        @page :first {
+            margin: 0;
+        }
+        
+        /* Cover Page */
+        .cover {
+            width: 210mm;
+            height: 297mm;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+            background: linear-gradient(135deg, #0d7377 0%, #14919b 50%, #14b8a6 100%);
+        }
+        
+        .cover-circle-1 {
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        .cover-circle-2 {
+            position: absolute;
+            bottom: -120px;
+            left: -80px;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+        }
+        
+        .cover-square {
+            position: absolute;
+            top: 50px;
+            left: 40px;
+            width: 70px;
+            height: 70px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            transform: rotate(15deg);
+        }
+        
+        .cover-dot {
+            position: absolute;
+            top: 100px;
+            right: 80px;
+            width: 50px;
+            height: 50px;
+            background: rgba(251, 146, 60, 0.4);
+            border-radius: 50%;
+        }
+        
+        .cover-image {
+            position: absolute;
+            bottom: 30px;
+            right: 20px;
+            width: 50%;
+            max-height: 50%;
+            z-index: 1;
+        }
+        
+        .cover-content {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            transform: translateY(-50%);
+            z-index: 2;
+            max-width: 50%;
+            color: white;
+        }
+        
+        .cover-label {
+            font-size: 12pt;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .cover-title {
+            font-size: 36pt;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 18px;
+        }
+        
+        .cover-title span {
+            color: #fb923c;
+        }
+        
+        .cover-subtitle {
+            font-size: 12pt;
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: 35px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .cover-tagline {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 10pt;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Content Pages */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm 18mm;
+            page-break-after: always;
+            position: relative;
+            background: white;
+        }
+        
+        .page:last-child {
+            page-break-after: auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+        
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0d7377, #14b8a6);
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
+        .section-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: white;
+        }
+        
+        .section-title {
+            font-size: 22pt;
+            font-weight: 700;
+            color: #0d7377;
+            margin-bottom: 6px;
+        }
+        
+        .section-subtitle {
+            font-size: 11pt;
+            color: #718096;
+        }
+        
+        /* Feature Cards */
+        .feature-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid #14b8a6;
+        }
+        
+        .feature-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .feature-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .feature-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        
+        .feature-icon.teal { background: linear-gradient(135deg, #0d7377, #14b8a6); }
+        .feature-icon.orange { background: linear-gradient(135deg, #f97316, #fb923c); }
+        .feature-icon.purple { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+        .feature-icon.blue { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+        .feature-icon.green { background: linear-gradient(135deg, #059669, #34d399); }
+        .feature-icon.pink { background: linear-gradient(135deg, #db2777, #f472b6); }
+        
+        .feature-title {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .feature-text {
+            font-size: 9.5pt;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0 0;
+        }
+        
+        .feature-list li {
+            font-size: 9pt;
+            color: #4a5568;
+            padding: 3px 0 3px 18px;
+            position: relative;
+        }
+        
+        .feature-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 7px;
+            height: 7px;
+            background: #14b8a6;
+            border-radius: 50%;
+        }
+        
+        /* Two Column Layout */
+        .two-col {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .two-col > div {
+            flex: 1;
+        }
+        
+        .page-image {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .highlight-title {
+            font-size: 11pt;
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 5px;
+        }
+        
+        .highlight-text {
+            font-size: 9.5pt;
+            color: #78350f;
+        }
+        
+        /* Tool Cards */
+        .tools-row {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .tool-card {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .tool-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        
+        .tool-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        
+        .tool-icon.teal { background: linear-gradient(135deg, #0d7377, #14b8a6); }
+        .tool-icon.orange { background: linear-gradient(135deg, #f97316, #fb923c); }
+        .tool-icon.purple { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+        .tool-icon.blue { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+        
+        .tool-name {
+            font-size: 9.5pt;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 3px;
+        }
+        
+        .tool-desc {
+            font-size: 8pt;
+            color: #718096;
+        }
+        
+        /* Stats */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 20pt;
+            font-weight: 800;
+            color: #0d7377;
+        }
+        
+        .stat-label {
+            font-size: 8pt;
+            color: #718096;
+        }
+        
+        /* Security Badges */
+        .badges-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 8pt;
+            color: #065f46;
+        }
+        
+        .badge svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
+            fill: #10b981;
+        }
+        
+        /* Comparison Table */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 9.5pt;
+        }
+        
+        .comp-table th {
+            background: linear-gradient(135deg, #0d7377, #14b8a6);
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comp-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+        
+        .comp-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        
+        .comp-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .comp-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        .challenge {
+            color: #dc2626;
+            font-weight: 500;
+        }
+        
+        .solution {
+            color: #059669;
+            font-weight: 500;
+        }
+        
+        /* CTA Section */
+        .cta-box {
+            background: linear-gradient(135deg, #0d7377, #14b8a6);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+        }
+        
+        .cta-title {
+            font-size: 16pt;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .cta-text {
+            font-size: 10pt;
+            opacity: 0.95;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .cta-tagline {
+            font-size: 12pt;
+            font-weight: 600;
+            color: #fb923c;
+        }
+        
+        /* Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 12mm;
+            left: 18mm;
+            right: 18mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 8pt;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+        }
+        
+        .footer-logo {
+            font-weight: 600;
+            color: #0d7377;
+        }
+        
+        h3 {
+            font-size: 11pt;
+            color: #0d7377;
+            margin: 15px 0 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover">
+        <div class="cover-circle-1"></div>
+        <div class="cover-circle-2"></div>
+        <div class="cover-square"></div>
+        <div class="cover-dot"></div>
+        <img src="hero_cover.jpg" alt="MortMortgage" class="cover-image">
+        <div class="cover-content">
+            <div class="cover-label">Product Overview</div>
+            <h1 class="cover-title">Mort<span>Mortgage</span></h1>
+            <p class="cover-subtitle">A modern mortgage platform that simplifies the home financing journey for borrowers while giving lenders powerful tools to make faster, smarter decisions.</p>
+            <div class="cover-tagline">Simplifying the path to homeownership</div>
+        </div>
+    </div>
+    
+    <!-- Page 2: For Home Buyers -->
+    <div class="page">
+        <div class="section-header">
+            <div class="section-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+            </div>
+            <h2 class="section-title">For Home Buyers</h2>
+            <p class="section-subtitle">Everything you need to find and finance your dream home</p>
+        </div>
+        
+        <div class="two-col">
+            <div>
+                <img src="feature_homebuyers.jpg" alt="Home Buyers" class="page-image">
+                
+                <div class="highlight-box">
+                    <div class="highlight-title">No credit check required. No commitment. Just clarity.</div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon teal">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 2h2v2h-2V5zm0 4h2v2h-2V9zm0 4h2v2h-2v-2zm-4-8h2v2H8V5zm0 4h2v2H8V9zm0 4h2v2H8v-2zM5 17h14v2H5v-2zm2-12h2v2H5V5zm0 4h2v2H5V9zm0 4h2v2H5v-2z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Pre-Qualification Calculator</h3>
+                    </div>
+                    <p class="feature-text">Know what you can afford instantly. Enter income, debts, and down payment to see your maximum purchase price and estimated monthly payments.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon orange">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                        </div>
+                        <h3 class="feature-title">10-Step Application Wizard</h3>
+                    </div>
+                    <p class="feature-text">Guided experience through URLA 2020 with smart address lookup, automatic saving, and built-in validation.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon purple">
+                            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Plaid Bank Integration</h3>
+                    </div>
+                    <p class="feature-text">Skip the paperwork. Link your bank account to instantly verify income and assets. Secure and fast.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="two-col" style="margin-top: 15px;">
+            <div class="feature-card" style="margin-bottom: 0;">
+                <div class="feature-header">
+                    <div class="feature-icon blue">
+                        <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+                    </div>
+                    <h3 class="feature-title">Loan Comparison Tool</h3>
+                </div>
+                <p class="feature-text">Compare up to three scenarios side-by-side. See 15-year vs 30-year terms, different down payments, total interest, and true costs.</p>
+            </div>
+            
+            <div class="feature-card" style="margin-bottom: 0;">
+                <div class="feature-header">
+                    <div class="feature-icon green">
+                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    </div>
+                    <h3 class="feature-title">Personal Dashboard</h3>
+                </div>
+                <p class="feature-text">Track all applications in one place. See status updates, continue where you left off, and know exactly where you stand.</p>
+            </div>
+        </div>
+        
+        <div class="page-footer">
+            <span class="footer-logo">MortMortgage</span>
+            <span>For Home Buyers</span>
+        </div>
+    </div>
+    
+    <!-- Page 3: For Lenders -->
+    <div class="page">
+        <div class="section-header">
+            <div class="section-icon">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </div>
+            <h2 class="section-title">For Lenders & Administrators</h2>
+            <p class="section-subtitle">Powerful tools to make faster, smarter decisions</p>
+        </div>
+        
+        <div class="two-col">
+            <div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon teal">
+                            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Complete Application View</h3>
+                    </div>
+                    <p class="feature-text">Centralized dashboard with all applications. Filter by status, search by borrower name, and manage from draft through approval.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon orange">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Qualification at a Glance</h3>
+                    </div>
+                    <p class="feature-text">Clear summary showing credit score, debt-to-income ratio, loan-to-value ratio, estimated payment, and overall qualification status.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon purple">
+                            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Analytics Dashboard</h3>
+                    </div>
+                    <p class="feature-text">Visibility into your pipeline: application volume, approval rates, average loan amounts, breakdown by loan type, and recent activity.</p>
+                </div>
+            </div>
+            
+            <div>
+                <img src="feature_lenders.jpg" alt="Lender Tools" class="page-image">
+                
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-number">3x</div>
+                        <div class="stat-label">Faster Processing</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50%</div>
+                        <div class="stat-label">Less Paperwork</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">99%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Integrated Underwriting Tools</h3>
+        
+        <div class="tools-row">
+            <div class="tool-card">
+                <div class="tool-icon teal">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                </div>
+                <div class="tool-name">Credit Analysis</div>
+                <div class="tool-desc">Tri-bureau reports with one click</div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-icon orange">
+                    <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                </div>
+                <div class="tool-name">Income Verification</div>
+                <div class="tool-desc">Instant employment verification</div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-icon purple">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                </div>
+                <div class="tool-name">Property Valuation</div>
+                <div class="tool-desc">AVM results & comparables</div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-icon blue">
+                    <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                </div>
+                <div class="tool-name">Loan Pricing</div>
+                <div class="tool-desc">Multiple rate scenarios</div>
+            </div>
+        </div>
+        
+        <div class="page-footer">
+            <span class="footer-logo">MortMortgage</span>
+            <span>For Lenders</span>
+        </div>
+    </div>
+    
+    <!-- Page 4: Compliance & Security -->
+    <div class="page">
+        <div class="section-header">
+            <div class="section-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+            </div>
+            <h2 class="section-title">Built for Compliance & Security</h2>
+            <p class="section-subtitle">Industry standards with enterprise-grade protection</p>
+        </div>
+        
+        <div class="two-col">
+            <div>
+                <img src="feature_security.jpg" alt="Security" class="page-image">
+                
+                <div class="badges-row">
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        SOC 2 Compliant
+                    </span>
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        256-bit Encryption
+                    </span>
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        URLA 2020
+                    </span>
+                </div>
+            </div>
+            
+            <div>
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon teal">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                        </div>
+                        <h3 class="feature-title">URLA 2020 Compliant</h3>
+                    </div>
+                    <ul class="feature-list">
+                        <li>All required fields and sections captured</li>
+                        <li>HMDA-compliant demographic collection</li>
+                        <li>Declaration questions match regulatory requirements</li>
+                        <li>Proper handling of sensitive information</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon orange">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Industry-Standard Exports</h3>
+                    </div>
+                    <ul class="feature-list">
+                        <li>MISMO v3.4 export in JSON or XML format</li>
+                        <li>URLA PDF generation with SSN masking</li>
+                        <li>All data mapped to industry standards</li>
+                        <li>Seamless LOS integration</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon purple">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        </div>
+                        <h3 class="feature-title">Security & Privacy</h3>
+                    </div>
+                    <ul class="feature-list">
+                        <li>Secure authentication with role-based access</li>
+                        <li>Document uploads validated for type and size</li>
+                        <li>Sensitive data (SSN) masked in exports</li>
+                        <li>Bank connections through Plaid's secure infrastructure</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page-footer">
+            <span class="footer-logo">MortMortgage</span>
+            <span>Compliance & Security</span>
+        </div>
+    </div>
+    
+    <!-- Page 5: Why MortMortgage -->
+    <div class="page">
+        <div class="section-header">
+            <div class="section-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </div>
+            <h2 class="section-title">Why MortMortgage?</h2>
+            <p class="section-subtitle">See how we solve common mortgage challenges</p>
+        </div>
+        
+        <table class="comp-table">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Challenge</th>
+                    <th style="width: 60%;">Our Solution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="challenge">Borrowers abandon complex applications</td>
+                    <td class="solution">Guided wizard with auto-save and clear progress tracking</td>
+                </tr>
+                <tr>
+                    <td class="challenge">Manual income/asset verification takes days</td>
+                    <td class="solution">Instant verification through Plaid integration</td>
+                </tr>
+                <tr>
+                    <td class="challenge">Underwriters juggle multiple systems</td>
+                    <td class="solution">All verification tools in one unified panel</td>
+                </tr>
+                <tr>
+                    <td class="challenge">Difficult to compare loan options</td>
+                    <td class="solution">Side-by-side comparison tool with visual breakdowns</td>
+                </tr>
+                <tr>
+                    <td class="challenge">Integration with existing LOS</td>
+                    <td class="solution">MISMO v3.4 export ready for seamless integration</td>
+                </tr>
+                <tr>
+                    <td class="challenge">Compliance concerns</td>
+                    <td class="solution">Built on URLA 2020 standards with HMDA compliance</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="two-col" style="margin-top: 20px;">
+            <div class="feature-card" style="margin-bottom: 0;">
+                <div class="feature-header">
+                    <div class="feature-icon teal">
+                        <svg viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                    </div>
+                    <h3 class="feature-title">For Borrowers</h3>
+                </div>
+                <ul class="feature-list">
+                    <li>Clear, guided application process</li>
+                    <li>Instant pre-qualification</li>
+                    <li>Easy loan comparison</li>
+                    <li>Track progress in real-time</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card" style="margin-bottom: 0;">
+                <div class="feature-header">
+                    <div class="feature-icon orange">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
+                    <h3 class="feature-title">For Lenders</h3>
+                </div>
+                <ul class="feature-list">
+                    <li>Faster underwriting decisions</li>
+                    <li>Integrated verification tools</li>
+                    <li>Complete pipeline visibility</li>
+                    <li>Industry-standard exports</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="cta-box">
+            <h2 class="cta-title">Ready to Modernize Your Mortgage Process?</h2>
+            <p class="cta-text">MortMortgage brings together everything borrowers and lenders need in one streamlined platform. From the first "Can I afford this?" question through final underwriting decisions, we make the mortgage process clearer, faster, and more transparent for everyone involved.</p>
+            <p class="cta-tagline">MortMortgage — Simplifying the path to homeownership.</p>
+        </div>
+        
+        <div class="page-footer">
+            <span class="footer-logo">MortMortgage</span>
+            <span>Why MortMortgage</span>
+        </div>
+    </div>
+</body>
+</html>
