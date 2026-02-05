@@ -52,6 +52,20 @@ This file tracks the current development session progress. Claude updates this f
 
 ## Latest Session Work (2026-02-05)
 
+### Bug Fix: OCR Extraction Results Displaying Character-by-Character
+
+**Problem**: Document OCR extraction showed 612 individual characters as separate fields (e.g., `{`, `"`, `d`, `o`, `c`...) instead of properly parsed field names and values.
+
+**Root Cause**: The `/api/apps/[id]/documents` GET endpoint returned JSON string fields (`extractedData`, `extractedFields`, `fieldConfidences`) directly from SQLite without parsing them. When the UI's `Object.entries()` received a string instead of an object, it iterated character by character.
+
+**Fix**: Added JSON.parse() for the three JSON string fields in the documents listing API before returning to the client.
+
+**File Modified**: `src/pages/api/apps/[id]/documents/index.ts` (lines 44-75)
+
+**Related**: This bug was in INTEG-04 (AI Document Intelligence) which was already marked DONE. The extraction endpoint (`/api/documents/[docId]/extraction.ts`) already had the JSON parsing logic - the documents listing endpoint was missing it.
+
+---
+
 ### UX-02: Wizard Stepper Fix + UX Polish Bundle
 
 **Bug Fix: Wizard stepper steps not visible**

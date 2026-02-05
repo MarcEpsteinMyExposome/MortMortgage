@@ -685,6 +685,16 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 
 ---
 
+## Bug Fixes (2026-02-05)
+
+### OCR Extraction Results Displaying Character-by-Character
+- **Problem**: Document extraction showed 612 individual characters instead of parsed fields
+- **Root Cause**: Documents API returned JSON strings from SQLite without parsing them
+- **Fix**: Added JSON.parse() for extractedData, extractedFields, fieldConfidences in documents listing endpoint
+- **File**: `src/pages/api/apps/[id]/documents/index.ts`
+
+---
+
 ## Bug Fixes (2026-02-03)
 
 ### Login Redirect to Wrong Port

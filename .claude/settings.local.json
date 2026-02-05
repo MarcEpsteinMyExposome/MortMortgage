@@ -44,7 +44,8 @@
       "Bash(npx next lint:*)",
       "Bash(npx eslint:*)",
       "Bash(npx ts-node:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [
       "Bash(rm:*)",
