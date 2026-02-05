@@ -45,12 +45,18 @@ This file tracks the current development session progress. Claude updates this f
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 
 ### Test Coverage
-- **217 tests all passing**
+- **299 tests all passing**
 - Run with: `npm test`
+- OCR integration tests run separately: `npm run test:ocr`
 
 ---
 
 ## Latest Session Work (2026-02-05)
+
+### CI/Test Fixes
+- **Jest config**: Added `testMatch` to only run `src/**/*.test.ts` (excludes Cypress specs)
+- **CI workflow**: Skip OCR integration tests (Tesseract requires canvas libs unavailable in CI)
+- **Git security**: Added `.env.local` to `.gitignore` (was accidentally committed)
 
 ### Bug Fix: OCR Extraction Results Displaying Character-by-Character
 

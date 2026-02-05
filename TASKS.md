@@ -733,7 +733,7 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 
 ## Contact & Notes
 - All demo data must remain synthetic
-- Tests: `npm test` (310+ unit tests)
+- Tests: `npm test` (299 unit tests, excludes OCR integration)
 - OCR Tests: `npm run test:ocr` (integration tests with real images)
 - Database: SQLite at `prisma/dev.db`
 - Auth: NextAuth.js with JWT sessions
