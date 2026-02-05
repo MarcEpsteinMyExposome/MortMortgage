@@ -6,5 +6,6 @@ module.exports = {
   },
   moduleFileExtensions: ['ts','tsx','js','jsx','json','node'],
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-  testPathIgnorePatterns: ['/node_modules/', '/cypress/']
+  testPathIgnorePatterns: ['/node_modules/'],
+  testMatch: ['**/src/**/*.test.ts', '**/src/**/*.test.tsx']
 }
