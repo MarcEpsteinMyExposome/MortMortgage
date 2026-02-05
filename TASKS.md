@@ -401,30 +401,134 @@ Get credentials at: https://dashboard.plaid.com/signup (free)
 
 ---
 
-## Future Tasks (TBD/Skipped)
+## Recently Completed (2026-02-05)
 
-### INTEG-03: eSign Integration (DocuSign)
-**Status**: TODO
+### INTEG-04: AI Document Intelligence — DONE
+**Status**: DONE
+**Priority**: High
+**Complexity**: High
+**Goal**: AI-powered OCR and data extraction from mortgage documents
+
+**Completed Features**:
+- [x] Claude API extractor with vision capability
+- [x] Tesseract.js fallback (works offline, no API key needed)
+- [x] Mock provider for demos
+- [x] Extraction prompts for W2, paystubs, bank statements
+- [x] Field parsers and normalizers (currency, dates, SSN masking)
+- [x] Confidence scoring with color-coded badges
+- [x] Auto-fill suggestions when documents are processed
+- [x] Admin panel with Document Intelligence section
+- [x] Comparison view (OCR vs borrower-entered data)
+- [x] Fraud risk flagging for discrepancies
+
+**Files Created**:
+- `src/lib/ocr/types.ts` - TypeScript types
+- `src/lib/ocr/index.ts` - OCR orchestrator
+- `src/lib/ocr/claude-extractor.ts` - Claude API integration
+- `src/lib/ocr/tesseract-extractor.ts` - Tesseract.js fallback
+- `src/lib/ocr/extraction-prompts.ts` - Document-specific prompts
+- `src/lib/ocr/field-parsers.ts` - Field normalization
+- `src/lib/ocr/text-patterns.ts` - Regex patterns for Tesseract
+- `src/pages/api/documents/[docId]/process.ts` - Process OCR endpoint
+- `src/pages/api/documents/[docId]/extraction.ts` - Get results endpoint
+- `src/pages/api/documents/[docId]/retry-ocr.ts` - Retry endpoint
+- `src/pages/api/apps/[id]/process-documents.ts` - Batch process
+- `src/components/ExtractionStatus.tsx` - Status indicator
+- `src/components/ExtractionResults.tsx` - Results display
+- `src/components/DataComparisonPanel.tsx` - Comparison view
+- `src/components/AutoFillSuggestion.tsx` - Auto-fill banner
+- `src/components/ai/*` - AI components for DocumentsStep
+
+**Setup**:
+```bash
+# Add to .env.local for Claude extraction:
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Or use without API key - Tesseract fallback will be used
+```
+
+**Test Fixtures** (in `src/fixtures/documents/`):
+- `sample-w2.png` - Synthetic W-2 with known values
+- `sample-paystub.png` - Synthetic paystub
+- `sample-bank-statement.png` - Synthetic bank statement
+- `expected-values.json` - Expected OCR extraction values
+- Regenerate with: `npm run generate:docs`
+
+---
+
+### INTEG-05: SignaturePad Component — DONE
+**Status**: DONE (Minimal Scope)
 **Priority**: Medium
-**Complexity**: Medium-High
-**Dependencies**: PDF-01 (URLA PDF Export)
-**Goal**: Electronic document signing via DocuSign
+**Complexity**: Low
+**Goal**: Reusable signature capture component
+
+**Completed Features**:
+- [x] SignaturePad component with touch support
+- [x] pdf-signer utility to embed signatures in PDFs
+- [x] Clear/save functionality
+- [x] Responsive canvas sizing
+- [x] 20 unit tests
+
+**Files Created**:
+- `src/components/SignaturePad.tsx` - Signature capture component
+- `src/lib/signing/pdf-signer.ts` - PDF signature embedding utility
+- `src/__tests__/signature-pad.test.ts` - Tests
+
+**Usage**:
+```tsx
+import SignaturePad from '@/components/SignaturePad';
+
+<SignaturePad
+  onSave={(base64Png) => console.log('Signature:', base64Png)}
+  onCancel={() => setShowPad(false)}
+/>
+```
+
+---
+
+## Future Ideas (Backlog)
+
+### IDEA-01: Borrower Status Tracker ("Pizza Tracker")
+**Inspiration**: Domino's Pizza Tracker, Uber ride status
+**Goal**: Real-time application status visibility
 **Would include**:
-- Sign Application button on review step
-- DocuSign envelope creation with PDF
-- Embedded signing flow (sign within app)
-- Co-borrower signatures (sequential)
-- Webhook handling for status updates
-- Signed document storage
-- Sandbox mode for demos
+- Visual pipeline: Applied → Processing → Underwriting → Clear to Close
+- Push notifications for status changes
+- In-app secure messaging with loan officer
+- Document request portal with upload buttons
+- Closing countdown with checklist
 
-**Implementation Phases**:
-1. Basic Integration (JWT auth, create envelope, redirect signing)
-2. Embedded Signing (sign within app, status UI)
-3. Webhooks & Status (auto-updates, store signed docs)
-4. Co-Borrower Support (multi-signer, sequential routing)
+**Impact**: High (80%+ of borrower complaints are about communication)
 
-**Task Spec**: `.claude/tasks/INTEG-03.md`
+---
+
+### IDEA-02: What-If Scenario Planner
+**Inspiration**: NerdWallet, Bankrate calculators
+**Goal**: Advanced loan exploration beyond current Compare tool
+**Would include**:
+- Slider-based exploration (price/down payment/rate)
+- Break-even analysis for rate buydowns
+- Rent vs Buy calculator
+- Affordability by location comparison
+- Future refinance estimator
+
+**Impact**: Medium (engagement driver, trusted advisor positioning)
+
+---
+
+### IDEA-03: Instant Pre-Approval Engine
+**Inspiration**: Better.com's 1-day AI approval
+**Goal**: Simulate real underwriting for instant decisions
+**Would include**:
+- Simulate DU/LP findings
+- Generate conditional approval letter PDF
+- Rate lock simulation with pricing impact
+- Approval confidence score
+
+**Impact**: Very High (major competitive differentiator)
+**Complexity**: Very High (requires deep integration work)
+
+---
 
 ### TEST-01: E2E Tests (Cypress)
 **Status**: TBD - Future
@@ -433,6 +537,13 @@ Get credentials at: https://dashboard.plaid.com/signup (free)
 - Complete application flow test
 - Admin portal test
 - Export functionality test (including PDF)
+
+---
+
+### INTEG-03: eSign Integration (DocuSign) — SUPERSEDED
+**Status**: Superseded by INTEG-05
+**Note**: Original DocuSign approach replaced with simpler DIY solution.
+**Task Spec**: `.claude/tasks/INTEG-03.md` (archived reference)
 
 ### CO-BORROWER-02: Co-Borrower UI — Completed 2026-02-04
 **Status**: DONE
@@ -612,6 +723,8 @@ Read TASKS.md, REQUIREMENTS.md, and SESSION.md then continue with [TASK-ID]
 
 ## Contact & Notes
 - All demo data must remain synthetic
-- Tests: `npm test` (149+ unit tests)
+- Tests: `npm test` (310+ unit tests)
+- OCR Tests: `npm run test:ocr` (integration tests with real images)
 - Database: SQLite at `prisma/dev.db`
 - Auth: NextAuth.js with JWT sessions
+- **Important**: Stop dev server before running `npx prisma generate` on Windows

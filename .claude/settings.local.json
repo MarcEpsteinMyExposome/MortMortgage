@@ -6,6 +6,8 @@
       "Write(*)",
       "Glob(*)",
       "Grep(*)",
+      "WebSearch",
+      "WebFetch",
       "Bash(mv:*)",
       "Bash(mkdir:*)",
       "Bash(git add:*)",
@@ -32,11 +34,25 @@
       "Bash(Select-Object FullName)",
       "Bash(npm uninstall:*)",
       "Bash(powershell:*)",
-      "Bash(git reset:*)"    ],
+      "Bash(git reset:*)",
+      "WebFetch(domain:www.docuseal.com)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(node -e:*)",
+      "Bash(npx next build)",
+      "Bash(npx jest:*)",
+      "Bash(npx next lint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsx:*)"
+    ],
     "deny": [
       "Bash(rm:*)",
       "Bash(git push:*)",
       "Bash(git reset --hard:*)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\marce\\Documents\\Projects\\MortMortgage\\src\\lib"
     ]
   }
 }

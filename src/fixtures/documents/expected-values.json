@@ -1,0 +1,56 @@
+{
+  "w2": {
+    "taxYear": 2025,
+    "employerName": "Acme Corporation",
+    "employerEIN": "12-3456789",
+    "employerAddress": "123 Business Ave, Austin, TX 78701",
+    "employeeName": "John Michael Smith",
+    "employeeSSN": "1234",
+    "wagesTipsCompensation": 85000,
+    "federalIncomeTaxWithheld": 12750,
+    "socialSecurityWages": 85000,
+    "socialSecurityTaxWithheld": 5270,
+    "medicareWages": 85000,
+    "medicareTaxWithheld": 1232.5
+  },
+  "paystub": {
+    "employerName": "TechStart Inc",
+    "employeeName": "Jane Doe",
+    "employeeId": "EMP-78945",
+    "payPeriodStart": "01/01/2026",
+    "payPeriodEnd": "01/15/2026",
+    "payDate": "01/20/2026",
+    "grossPay": 4166.67,
+    "federalTax": 625,
+    "stateTax": 208.33,
+    "socialSecurity": 258.33,
+    "medicare": 60.42,
+    "healthInsurance": 150,
+    "retirement401k": 208.33,
+    "netPay": 2656.26,
+    "ytdGross": 4166.67,
+    "ytdNet": 2656.26
+  },
+  "bankStatement": {
+    "institutionName": "First National Bank",
+    "accountHolder": "John Smith",
+    "accountType": "Checking",
+    "accountNumberLast4": "7890",
+    "statementPeriodStart": "01/01/2026",
+    "statementPeriodEnd": "01/31/2026",
+    "beginningBalance": 5432.1,
+    "totalDeposits": 8500,
+    "totalWithdrawals": 6200,
+    "endingBalance": 7732.1
+  },
+  "id": {
+    "fullName": "SMITH, JOHN MICHAEL",
+    "dateOfBirth": "03/15/1985",
+    "licenseNumber": "5678",
+    "expirationDate": "03/15/2030",
+    "issueDate": "01/15/2024",
+    "address": "456 Oak Street, Austin, TX 78701",
+    "state": "TX",
+    "idType": "driver_license"
+  }
+}

@@ -6,3 +6,5 @@ uploads/
 .DS_Store
 coverage/
 nul
+.env.local
+.env*.local

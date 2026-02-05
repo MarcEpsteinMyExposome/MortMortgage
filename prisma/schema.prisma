@@ -34,4 +34,15 @@ model Document {
   path          String
   documentType  String   @default("other")
   createdAt     DateTime @default(now())
+
+  // OCR Processing Fields
+  ocrStatus            String    @default("pending") // pending | processing | completed | failed
+  ocrProvider          String?   // claude | tesseract | textract | mock
+  extractedData        String?   // JSON string: raw extraction output
+  extractedFields      String?   // JSON string: normalized field map
+  extractionConfidence Float?    // 0-100 overall confidence
+  fieldConfidences     String?   // JSON string: per-field confidence scores
+  processingError      String?   // Error message if failed
+  processedAt          DateTime?
+  retryCount           Int       @default(0)
 }

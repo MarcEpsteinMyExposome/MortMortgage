@@ -20,6 +20,36 @@ import {
   formatDateTime
 } from '../../../lib/underwriting-utils'
 
+// Types for document OCR
+interface DocumentWithOCR {
+  id: string
+  filename: string
+  documentType: string
+  contentType: string
+  ocrStatus: 'pending' | 'processing' | 'completed' | 'failed'
+  ocrProvider?: string
+  extractionConfidence?: number
+  extractedFields?: Record<string, any>
+  fieldConfidences?: Record<string, number>
+  extractedData?: any
+  processedAt?: string
+  processingError?: string
+  retryCount?: number
+  createdAt: string
+}
+
+interface ExtractionDetails {
+  id: string
+  extractedData: any
+  extractedFields: Record<string, any> | null
+  fieldConfidences: Record<string, number> | null
+  ocrStatus: string
+  ocrProvider?: string
+  extractionConfidence?: number
+  processedAt?: string
+  error?: string
+}
+
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft', color: 'bg-yellow-100 text-yellow-800' },
   { value: 'submitted', label: 'Submitted', color: 'bg-blue-100 text-blue-800' },
@@ -55,6 +85,15 @@ export default function AdminAppDetail() {
   const [mapLoading, setMapLoading] = useState(false)
   const [mapError, setMapError] = useState<string | null>(null)
 
+  // Document Intelligence state
+  const [documents, setDocuments] = useState<DocumentWithOCR[]>([])
+  const [documentsLoading, setDocumentsLoading] = useState(false)
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null)
+  const [extractionDetails, setExtractionDetails] = useState<ExtractionDetails | null>(null)
+  const [extractionLoading, setExtractionLoading] = useState(false)
+  const [processingDocId, setProcessingDocId] = useState<string | null>(null)
+  const [batchProcessing, setBatchProcessing] = useState(false)
+
   useEffect(() => {
     if (!id) return
 
@@ -72,6 +111,28 @@ export default function AdminAppDetail() {
     }
 
     loadApp()
+  }, [id])
+
+  // Load documents for the application
+  useEffect(() => {
+    if (!id) return
+
+    async function loadDocuments() {
+      setDocumentsLoading(true)
+      try {
+        const res = await fetch(`/api/apps/${id}/documents`)
+        if (res.ok) {
+          const data = await res.json()
+          setDocuments(data)
+        }
+      } catch (err) {
+        console.error('Failed to load documents:', err)
+      } finally {
+        setDocumentsLoading(false)
+      }
+    }
+
+    loadDocuments()
   }, [id])
 
   // Geocode addresses when property valuation is available
@@ -380,6 +441,260 @@ export default function AdminAppDetail() {
     } finally {
       setUwLoading(prev => ({ ...prev, pricing: false }))
     }
+  }
+
+  // Document Intelligence Handlers
+  async function loadExtractionDetails(docId: string) {
+    setExtractionLoading(true)
+    try {
+      const res = await fetch(`/api/documents/${docId}/extraction`)
+      if (res.ok) {
+        const data = await res.json()
+        setExtractionDetails(data)
+      }
+    } catch (err) {
+      console.error('Failed to load extraction details:', err)
+    } finally {
+      setExtractionLoading(false)
+    }
+  }
+
+  async function handleDocumentSelect(docId: string) {
+    if (selectedDocId === docId) {
+      // Collapse if clicking the same document
+      setSelectedDocId(null)
+      setExtractionDetails(null)
+    } else {
+      setSelectedDocId(docId)
+      await loadExtractionDetails(docId)
+    }
+  }
+
+  async function handleProcessDocument(docId: string) {
+    setProcessingDocId(docId)
+    try {
+      const res = await fetch(`/api/documents/${docId}/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (res.ok) {
+        // Refresh documents list
+        const docsRes = await fetch(`/api/apps/${id}/documents`)
+        if (docsRes.ok) {
+          setDocuments(await docsRes.json())
+        }
+        // If this was the selected document, refresh extraction details
+        if (selectedDocId === docId) {
+          await loadExtractionDetails(docId)
+        }
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Failed to process document')
+      }
+    } catch (err) {
+      alert('Failed to process document')
+    } finally {
+      setProcessingDocId(null)
+    }
+  }
+
+  async function handleRetryDocument(docId: string) {
+    setProcessingDocId(docId)
+    try {
+      const res = await fetch(`/api/documents/${docId}/retry-ocr`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (res.ok) {
+        // Refresh documents list
+        const docsRes = await fetch(`/api/apps/${id}/documents`)
+        if (docsRes.ok) {
+          setDocuments(await docsRes.json())
+        }
+        // If this was the selected document, refresh extraction details
+        if (selectedDocId === docId) {
+          await loadExtractionDetails(docId)
+        }
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Failed to retry OCR')
+      }
+    } catch (err) {
+      alert('Failed to retry OCR')
+    } finally {
+      setProcessingDocId(null)
+    }
+  }
+
+  async function handleProcessAllDocuments() {
+    setBatchProcessing(true)
+    try {
+      const res = await fetch(`/api/apps/${id}/process-documents`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      if (res.ok) {
+        const result = await res.json()
+        // Refresh documents list
+        const docsRes = await fetch(`/api/apps/${id}/documents`)
+        if (docsRes.ok) {
+          setDocuments(await docsRes.json())
+        }
+        alert(`Processed ${result.processed} documents: ${result.successful} successful, ${result.failed} failed`)
+      } else {
+        const error = await res.json()
+        alert(error.error || 'Failed to process documents')
+      }
+    } catch (err) {
+      alert('Failed to process documents')
+    } finally {
+      setBatchProcessing(false)
+    }
+  }
+
+  // Helper function to get OCR status badge
+  function getOCRStatusBadge(status: string) {
+    switch (status) {
+      case 'pending':
+        return { label: 'Pending', colorClass: 'bg-gray-100 text-gray-800' }
+      case 'processing':
+        return { label: 'Processing', colorClass: 'bg-blue-100 text-blue-800' }
+      case 'completed':
+        return { label: 'Completed', colorClass: 'bg-green-100 text-green-800' }
+      case 'failed':
+        return { label: 'Failed', colorClass: 'bg-red-100 text-red-800' }
+      default:
+        return { label: status, colorClass: 'bg-gray-100 text-gray-800' }
+    }
+  }
+
+  // Helper function to get confidence color
+  function getConfidenceColor(confidence: number) {
+    if (confidence >= 90) return 'text-green-600'
+    if (confidence >= 70) return 'text-yellow-600'
+    return 'text-red-600'
+  }
+
+  // Helper function to get confidence badge
+  function getConfidenceBadge(confidence: number) {
+    if (confidence >= 90) return { label: 'High', colorClass: 'bg-green-100 text-green-800' }
+    if (confidence >= 70) return { label: 'Medium', colorClass: 'bg-yellow-100 text-yellow-800' }
+    return { label: 'Low', colorClass: 'bg-red-100 text-red-800' }
+  }
+
+  // Helper to format document type for display
+  function formatDocumentType(type: string) {
+    const typeLabels: Record<string, string> = {
+      w2: 'W-2',
+      paystub: 'Paystub',
+      bank_statement: 'Bank Statement',
+      tax_return: 'Tax Return',
+      id: 'ID Document',
+      other: 'Other'
+    }
+    return typeLabels[type] || type
+  }
+
+  // Get borrower data for comparison
+  function getBorrowerDataForComparison(docType: string, extractedFields: Record<string, any> | null) {
+    if (!extractedFields || !borrower) return []
+
+    const comparisons: Array<{
+      field: string
+      extracted: any
+      borrowerValue: any
+      confidence: number
+      match: boolean | null
+      fraudRisk: boolean
+    }> = []
+
+    const employment = Array.isArray(borrower.employment) ? borrower.employment[0] : null
+
+    if (docType === 'w2' || docType === 'paystub') {
+      // Compare employer name
+      if (extractedFields.employerName && employment?.employerName) {
+        const extracted = String(extractedFields.employerName).toLowerCase()
+        const entered = String(employment.employerName).toLowerCase()
+        const match = extracted.includes(entered) || entered.includes(extracted)
+        comparisons.push({
+          field: 'Employer Name',
+          extracted: extractedFields.employerName,
+          borrowerValue: employment.employerName,
+          confidence: extractionDetails?.fieldConfidences?.employerName || 0,
+          match,
+          fraudRisk: !match
+        })
+      }
+
+      // Compare employee name
+      if (extractedFields.employeeName && borrower.name) {
+        const fullName = `${borrower.name.firstName || ''} ${borrower.name.lastName || ''}`.toLowerCase()
+        const extracted = String(extractedFields.employeeName).toLowerCase()
+        const match = extracted.includes(fullName) || fullName.includes(extracted)
+        comparisons.push({
+          field: 'Employee Name',
+          extracted: extractedFields.employeeName,
+          borrowerValue: `${borrower.name.firstName} ${borrower.name.lastName}`,
+          confidence: extractionDetails?.fieldConfidences?.employeeName || 0,
+          match,
+          fraudRisk: !match
+        })
+      }
+
+      // Compare income for W2
+      if (docType === 'w2' && extractedFields.wagesTipsCompensation && employment?.monthlyIncome) {
+        const statedAnnual = employment.monthlyIncome * 12
+        const extractedIncome = parseFloat(extractedFields.wagesTipsCompensation) || 0
+        const variance = Math.abs(extractedIncome - statedAnnual) / statedAnnual * 100
+        const match = variance <= 10 // Within 10%
+        comparisons.push({
+          field: 'Annual Income (W-2 Box 1)',
+          extracted: `$${extractedIncome.toLocaleString()}`,
+          borrowerValue: `$${statedAnnual.toLocaleString()} (stated)`,
+          confidence: extractionDetails?.fieldConfidences?.wagesTipsCompensation || 0,
+          match,
+          fraudRisk: variance > 20 // Flag if >20% variance
+        })
+      }
+
+      // Compare YTD income for paystub
+      if (docType === 'paystub' && extractedFields.ytdGrossPay && employment?.monthlyIncome) {
+        const statedAnnual = employment.monthlyIncome * 12
+        const ytdGross = parseFloat(extractedFields.ytdGrossPay) || 0
+        // Estimate annual from YTD (very rough)
+        const currentMonth = new Date().getMonth() + 1
+        const estimatedAnnual = (ytdGross / currentMonth) * 12
+        const variance = Math.abs(estimatedAnnual - statedAnnual) / statedAnnual * 100
+        comparisons.push({
+          field: 'YTD Gross Pay',
+          extracted: `$${ytdGross.toLocaleString()}`,
+          borrowerValue: `$${statedAnnual.toLocaleString()}/yr stated`,
+          confidence: extractionDetails?.fieldConfidences?.ytdGrossPay || 0,
+          match: variance <= 15,
+          fraudRisk: variance > 25
+        })
+      }
+    }
+
+    if (docType === 'bank_statement') {
+      // Could compare assets
+      if (extractedFields.endingBalance && assets.length > 0) {
+        const totalBankAssets = assets
+          .filter((a: any) => a.type === 'checking' || a.type === 'savings')
+          .reduce((sum: number, a: any) => sum + (a.balance || 0), 0)
+        const extractedBalance = parseFloat(extractedFields.endingBalance) || 0
+        comparisons.push({
+          field: 'Ending Balance',
+          extracted: `$${extractedBalance.toLocaleString()}`,
+          borrowerValue: `$${totalBankAssets.toLocaleString()} (total bank assets)`,
+          confidence: extractionDetails?.fieldConfidences?.endingBalance || 0,
+          match: null, // Can't directly compare one statement to total
+          fraudRisk: false
+        })
+      }
+    }
+
+    return comparisons
   }
 
   if (loading) {
@@ -1075,12 +1390,298 @@ export default function AdminAppDetail() {
             {Object.entries(declarations).map(([key, value]) => (
               <div key={key} className="flex items-center gap-2">
                 <span className={value ? 'text-red-600' : 'text-green-600'}>
-                  {value ? '⚠' : '✓'}
+                  {value ? '!' : 'v'}
                 </span>
                 <span className="capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Document Intelligence Panel */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Document Intelligence</h2>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-500">
+                {documents.filter(d => d.ocrStatus === 'completed').length}/{documents.length} processed
+              </span>
+              <button
+                onClick={handleProcessAllDocuments}
+                disabled={batchProcessing || documents.filter(d => d.ocrStatus === 'pending').length === 0}
+                className="btn bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-sm py-1.5 px-3"
+              >
+                {batchProcessing ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  'Process All Pending'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {documentsLoading ? (
+            <div className="text-center py-8 text-gray-500">Loading documents...</div>
+          ) : documents.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No documents uploaded yet.</p>
+              <p className="text-sm mt-1">Documents can be uploaded in the application wizard.</p>
+            </div>
+          ) : (
+            <>
+              {/* Documents Table */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Document</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OCR Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Processed</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {documents.map((doc) => {
+                      const statusBadge = getOCRStatusBadge(doc.ocrStatus)
+                      const isSelected = selectedDocId === doc.id
+                      const isProcessing = processingDocId === doc.id
+
+                      return (
+                        <tr
+                          key={doc.id}
+                          className={`${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'} cursor-pointer transition-colors`}
+                          onClick={() => handleDocumentSelect(doc.id)}
+                        >
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-400">
+                                {isSelected ? '[-]' : '[+]'}
+                              </span>
+                              <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]" title={doc.filename}>
+                                {doc.filename}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600">
+                            {formatDocumentType(doc.documentType)}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusBadge.colorClass}`}>
+                              {statusBadge.label}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm">
+                            {doc.extractionConfidence !== undefined && doc.extractionConfidence !== null ? (
+                              <span className={getConfidenceColor(doc.extractionConfidence)}>
+                                {doc.extractionConfidence.toFixed(0)}%
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-500">
+                            {doc.processedAt ? new Date(doc.processedAt).toLocaleDateString() : '-'}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                              {doc.ocrStatus === 'pending' && (
+                                <button
+                                  onClick={() => handleProcessDocument(doc.id)}
+                                  disabled={isProcessing}
+                                  className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50"
+                                >
+                                  {isProcessing ? 'Processing...' : 'Process'}
+                                </button>
+                              )}
+                              {doc.ocrStatus === 'failed' && (
+                                <button
+                                  onClick={() => handleRetryDocument(doc.id)}
+                                  disabled={isProcessing}
+                                  className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+                                >
+                                  {isProcessing ? 'Retrying...' : 'Retry'}
+                                </button>
+                              )}
+                              {doc.ocrStatus === 'completed' && (
+                                <button
+                                  onClick={() => handleProcessDocument(doc.id)}
+                                  disabled={isProcessing}
+                                  className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50"
+                                >
+                                  {isProcessing ? 'Re-processing...' : 'Re-process'}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Expanded Extraction Details */}
+              {selectedDocId && (
+                <div className="mt-4 border-t pt-4">
+                  {extractionLoading ? (
+                    <div className="text-center py-6 text-gray-500">
+                      <svg className="animate-spin h-6 w-6 mx-auto mb-2" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Loading extraction details...
+                    </div>
+                  ) : extractionDetails ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Extracted Fields Panel */}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                          Extracted Data
+                          {extractionDetails.ocrProvider && (
+                            <span className="text-xs font-normal text-gray-500">
+                              via {extractionDetails.ocrProvider}
+                            </span>
+                          )}
+                        </h3>
+
+                        {extractionDetails.ocrStatus === 'failed' && extractionDetails.error ? (
+                          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                            <strong>Error:</strong> {extractionDetails.error}
+                          </div>
+                        ) : extractionDetails.extractedFields && Object.keys(extractionDetails.extractedFields).length > 0 ? (
+                          <div className="space-y-2">
+                            {Object.entries(extractionDetails.extractedFields).map(([key, value]) => {
+                              const confidence = extractionDetails.fieldConfidences?.[key]
+                              const confidenceBadge = confidence !== undefined ? getConfidenceBadge(confidence) : null
+
+                              return (
+                                <div key={key} className="flex items-start justify-between py-2 border-b border-gray-100 last:border-0">
+                                  <div className="flex-1">
+                                    <span className="text-xs text-gray-500 capitalize">
+                                      {key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').trim()}
+                                    </span>
+                                    <p className="text-sm font-medium text-gray-900">
+                                      {value !== null && value !== undefined ? String(value) : '-'}
+                                    </p>
+                                  </div>
+                                  {confidenceBadge && (
+                                    <div className="flex items-center gap-1 ml-2">
+                                      <span className={`text-xs px-1.5 py-0.5 rounded ${confidenceBadge.colorClass}`}>
+                                        {confidence?.toFixed(0)}%
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : extractionDetails.ocrStatus === 'pending' ? (
+                          <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                            Document has not been processed yet. Click "Process" to extract data.
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                            No extracted fields available.
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Comparison Panel */}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 mb-3">
+                          Data Comparison
+                          <span className="text-xs font-normal text-gray-500 ml-2">OCR vs. Application</span>
+                        </h3>
+
+                        {(() => {
+                          const selectedDoc = documents.find(d => d.id === selectedDocId)
+                          const comparisons = selectedDoc
+                            ? getBorrowerDataForComparison(selectedDoc.documentType, extractionDetails.extractedFields)
+                            : []
+
+                          if (comparisons.length === 0) {
+                            return (
+                              <div className="p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+                                {extractionDetails.ocrStatus !== 'completed'
+                                  ? 'Process the document to see data comparisons.'
+                                  : 'No comparable data fields found for this document type.'}
+                              </div>
+                            )
+                          }
+
+                          const hasFraudRisk = comparisons.some(c => c.fraudRisk)
+
+                          return (
+                            <div>
+                              {hasFraudRisk && (
+                                <div className="mb-3 p-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
+                                  <span className="font-semibold">[!]</span>
+                                  Potential discrepancies detected. Review flagged items below.
+                                </div>
+                              )}
+
+                              <div className="space-y-3">
+                                {comparisons.map((comp, idx) => (
+                                  <div
+                                    key={idx}
+                                    className={`p-3 rounded-lg border ${
+                                      comp.fraudRisk
+                                        ? 'border-red-200 bg-red-50'
+                                        : comp.match === true
+                                        ? 'border-green-200 bg-green-50'
+                                        : 'border-gray-200 bg-gray-50'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="text-xs font-medium text-gray-600">{comp.field}</span>
+                                      {comp.match !== null && (
+                                        <span className={`text-xs px-2 py-0.5 rounded ${
+                                          comp.match ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                        }`}>
+                                          {comp.match ? 'Match' : 'Mismatch'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                      <div>
+                                        <span className="text-xs text-gray-500">OCR Extracted:</span>
+                                        <p className="font-medium">{comp.extracted}</p>
+                                      </div>
+                                      <div>
+                                        <span className="text-xs text-gray-500">Borrower Stated:</span>
+                                        <p className="font-medium">{comp.borrowerValue}</p>
+                                      </div>
+                                    </div>
+                                    {comp.fraudRisk && (
+                                      <div className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                                        <span>[!]</span> Significant discrepancy - verify with borrower
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-gray-500">
+                      Failed to load extraction details.
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {/* Timestamps */}

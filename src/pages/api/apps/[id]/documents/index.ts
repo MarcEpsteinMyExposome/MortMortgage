@@ -40,7 +40,41 @@ export default async function handler(req: any, res: any) {
         orderBy: { createdAt: 'desc' }
       })
 
-      return res.status(200).json(documents)
+      // Parse JSON string fields from SQLite before returning
+      const parsedDocuments = documents.map((doc: any) => {
+        const parsed = { ...doc }
+
+        // Parse extractedData if present
+        if (doc.extractedData && typeof doc.extractedData === 'string') {
+          try {
+            parsed.extractedData = JSON.parse(doc.extractedData)
+          } catch {
+            parsed.extractedData = null
+          }
+        }
+
+        // Parse extractedFields if present
+        if (doc.extractedFields && typeof doc.extractedFields === 'string') {
+          try {
+            parsed.extractedFields = JSON.parse(doc.extractedFields)
+          } catch {
+            parsed.extractedFields = null
+          }
+        }
+
+        // Parse fieldConfidences if present
+        if (doc.fieldConfidences && typeof doc.fieldConfidences === 'string') {
+          try {
+            parsed.fieldConfidences = JSON.parse(doc.fieldConfidences)
+          } catch {
+            parsed.fieldConfidences = null
+          }
+        }
+
+        return parsed
+      })
+
+      return res.status(200).json(parsedDocuments)
     } catch (error) {
       console.error('Error fetching documents:', error)
       return res.status(500).json({ error: 'Failed to fetch documents' })
