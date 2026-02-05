@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { validateStep, validateAllSteps, ValidationResult } from '../lib/form-validator'
 
 export type WizardStep = {
@@ -61,6 +61,11 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
   const [hasCoBorrower, setHasCoBorrower] = useState(initialData.borrowers?.length > 1)
   const [activeBorrowerIndex, setActiveBorrowerIndex] = useState(0)
 
+  // Stepper scroll state
+  const stepperRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
   const step = steps[currentStep]
   const StepComponent = step.component
   const currentValidation = stepValidation[step.id]
@@ -81,6 +86,48 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
     })
     setStepValidation(validationMap)
   }, [data])
+
+  // Check if stepper can scroll and update arrow visibility
+  const checkScrollability = () => {
+    const el = stepperRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 0)
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1)
+  }
+
+  // Auto-scroll to active step when it changes
+  useEffect(() => {
+    const el = stepperRef.current
+    if (!el) return
+
+    // Find the active step button (nth child accounting for connector lines)
+    const stepElements = el.querySelectorAll('button')
+    const activeStepEl = stepElements[currentStep]
+    if (activeStepEl) {
+      const containerRect = el.getBoundingClientRect()
+      const stepRect = activeStepEl.getBoundingClientRect()
+      const scrollLeft = stepRect.left - containerRect.left + el.scrollLeft - (containerRect.width / 2) + (stepRect.width / 2)
+      el.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' })
+    }
+
+    // Update scroll arrows after scroll
+    setTimeout(checkScrollability, 300)
+  }, [currentStep])
+
+  // Check scrollability on mount and resize
+  useEffect(() => {
+    checkScrollability()
+    window.addEventListener('resize', checkScrollability)
+    return () => window.removeEventListener('resize', checkScrollability)
+  }, [])
+
+  const scrollStepper = (direction: 'left' | 'right') => {
+    const el = stepperRef.current
+    if (!el) return
+    const scrollAmount = 200
+    el.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' })
+    setTimeout(checkScrollability, 300)
+  }
 
   async function handleUpdate(section: string, value: any) {
     const updated = { ...data, [section]: value }
@@ -172,8 +219,40 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
       {/* Progress Header Card */}
       <div className="card p-6 mb-6">
         {/* Step Navigator */}
-        <div className="mb-6 overflow-x-auto scrollbar-thin">
-          <div className="flex items-center min-w-max">
+        <div className="mb-6 relative">
+          {/* Left scroll arrow */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scrollStepper('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-50 border border-gray-200"
+              aria-label="Scroll left"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Right scroll arrow */}
+          {canScrollRight && (
+            <button
+              onClick={() => scrollStepper('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-50 border border-gray-200"
+              aria-label="Scroll right"
+            >
+              <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Scrollable container */}
+          <div
+            ref={stepperRef}
+            onScroll={checkScrollability}
+            className="overflow-x-auto scrollbar-thin px-4"
+          >
+            <div className="flex items-center min-w-max">
             {steps.map((s, i) => {
               const status = getStepStatus(s.id)
               const isActive = i === currentStep
@@ -227,6 +306,7 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
                 </React.Fragment>
               )
             })}
+            </div>
           </div>
         </div>
 
