@@ -28,6 +28,13 @@ Install the following before starting:
 2. Sign in with an Anthropic account at [console.anthropic.com](https://console.anthropic.com)
 3. Ensure you have API credits available
 
+### Claude Code CLI (Optional)
+The CLI provides advanced features like full plugin management:
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+Once installed, run `claude` in your terminal to access the CLI version.
+
 ---
 
 ## Development Setup
@@ -102,6 +109,42 @@ This project is optimized for development with Claude Code.
 - "What's the status of current tasks?"
 - "Help me implement [feature]"
 - "Run the tests and fix any failures"
+
+### Recommended Plugins
+
+Install these plugins at **user scope** (global, works across all projects):
+
+| Plugin | Marketplace | Purpose |
+|--------|-------------|---------|
+| `typescript-lsp` | `claude-plugins-official` | Real-time type error feedback after edits |
+| `github` | `claude-plugins-official` | PR and issue integration |
+| `frontend-design` | `claude-code-plugins` | Better UI/component generation |
+| `commit-commands` | `claude-code-plugins` | Streamlined git workflows (`/commit-commands:commit`) |
+
+**Install via CLI:**
+```bash
+claude plugin install typescript-lsp@claude-plugins-official --scope user
+claude plugin install github@claude-plugins-official --scope user
+claude plugin install frontend-design@claude-code-plugins --scope user
+claude plugin install commit-commands@claude-code-plugins --scope user
+```
+
+**Or via VSCode:** Open Claude Code → `/plugins` → Manage Plugins → Discover tab
+
+**Note:** `typescript-lsp` requires the language server binary:
+```bash
+npm install -g typescript-language-server typescript
+```
+
+### Plugin Scopes
+
+| Scope | Where Stored | Best For |
+|-------|--------------|----------|
+| **User** | `~/.claude/settings.json` | Personal tools (recommended) |
+| **Project** | `.claude/settings.json` | Team-shared plugins (committed to git) |
+| **Local** | `.claude/settings.local.json` | Personal overrides for one project |
+
+For personal productivity plugins, use **user scope** so they work in all your projects.
 
 ---
 
