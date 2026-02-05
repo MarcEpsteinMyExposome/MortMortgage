@@ -1,7 +1,12 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import type { UnderwritingData } from '../../../types/underwriting'
+import type { SubjectProperty, ComparableProperty } from '../../../components/PropertyMap'
+
+// Dynamic import for Leaflet (doesn't work server-side)
+const PropertyMap = dynamic(() => import('../../../components/PropertyMap'), { ssr: false })
 import {
   getCreditRiskBadge,
   getDTIRiskBadge,
@@ -42,6 +47,14 @@ export default function AdminAppDetail() {
     pricing: boolean
   }>({ credit: false, income: false, property: false, pricing: false })
 
+  // Property map state
+  const [mapData, setMapData] = useState<{
+    subject: SubjectProperty | null
+    comparables: ComparableProperty[]
+  }>({ subject: null, comparables: [] })
+  const [mapLoading, setMapLoading] = useState(false)
+  const [mapError, setMapError] = useState<string | null>(null)
+
   useEffect(() => {
     if (!id) return
 
@@ -60,6 +73,85 @@ export default function AdminAppDetail() {
 
     loadApp()
   }, [id])
+
+  // Geocode addresses when property valuation is available
+  useEffect(() => {
+    if (!underwriting.property || !app) return
+
+    const avmResult = underwriting.property.result
+    const propertyData = app.data?.property || {}
+
+    async function geocodeAddresses() {
+      setMapLoading(true)
+      setMapError(null)
+
+      try {
+        // Build full subject address
+        const subjectAddress = propertyData.address
+          ? `${propertyData.address.street}, ${propertyData.address.city}, ${propertyData.address.state} ${propertyData.address.zip}`
+          : avmResult.property.address
+
+        // Geocode subject property
+        const subjectRes = await fetch('/api/geocode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: subjectAddress })
+        })
+
+        if (!subjectRes.ok) {
+          throw new Error('Failed to geocode subject property')
+        }
+
+        const subjectCoords = await subjectRes.json()
+
+        // Geocode comparables in parallel
+        const compPromises = avmResult.comparables.map(async (comp: any) => {
+          // Build comparable address (use city/state from subject since comps only have street)
+          const compAddress = `${comp.address}, ${avmResult.property.city}, ${avmResult.property.state}`
+
+          try {
+            const res = await fetch('/api/geocode', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address: compAddress })
+            })
+
+            if (!res.ok) return null
+
+            const coords = await res.json()
+            return {
+              address: comp.address,
+              lat: coords.lat,
+              lng: coords.lng,
+              salePrice: comp.salePrice,
+              sqft: comp.squareFeet,
+              saleDate: comp.saleDate
+            } as ComparableProperty
+          } catch {
+            return null
+          }
+        })
+
+        const comparables = (await Promise.all(compPromises)).filter(Boolean) as ComparableProperty[]
+
+        setMapData({
+          subject: {
+            address: subjectAddress,
+            lat: subjectCoords.lat,
+            lng: subjectCoords.lng,
+            estimatedValue: avmResult.valuation.estimatedValue
+          },
+          comparables
+        })
+      } catch (err: any) {
+        setMapError(err?.message || 'Failed to load map data')
+      } finally {
+        setMapLoading(false)
+      }
+    }
+
+    geocodeAddresses()
+  }, [underwriting.property, app])
 
   async function handleStatusChange(newStatus: string) {
     setUpdating(true)
@@ -201,6 +293,15 @@ export default function AdminAppDetail() {
     }
     setUwLoading(prev => ({ ...prev, property: true }))
     try {
+      // Map snake_case to PascalCase for AVM API
+      const propertyTypeMap: Record<string, string> = {
+        single_family: 'SingleFamily',
+        condo: 'Condo',
+        townhouse: 'Townhouse',
+        multi_family: 'MultiFamily',
+        manufactured: 'Manufactured'
+      }
+
       const res = await fetch('/api/integrations/property-value', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -209,7 +310,7 @@ export default function AdminAppDetail() {
           city: property.address.city || '',
           state: property.address.state || '',
           zip: property.address.zip || '',
-          propertyType: property.propertyType || 'single_family',
+          propertyType: propertyTypeMap[property.propertyType] || 'SingleFamily',
           squareFeet: property.squareFeet,
           bedrooms: property.bedrooms,
           bathrooms: property.bathrooms
@@ -595,6 +696,33 @@ export default function AdminAppDetail() {
                     Valued: {formatDateTime(underwriting.property.valuedAt)}
                   </div>
                 </div>
+
+                {/* Property Map */}
+                {mapLoading && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center text-sm text-gray-500">
+                    <svg className="animate-spin h-5 w-5 mx-auto mb-2" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Loading map...
+                  </div>
+                )}
+                {!mapLoading && mapError && (
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-700">
+                    Map unavailable: {mapError}
+                  </div>
+                )}
+                {!mapLoading && !mapError && mapData.subject && (
+                  <div className="mt-4">
+                    <p className="text-xs text-gray-500 mb-2">
+                      Subject property (blue) and {mapData.comparables.length} comparable sales (orange)
+                    </p>
+                    <PropertyMap
+                      subjectProperty={mapData.subject}
+                      comparables={mapData.comparables}
+                    />
+                  </div>
+                )}
               </div>
             )}
 

@@ -5,8 +5,8 @@ This file tracks the current development session progress. Claude updates this f
 ---
 
 ## Last Updated
-**Date**: 2026-02-04
-**Status**: 20 tasks complete, 2 future tasks planned
+**Date**: 2026-02-05
+**Status**: 21 tasks complete
 
 ---
 
@@ -35,6 +35,7 @@ This file tracks the current development session progress. Claude updates this f
 | UX-01 | Address Autocomplete | DONE |
 | INTEG-02 | Plaid Integration | DONE |
 | CO-BORROWER-02 | Co-Borrower UI | DONE |
+| MAP-01 | Property Map with Comparables | DONE |
 
 ### Future Tasks
 | ID | Task | Status |
@@ -193,7 +194,50 @@ For full context: Read `TASKS.md` and `SESSION.md`.
 
 ## Session History
 
-### Session 2026-02-04 (Latest)
+### Session 2026-02-05 (Latest)
+
+**Enterprise Readiness & New Feature Planning**
+
+1. **Created marketing docs:**
+   - `FEATURES.md` — Non-technical product overview for marketing
+   - `DEPLOYMENT.md` — Production deployment guide
+
+2. **Added CI/CD:**
+   - `.github/workflows/ci.yml` — GitHub Actions runs tests on push/PR
+   - Fixed flaky test (credit score used Math.random, now deterministic)
+   - Updated to Node.js 20 (Next.js requirement)
+
+3. **Updated documentation:**
+   - Added Plaid/Google Places setup to CONTRIBUTING.md
+   - Added third-party integration details to DEPLOYMENT.md
+   - Updated README.md with new docs
+
+4. **Implemented: Property Map with Comparables (MAP-01)**
+   - Shows subject property + 4 comparable sales on interactive map
+   - Uses Leaflet (free) + Google Geocoding API
+   - Appears in admin underwriting panel after "Get Appraisal" click
+   - **Status: DONE**
+
+**Files Created/Modified:**
+- `FEATURES.md` (new)
+- `DEPLOYMENT.md` (new)
+- `.github/workflows/ci.yml` (new)
+- `src/lib/integrations/credit.ts` (fixed deterministic scores)
+- `CONTRIBUTING.md` (added integration setup)
+- `README.md` (added docs table, CI section)
+- `src/pages/api/geocode.ts` (new - Google Geocoding proxy)
+- `src/components/PropertyMap.tsx` (new - Leaflet map component)
+- `src/pages/admin/apps/[id].tsx` (added map to AVM results)
+- `src/styles/globals.css` (added Leaflet CSS import)
+
+**Packages Added:**
+- `leaflet` - Map rendering library
+- `react-leaflet@4` - React bindings for Leaflet (v4 for React 18 compatibility)
+- `@types/leaflet` - TypeScript definitions
+
+---
+
+### Session 2026-02-04 (Previous)
 - Implemented 3 features in parallel using Claude Code agents:
   - **UX-01**: Address Autocomplete with Google Places API
   - **INTEG-02**: Plaid Integration for bank/income verification

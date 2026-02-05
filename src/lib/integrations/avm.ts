@@ -75,7 +75,7 @@ export type AVMRequest = {
 const STATE_BASE_PRICES: Record<string, number> = {
   CA: 550, NY: 450, TX: 180, FL: 280, WA: 400,
   CO: 350, AZ: 280, MA: 420, IL: 200, GA: 220,
-  NC: 200, PA: 180, NJ: 320, VA: 280, OH: 150,
+  NC: 200, PA: 400, NJ: 320, VA: 280, OH: 150,
   // Default for other states
   DEFAULT: 200
 }
