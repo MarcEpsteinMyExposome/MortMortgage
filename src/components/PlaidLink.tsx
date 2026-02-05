@@ -43,6 +43,7 @@ export function PlaidLinkButton({
     error: null,
     configured: true,
   })
+  const [showSuccess, setShowSuccess] = useState<string | null>(null)
 
   // Fetch link token on mount
   useEffect(() => {
@@ -114,6 +115,10 @@ export function PlaidLinkButton({
         }
 
         setState(prev => ({ ...prev, loading: false }))
+        // Show success toast with institution name
+        const institutionName = result.data.institutionName || metadata?.institution?.name || 'your bank'
+        setShowSuccess(`Successfully connected to ${institutionName}`)
+        setTimeout(() => setShowSuccess(null), 5000)
         onSuccess(result.data)
       } catch (error: any) {
         setState(prev => ({
@@ -165,6 +170,10 @@ export function PlaidLinkButton({
       }
 
       setState(prev => ({ ...prev, loading: false }))
+      // Show success toast
+      const institutionName = result.data.institutionName || 'Demo Bank'
+      setShowSuccess(`Successfully connected to ${institutionName}`)
+      setTimeout(() => setShowSuccess(null), 5000)
       onSuccess(result.data)
     } catch (error: any) {
       setState(prev => ({
@@ -221,6 +230,15 @@ export function PlaidLinkButton({
           children || 'Connect Bank Account'
         )}
       </button>
+
+      {showSuccess && (
+        <div className="mt-3 p-3 bg-success-50 border border-success-200 rounded-lg flex items-center gap-2 text-success-800">
+          <svg className="w-5 h-5 text-success-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span className="text-sm font-medium">{showSuccess}</span>
+        </div>
+      )}
 
       {state.error && (
         <p className="text-red-500 text-sm mt-2">{state.error}</p>

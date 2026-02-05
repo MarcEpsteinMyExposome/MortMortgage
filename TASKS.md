@@ -89,11 +89,26 @@ npm run test:schemas  # Run schema validation tests
 | UX-01 | Address Autocomplete (Google Places) | DONE |
 | INTEG-02 | Plaid Integration (Bank/Income) | DONE |
 | CO-BORROWER-02 | Co-Borrower UI | DONE |
+| UX-02 | Wizard Stepper Fix + UX Polish | DONE |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 
 ---
 
-## Recently Completed Tasks (2026-02-03)
+## Recently Completed Tasks (2026-02-05)
+
+### UX-02: Wizard Stepper Fix + UX Polish Bundle
+
+| Fix | Files |
+|-----|-------|
+| Stepper scroll arrows + auto-scroll | `ApplicationWizard.tsx` |
+| Auto-save timestamp indicator | `ApplicationWizard.tsx` |
+| "In Review" status in admin | `admin/index.tsx` |
+| Plaid success toast | `PlaidLink.tsx` |
+| Claude Code plugin documentation | `CONTRIBUTING.md` |
+
+---
+
+## Previously Completed (2026-02-03)
 
 Four features implemented in parallel:
 

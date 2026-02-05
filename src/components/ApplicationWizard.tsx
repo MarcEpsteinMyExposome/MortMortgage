@@ -53,6 +53,7 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
   const [currentStep, setCurrentStep] = useState(0)
   const [data, setData] = useState(initialData)
   const [saving, setSaving] = useState(false)
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [stepValidation, setStepValidation] = useState<Record<string, ValidationResult>>({})
   const [showValidationPanel, setShowValidationPanel] = useState(false)
@@ -138,6 +139,7 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
     setSaving(true)
     try {
       await onSave(updated)
+      setLastSavedAt(new Date())
     } catch (err: any) {
       setError(err?.message || 'Failed to save')
     } finally {
@@ -335,7 +337,7 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
           </div>
 
           <div className="flex items-center gap-4">
-            {saving && (
+            {saving ? (
               <span className="inline-flex items-center gap-1.5 text-sm text-primary-600">
                 <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -343,7 +345,14 @@ export default function ApplicationWizard({ steps, initialData, onSave, onComple
                 </svg>
                 Saving...
               </span>
-            )}
+            ) : lastSavedAt && !error ? (
+              <span className="inline-flex items-center gap-1.5 text-sm text-success-600">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Saved at {lastSavedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+              </span>
+            ) : null}
 
             {error && (
               <span className="text-sm text-danger-600">{error}</span>

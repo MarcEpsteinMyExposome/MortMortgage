@@ -6,13 +6,13 @@ This file tracks the current development session progress. Claude updates this f
 
 ## Last Updated
 **Date**: 2026-02-05
-**Status**: 21 tasks complete
+**Status**: 22 tasks complete
 
 ---
 
 ## Current Project Status
 
-### Completed Tasks (20 total)
+### Completed Tasks (22 total)
 | ID | Task | Status |
 |----|------|--------|
 | DM-1 | Full URLA 2020 Schema | DONE |
@@ -36,6 +36,7 @@ This file tracks the current development session progress. Claude updates this f
 | INTEG-02 | Plaid Integration | DONE |
 | CO-BORROWER-02 | Co-Borrower UI | DONE |
 | MAP-01 | Property Map with Comparables | DONE |
+| UX-02 | Wizard Stepper Fix + UX Polish | DONE |
 
 ### Future Tasks
 | ID | Task | Status |
@@ -49,7 +50,29 @@ This file tracks the current development session progress. Claude updates this f
 
 ---
 
-## Latest Session Work (2026-02-03)
+## Latest Session Work (2026-02-05)
+
+### UX-02: Wizard Stepper Fix + UX Polish Bundle
+
+**Bug Fix: Wizard stepper steps not visible**
+- Problem: Steps 8-12 (Property, Loan, Declarations, Demographics, Documents) were hidden off-screen with a nearly invisible scrollbar
+- Solution: Added scroll arrow buttons + auto-scroll to active step
+- File: `src/components/ApplicationWizard.tsx`
+
+**UX Improvements:**
+1. **Auto-save timestamp** - Shows "Saved at X:XX PM" after successful save (`ApplicationWizard.tsx`)
+2. **"In Review" status** - Added to admin dashboard stat cards and filter (`admin/index.tsx`)
+3. **Plaid success toast** - Shows "Successfully connected to [Bank Name]" after bank connection (`PlaidLink.tsx`)
+
+**Documentation:**
+- Added Claude Code CLI installation and plugin documentation to `CONTRIBUTING.md`
+- Recommended plugins: `typescript-lsp`, `github`, `frontend-design`, `commit-commands`
+
+**Tests:** 217 tests passing
+
+---
+
+## Previous Session Work (2026-02-03)
 
 ### Parallel Feature Implementation - COMPLETED
 

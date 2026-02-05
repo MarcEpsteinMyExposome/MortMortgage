@@ -30,6 +30,11 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; icon: React.Reac
     bg: 'bg-orange-100',
     text: 'text-orange-800',
     icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+  },
+  in_review: {
+    bg: 'bg-purple-100',
+    text: 'text-purple-800',
+    icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
   }
 }
 
@@ -87,6 +92,7 @@ export default function Admin() {
     total: data.length,
     draft: data.filter((a: any) => a.status === 'draft').length,
     submitted: data.filter((a: any) => a.status === 'submitted').length,
+    in_review: data.filter((a: any) => a.status === 'in_review').length,
     approved: data.filter((a: any) => a.status === 'approved').length,
     denied: data.filter((a: any) => a.status === 'denied').length
   } : null
@@ -141,7 +147,7 @@ export default function Admin() {
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
             <div className="stat-card border-l-4 border-gray-400">
               <div className="flex items-center justify-between">
                 <div>
@@ -179,6 +185,21 @@ export default function Admin() {
                 <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600">
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="stat-card border-l-4 border-purple-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="stat-value text-purple-600">{stats.in_review}</div>
+                  <div className="stat-label">In Review</div>
+                </div>
+                <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
               </div>
@@ -231,6 +252,7 @@ export default function Admin() {
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>
               <option value="submitted">Submitted</option>
+              <option value="in_review">In Review</option>
               <option value="approved">Approved</option>
               <option value="denied">Denied</option>
               <option value="pending_documents">Pending Documents</option>
