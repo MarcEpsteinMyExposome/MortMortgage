@@ -134,7 +134,7 @@ Task specs live in `.claude/tasks/` (active) and `.claude/tasks/archive/` (compl
 
 ## Future Work
 
+- **ARCH-01: Layered Architecture Refactor** — Full plan at `docs/ARCH-01-layered-architecture.md` (5 phases, 21 new files, ~48 modified)
 - E2E tests with Cypress
-- Co-borrower UI
 - Real third-party integrations
 - Email notifications

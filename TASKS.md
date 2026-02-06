@@ -91,6 +91,7 @@ npm run test:schemas  # Run schema validation tests
 | CO-BORROWER-02 | Co-Borrower UI | DONE |
 | UX-02 | Wizard Stepper Fix + UX Polish | DONE |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
+| ARCH-01 | Layered Architecture Refactor | PLANNED |
 
 ---
 
@@ -486,6 +487,40 @@ import SignaturePad from '@/components/SignaturePad';
 
 ---
 
+## Planned Refactoring
+
+### ARCH-01: Layered Architecture Refactor
+**Status**: PLANNED (not started)
+**Full Plan**: `docs/ARCH-01-layered-architecture.md`
+**Goal**: Refactor from flat Next.js structure to proper 4-layer architecture
+
+**Current problems**: 12 separate PrismaClient instances, ~40 inline fetch() calls, business logic scattered across components and API routes, repeated JSON.parse() patterns.
+
+**Target layers**:
+1. **DB Layer** (`src/lib/db/`) — Prisma singleton + repositories + JSON helpers
+2. **Service Layer** (`src/lib/services/`) — All business logic
+3. **API Layer** (`src/pages/api/`) — Thin controllers
+4. **UI Layer** (`src/hooks/` + components) — Custom hooks, render-only components
+
+**Phases** (each independently deployable):
+
+| Phase | What | New Files | Modified | Risk |
+|-------|------|-----------|----------|------|
+| 1 | Prisma singleton + JSON helpers | 2 | 12 | Low |
+| 2 | Repository layer | 2 | 12 | Low |
+| 3 | Service layer + tests | 8 | 12 | Medium |
+| 4 | UI hooks layer | 6 | 7 | Medium |
+| 5 | Cleanup & polish | 3 | ~5 | Low |
+| **Total** | | **21** | **~48** | |
+
+**Notes**:
+- Phases 1-2 can be combined (both mechanical, zero behavior change)
+- Phase 3 is highest risk (extracting business logic)
+- Existing `src/lib/` files (integrations, ocr, mismo-mapper, etc.) stay as-is
+- 299 tests must pass after each phase
+
+---
+
 ## Future Ideas (Backlog)
 
 ### IDEA-01: Borrower Status Tracker ("Pizza Tracker")
@@ -527,6 +562,37 @@ import SignaturePad from '@/components/SignaturePad';
 
 **Impact**: Very High (major competitive differentiator)
 **Complexity**: Very High (requires deep integration work)
+
+---
+
+### IDEA-04: Usage Analytics / Dead Code Detector
+**Status**: Not Scheduled
+**Goal**: Identify which parts of the application are actively used vs unused
+**Would include**:
+- Client-side telemetry tracking page visits, feature clicks, and component renders
+- Admin dashboard showing usage heatmap (most/least visited pages, buttons clicked)
+- Dead code detection report (unused components, API routes with zero calls)
+- Bundle analysis integration (visualize what ships to production vs what's actually used)
+- Optional: lightweight analytics service (self-hosted, no third-party tracking)
+
+**Impact**: Medium (helps prioritize features and clean up tech debt)
+**Complexity**: Medium
+
+---
+
+### IDEA-05: In-App Feature Request Button
+**Status**: Not Scheduled
+**Goal**: Let users submit feature requests and feedback from within the app
+**Would include**:
+- Floating "Request a Feature" button (or menu item)
+- Simple form: title, description, category (bug/feature/improvement), priority vote
+- Admin view to triage and manage incoming requests
+- Upvote/vote system so popular requests bubble up
+- Status updates visible to submitter (received → reviewing → planned → shipped)
+- Optional: screenshot/screen recording attachment
+
+**Impact**: Medium (improves user engagement, captures real needs)
+**Complexity**: Low-Medium
 
 ---
 

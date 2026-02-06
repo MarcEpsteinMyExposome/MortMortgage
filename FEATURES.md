@@ -3,6 +3,33 @@
 > A modern mortgage platform that simplifies the home financing journey for borrowers while giving lenders powerful tools to make faster, smarter decisions.
 
 ---
+## A feature summary
+Completed Features (22)
+
+Full URLA 2020 JSON Schema (10 sections)
+10-step application wizard with auto-save
+Application CRUD API
+MISMO v3.4 JSON/XML export
+Admin portal with status management
+Form validation (DTI/LTV warnings)
+Authentication (NextAuth, demo accounts)
+Document upload (PDF/JPG/PNG)
+Modern UI design (Tailwind)
+Mock integrations (credit, income, AVM, pricing)
+URLA PDF export
+Admin underwriting panel
+299 unit tests
+Borrower dashboard
+Pre-qualification calculator
+Admin analytics with charts
+Loan comparison tool
+Address autocomplete (Google Places)
+Plaid bank/income verification
+Co-borrower support
+Property map with comparables (Leaflet)
+AI document OCR (Claude + Tesseract fallback)
+Signature pad component
+
 
 ## For Home Buyers
 

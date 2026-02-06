@@ -41,6 +41,7 @@ This file tracks the current development session progress. Claude updates this f
 ### Future Tasks
 | ID | Task | Status |
 |----|------|--------|
+| ARCH-01 | Layered Architecture Refactor (5 phases) | PLANNED |
 | INTEG-03 | eSign Integration (DocuSign) | TODO |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 
@@ -52,6 +53,12 @@ This file tracks the current development session progress. Claude updates this f
 ---
 
 ## Latest Session Work (2026-02-05)
+
+### ARCH-01: Layered Architecture Plan Created
+- Full 5-phase plan for refactoring to layered architecture (DB → Repository → Service → API → UI Hooks)
+- Plan file: `docs/ARCH-01-layered-architecture.md`
+- 21 new files, ~48 modified files across 5 phases
+- Status: PLANNED — awaiting decision on when/whether to implement
 
 ### CI/Test Fixes
 - **Jest config**: Added `testMatch` to only run `src/**/*.test.ts` (excludes Cypress specs)
