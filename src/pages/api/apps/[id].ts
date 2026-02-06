@@ -6,7 +6,8 @@ export default async function handler(req: any, res: any) {
   const { id } = req.query
 
   if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'Invalid application ID' })
+    res.status(400).json({ error: 'Invalid application ID' })
+    return
   }
 
   // GET - Fetch single application
@@ -17,18 +18,20 @@ export default async function handler(req: any, res: any) {
       })
 
       if (!app) {
-        return res.status(404).json({ error: 'Application not found' })
+        res.status(404).json({ error: 'Application not found' })
+        return
       }
 
-      return res.status(200).json({
+      res.status(200).json({
         ...app,
         data: JSON.parse(app.data || '{}'),
         borrowers: JSON.parse(app.borrowers || '[]')
       })
     } catch (error) {
       console.error('Error fetching application:', error)
-      return res.status(500).json({ error: 'Failed to fetch application' })
+      res.status(500).json({ error: 'Failed to fetch application' })
     }
+    return
   }
 
   // PUT - Update application
@@ -57,15 +60,16 @@ export default async function handler(req: any, res: any) {
         data: updateData
       })
 
-      return res.status(200).json({
+      res.status(200).json({
         ...app,
         data: JSON.parse(app.data || '{}'),
         borrowers: JSON.parse(app.borrowers || '[]')
       })
     } catch (error) {
       console.error('Error updating application:', error)
-      return res.status(500).json({ error: 'Failed to update application' })
+      res.status(500).json({ error: 'Failed to update application' })
     }
+    return
   }
 
   // DELETE - Delete application
@@ -75,11 +79,12 @@ export default async function handler(req: any, res: any) {
         where: { id }
       })
 
-      return res.status(204).end()
+      res.status(204).end()
     } catch (error) {
       console.error('Error deleting application:', error)
-      return res.status(500).json({ error: 'Failed to delete application' })
+      res.status(500).json({ error: 'Failed to delete application' })
     }
+    return
   }
 
   res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
