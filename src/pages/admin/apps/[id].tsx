@@ -4,6 +4,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import type { UnderwritingData } from '../../../types/underwriting'
 import type { SubjectProperty, ComparableProperty } from '../../../components/PropertyMap'
+import AssignmentPanel from '../../../components/AssignmentPanel'
 
 // Dynamic import for Leaflet (doesn't work server-side)
 const PropertyMap = dynamic(() => import('../../../components/PropertyMap'), { ssr: false })
@@ -749,6 +750,19 @@ export default function AdminAppDetail() {
             </div>
           </div>
         </div>
+
+        {/* Assignment Panel */}
+        <AssignmentPanel
+          applicationId={app.id}
+          assignedTo={app.assignedTo || null}
+          assignedAt={app.assignedAt}
+          priority={app.priority || 'normal'}
+          slaDeadline={app.slaDeadline}
+          onUpdate={() => {
+            // Reload app data
+            fetch(`/api/apps/${id}`).then(r => r.json()).then(setApp)
+          }}
+        />
 
         {/* Export Buttons */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
@@ -11,18 +12,42 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
-  role      String   @default("BORROWER") // BORROWER or ADMIN
+  role      String   @default("BORROWER") // BORROWER, ADMIN, CASEWORKER, SUPERVISOR
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  assignedApplications Application[] @relation("AssignedCaseworker")
+  assignmentsReceived  Assignment[]  @relation("AssignedTo")
+  assignmentsMade      Assignment[]  @relation("AssignedBy")
 }
 
 model Application {
-  id         String   @id @default(uuid())
-  status     String   @default("draft")
-  data       String   @default("{}") // JSON string - URLA application data
-  borrowers  String   @default("[]") // JSON string - array of borrowers
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  documents  Document[]
+  id            String    @id @default(uuid())
+  status        String    @default("draft")
+  data          String    @default("{}") // JSON string - URLA application data
+  borrowers     String    @default("[]") // JSON string - array of borrowers
+  assignedToId  String?
+  assignedTo    User?     @relation("AssignedCaseworker", fields: [assignedToId], references: [id])
+  assignedAt    DateTime?
+  priority      String    @default("normal") // low, normal, high, urgent
+  slaDeadline   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  documents     Document[]
+  assignments   Assignment[]
+}
+
+model Assignment {
+  id            String      @id @default(uuid())
+  application   Application @relation(fields: [applicationId], references: [id])
+  applicationId String
+  assignedTo    User        @relation("AssignedTo", fields: [assignedToId], references: [id])
+  assignedToId  String
+  assignedByUser User       @relation("AssignedBy", fields: [assignedBy], references: [id])
+  assignedBy    String
+  action        String      // assigned, reassigned, unassigned, completed
+  note          String?
+  createdAt     DateTime    @default(now())
 }
 
 model Document {

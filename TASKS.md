@@ -48,6 +48,11 @@ App runs at http://localhost:3000
 |------|-------|----------|
 | Borrower | borrower@demo.com | demo123 |
 | Admin | admin@demo.com | admin123 |
+| Supervisor | supervisor@demo.com | demo123 |
+| Caseworker | caseworker1@demo.com | demo123 |
+| Caseworker | caseworker2@demo.com | demo123 |
+| Caseworker | caseworker3@demo.com | demo123 |
+| Caseworker | caseworker4@demo.com | demo123 |
 
 ### Verify Everything Works
 ```bash
@@ -90,12 +95,32 @@ npm run test:schemas  # Run schema validation tests
 | INTEG-02 | Plaid Integration (Bank/Income) | DONE |
 | CO-BORROWER-02 | Co-Borrower UI | DONE |
 | UX-02 | Wizard Stepper Fix + UX Polish | DONE |
+| ADMIN-CW-01 | Caseworker Queues & Supervisor Dashboards | DONE |
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 | ARCH-01 | Layered Architecture Refactor | PLANNED |
 
 ---
 
-## Recently Completed Tasks (2026-02-05)
+## Recently Completed Tasks (2026-02-08)
+
+### ENV-FIX: Windows ARM64 Compatibility & Environment Setup
+**Branch**: `fix/env-setup-and-arm64-compat` (3 commits, ready to merge to main)
+
+| Fix | Details |
+|-----|---------|
+| Prisma version pinning | Exact `5.22.0` (removed `^` caret) |
+| Prisma engine type | `engineType = "binary"` in schema (ARM64 compat) |
+| Replaced `canvas` | Swapped for `jest-canvas-mock` (no ARM64 binary) |
+| Webpack mode | `--webpack` flag on both `dev` and `build` scripts |
+| tsconfig excludes | Excludes `scripts/` and `prisma/` from compilation |
+| Seed script fix | `JSON.stringify()` for SQLite JSON fields |
+| Jest pinning | Pinned jest/ts-jest to v29 |
+
+**Verification**: 316 tests passing, production build succeeds
+
+---
+
+## Previously Completed Tasks (2026-02-05)
 
 ### UX-02: Wizard Stepper Fix + UX Polish Bundle
 

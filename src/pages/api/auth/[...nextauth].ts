@@ -19,6 +19,41 @@ const DEMO_USERS = [
     password: 'admin123',
     name: 'Demo Admin',
     role: 'ADMIN'
+  },
+  {
+    id: 'demo-supervisor-1',
+    email: 'supervisor@demo.com',
+    password: 'demo123',
+    name: 'Maria Rodriguez',
+    role: 'SUPERVISOR'
+  },
+  {
+    id: 'demo-caseworker-1',
+    email: 'caseworker1@demo.com',
+    password: 'demo123',
+    name: 'Sarah Chen',
+    role: 'CASEWORKER'
+  },
+  {
+    id: 'demo-caseworker-2',
+    email: 'caseworker2@demo.com',
+    password: 'demo123',
+    name: 'James Wilson',
+    role: 'CASEWORKER'
+  },
+  {
+    id: 'demo-caseworker-3',
+    email: 'caseworker3@demo.com',
+    password: 'demo123',
+    name: 'Priya Patel',
+    role: 'CASEWORKER'
+  },
+  {
+    id: 'demo-caseworker-4',
+    email: 'caseworker4@demo.com',
+    password: 'demo123',
+    name: 'Marcus Johnson',
+    role: 'CASEWORKER'
   }
 ]
 

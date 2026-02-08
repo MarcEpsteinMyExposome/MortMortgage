@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "dev:seed": "ts-node --transpile-only prisma/seed.ts",
+    "dev:seed-caseworkers": "ts-node --transpile-only prisma/seed-caseworker-data.ts",
     "dev:reset": "node ./scripts/reset-db.js",
     "resume": "npm run dev:reset && npm run dev:seed",
     "test": "jest",
