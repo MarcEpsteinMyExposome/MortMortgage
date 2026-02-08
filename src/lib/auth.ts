@@ -1,7 +1,14 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../pages/api/auth/[...nextauth]'
 
-export type UserRole = 'BORROWER' | 'ADMIN'
+export type UserRole = 'BORROWER' | 'CASEWORKER' | 'ADMIN' | 'SUPERVISOR'
+
+const ROLE_HIERARCHY: Record<UserRole, number> = {
+  BORROWER: 0,
+  CASEWORKER: 1,
+  ADMIN: 2,
+  SUPERVISOR: 3
+}
 
 export interface AuthUser {
   id: string
@@ -18,12 +25,21 @@ export async function getSession(req: any, res: any) {
 }
 
 /**
- * Check if user has required role
+ * Check if user has required role (respects hierarchy)
  */
 export function hasRole(user: AuthUser | null, requiredRole: UserRole): boolean {
   if (!user) return false
-  if (requiredRole === 'ADMIN') return user.role === 'ADMIN'
-  return true // BORROWER role is default
+  const userLevel = ROLE_HIERARCHY[user.role] ?? 0
+  const requiredLevel = ROLE_HIERARCHY[requiredRole] ?? 0
+  return userLevel >= requiredLevel
+}
+
+/**
+ * Check if user is exactly one of the specified roles
+ */
+export function isRole(user: AuthUser | null, ...roles: UserRole[]): boolean {
+  if (!user) return false
+  return roles.includes(user.role)
 }
 
 /**

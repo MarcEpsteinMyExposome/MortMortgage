@@ -4,7 +4,26 @@ const prisma = new PrismaClient()
 
 export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
-    const apps = await prisma.application.findMany({ orderBy: { createdAt: 'desc' } })
+    const where: any = {}
+
+    // Filter by assigned caseworker
+    if (req.query.assignedTo) {
+      where.assignedToId = req.query.assignedTo
+    }
+
+    // Filter unassigned only
+    if (req.query.unassigned === 'true') {
+      where.assignedToId = null
+      where.status = { notIn: ['draft'] }
+    }
+
+    const apps = await prisma.application.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        assignedTo: { select: { id: true, name: true, email: true } }
+      }
+    })
     // Parse JSON strings back to objects for the response
     const parsed = apps.map((app: any) => ({
       ...app,

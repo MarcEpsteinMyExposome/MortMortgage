@@ -14,7 +14,10 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     try {
       const app = await prisma.application.findUnique({
-        where: { id }
+        where: { id },
+        include: {
+          assignedTo: { select: { id: true, name: true, email: true } }
+        }
       })
 
       if (!app) {
@@ -37,7 +40,7 @@ export default async function handler(req: any, res: any) {
   // PUT - Update application
   if (req.method === 'PUT') {
     try {
-      const { status, data, borrowers } = req.body
+      const { status, data, borrowers, priority, slaDeadline } = req.body
 
       const updateData: any = {
         updatedAt: new Date()
@@ -53,6 +56,14 @@ export default async function handler(req: any, res: any) {
 
       if (borrowers !== undefined) {
         updateData.borrowers = JSON.stringify(borrowers)
+      }
+
+      if (priority !== undefined) {
+        updateData.priority = priority
+      }
+
+      if (slaDeadline !== undefined) {
+        updateData.slaDeadline = slaDeadline ? new Date(slaDeadline) : null
       }
 
       const app = await prisma.application.update({

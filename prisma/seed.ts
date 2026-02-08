@@ -18,6 +18,24 @@ async function main() {
     }
   })
 
+  // Upsert supervisor and caseworker users
+  const demoUsers = [
+    { id: 'demo-supervisor-1', email: 'supervisor@demo.com', name: 'Maria Rodriguez', role: 'SUPERVISOR' },
+    { id: 'demo-caseworker-1', email: 'caseworker1@demo.com', name: 'Sarah Chen', role: 'CASEWORKER' },
+    { id: 'demo-caseworker-2', email: 'caseworker2@demo.com', name: 'James Wilson', role: 'CASEWORKER' },
+    { id: 'demo-caseworker-3', email: 'caseworker3@demo.com', name: 'Priya Patel', role: 'CASEWORKER' },
+    { id: 'demo-caseworker-4', email: 'caseworker4@demo.com', name: 'Marcus Johnson', role: 'CASEWORKER' }
+  ]
+
+  for (const user of demoUsers) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: { name: user.name, role: user.role },
+      create: { id: user.id, email: user.email, name: user.name, role: user.role }
+    })
+    console.log(`Upserted user: ${user.name} (${user.role})`)
+  }
+
   const seedFixtures = process.env.SEED_FIXTURES !== 'false'
 
   if (seedFixtures) {

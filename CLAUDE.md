@@ -25,6 +25,11 @@ npm test           # Run 149+ unit tests
 |------|-------|----------|
 | Borrower | borrower@demo.com | demo123 |
 | Admin | admin@demo.com | admin123 |
+| Supervisor | supervisor@demo.com | demo123 |
+| Caseworker | caseworker1@demo.com | demo123 |
+| Caseworker | caseworker2@demo.com | demo123 |
+| Caseworker | caseworker3@demo.com | demo123 |
+| Caseworker | caseworker4@demo.com | demo123 |
 
 ## Key Pages
 
@@ -37,6 +42,9 @@ npm test           # Run 149+ unit tests
 | Compare Loans | `/compare` | Side-by-side loan comparison |
 | Admin Portal | `/admin` | Application management |
 | Admin Analytics | `/admin/analytics` | Charts and metrics |
+| Caseworker Queue | `/caseworker` | Caseworker workbench |
+| Supervisor Dashboard | `/supervisor` | Supervisor oversight |
+| Caseworker Management | `/admin/caseworkers` | Manage caseworker team |
 | Sign In | `/auth/signin` | Authentication |
 
 ## Project Structure
@@ -98,7 +106,7 @@ npm run test:schemas        # Schema validation only
 3. Follow Tailwind component classes from `globals.css`
 4. Add tests for new business logic
 
-## Completed Features (19 tasks)
+## Completed Features (20 tasks)
 
 - DM-1: Full URLA 2020 Schema
 - FE-01: Multi-Step Wizard
@@ -119,6 +127,7 @@ npm run test:schemas        # Schema validation only
 - COMPARE-01: Loan Comparison Tool
 - UX-01: Address Autocomplete (Google Places)
 - INTEG-02: Plaid Integration (Bank/Income)
+- ADMIN-CW-01: Caseworker Queues & Supervisor Dashboards
 
 ## Task Management Protocol
 

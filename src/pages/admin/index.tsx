@@ -2,6 +2,8 @@ import useSWR from 'swr'
 import Link from 'next/link'
 import { useState } from 'react'
 import UserMenu from '../../components/UserMenu'
+import CaseworkerSelect from '../../components/CaseworkerSelect'
+import PriorityBadge from '../../components/PriorityBadge'
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
@@ -41,11 +43,32 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; icon: React.Reac
 export default function Admin() {
   const { data, error, mutate } = useSWR('/api/apps', fetcher)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [assignedFilter, setAssignedFilter] = useState('all')
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [assigningApp, setAssigningApp] = useState<string | null>(null)
+  const [selectedCw, setSelectedCw] = useState('')
 
-  const filteredApps = data?.filter((a: any) =>
-    statusFilter === 'all' || a.status === statusFilter
-  ) || []
+  const filteredApps = data?.filter((a: any) => {
+    if (statusFilter !== 'all' && a.status !== statusFilter) return false
+    if (assignedFilter === 'unassigned' && a.assignedToId) return false
+    if (assignedFilter === 'assigned' && !a.assignedToId) return false
+    return true
+  }) || []
+
+  async function handleQuickAssign(applicationId: string, assignedToId: string) {
+    try {
+      await fetch('/api/admin/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicationId, assignedToId })
+      })
+      setAssigningApp(null)
+      setSelectedCw('')
+      mutate()
+    } catch (err) {
+      alert('Failed to assign')
+    }
+  }
 
   async function handleDelete(id: string) {
     if (!confirm('Are you sure you want to delete this application?')) return
@@ -130,6 +153,9 @@ export default function Admin() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/admin/caseworkers" className="btn btn-ghost">
+              Caseworkers
+            </Link>
             <Link href="/admin/analytics" className="btn btn-ghost">
               <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -257,6 +283,15 @@ export default function Admin() {
               <option value="denied">Denied</option>
               <option value="pending_documents">Pending Documents</option>
             </select>
+            <select
+              value={assignedFilter}
+              onChange={(e) => setAssignedFilter(e.target.value)}
+              className="input w-auto"
+            >
+              <option value="all">All Assignments</option>
+              <option value="unassigned">Unassigned Only</option>
+              <option value="assigned">Assigned Only</option>
+            </select>
             <span className="text-sm text-gray-500 ml-auto">
               Showing {filteredApps.length} of {data?.length || 0} applications
             </span>
@@ -312,6 +347,8 @@ export default function Admin() {
                     <th className="table-header-cell">Loan Amount</th>
                     <th className="table-header-cell">Property</th>
                     <th className="table-header-cell">Status</th>
+                    <th className="table-header-cell">Priority</th>
+                    <th className="table-header-cell">Assigned To</th>
                     <th className="table-header-cell">Created</th>
                     <th className="table-header-cell">Actions</th>
                   </tr>
@@ -341,6 +378,38 @@ export default function Admin() {
                             {statusConfig.icon}
                             <span className="ml-1.5">{app.status}</span>
                           </span>
+                        </td>
+                        <td className="table-cell">
+                          <PriorityBadge priority={app.priority || 'normal'} />
+                        </td>
+                        <td className="table-cell">
+                          {assigningApp === app.id ? (
+                            <div className="flex items-center gap-1">
+                              <CaseworkerSelect value={selectedCw} onChange={setSelectedCw} />
+                              <button
+                                onClick={() => selectedCw && handleQuickAssign(app.id, selectedCw)}
+                                disabled={!selectedCw}
+                                className="btn btn-sm btn-primary disabled:opacity-50"
+                              >
+                                Go
+                              </button>
+                              <button onClick={() => setAssigningApp(null)} className="btn btn-sm btn-ghost">X</button>
+                            </div>
+                          ) : app.assignedTo ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 text-xs font-semibold">
+                                {(app.assignedTo.name || '?').charAt(0)}
+                              </div>
+                              <span className="text-sm">{app.assignedTo.name}</span>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setAssigningApp(app.id)}
+                              className="btn btn-sm btn-ghost text-primary-600"
+                            >
+                              Assign
+                            </button>
+                          )}
                         </td>
                         <td className="table-cell text-gray-500">
                           {formatDate(app.createdAt)}
