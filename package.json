@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "dev:seed": "ts-node --transpile-only prisma/seed.ts",
     "dev:reset": "node ./scripts/reset-db.js",
