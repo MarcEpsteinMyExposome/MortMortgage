@@ -1,6 +1,6 @@
 # MortMortgage — Claude Code Project Guide
 
-> **Read this file first** when starting a new Claude Code session.
+> **Read this file first** when starting a new Claude Code session..
 
 ## Quick Context
 
