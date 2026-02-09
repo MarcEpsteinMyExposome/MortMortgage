@@ -35,8 +35,8 @@ async function main() {
         data: {
           id: fixture.id,
           status: 'submitted',
-          data: fixture,
-          borrowers: fixture.borrowers
+          data: JSON.stringify(fixture),
+          borrowers: JSON.stringify(fixture.borrowers ?? [])
         }
       })
 

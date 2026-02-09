@@ -261,7 +261,7 @@ describe('PDF Signer Utility', () => {
       const signatureBase64 = createPlaceholderSignature()
 
       const params: SignPdfParams = {
-        pdfBytes: pdfArrayBuffer,
+        pdfBytes: pdfArrayBuffer as ArrayBuffer,
         signatureBase64,
         signatureOptions: {
           x: 100,
