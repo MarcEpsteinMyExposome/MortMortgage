@@ -4,7 +4,7 @@
 
 ---
 ## A feature summary
-Completed Features (22)
+Completed Features (23)
 
 Full URLA 2020 JSON Schema (10 sections)
 10-step application wizard with auto-save
@@ -12,13 +12,13 @@ Application CRUD API
 MISMO v3.4 JSON/XML export
 Admin portal with status management
 Form validation (DTI/LTV warnings)
-Authentication (NextAuth, demo accounts)
+Authentication (NextAuth, 4-tier role hierarchy)
 Document upload (PDF/JPG/PNG)
 Modern UI design (Tailwind)
 Mock integrations (credit, income, AVM, pricing)
 URLA PDF export
 Admin underwriting panel
-299 unit tests
+351 unit tests
 Borrower dashboard
 Pre-qualification calculator
 Admin analytics with charts
@@ -29,6 +29,7 @@ Co-borrower support
 Property map with comparables (Leaflet)
 AI document OCR (Claude + Tesseract fallback)
 Signature pad component
+Caseworker queues & supervisor dashboards
 
 
 ## For Home Buyers
@@ -136,6 +137,40 @@ The **Analytics Dashboard** gives you visibility into your pipeline:
 
 Spot trends, identify bottlenecks, and optimize your operations.
 
+### Caseworker Queues — Work Smarter, Not Harder
+
+Assign applications to caseworkers and give each one a focused **personal workbench**:
+
+- **Smart queue sorting** — Urgent priorities and overdue SLAs float to the top automatically
+- **Priority badges** — Color-coded urgent/high/normal/low indicators so nothing gets missed
+- **SLA tracking** — At-a-glance overdue (red), at-risk (yellow), and on-track (green) status
+- **Personal stats** — Queue size, completed this month, average days to decision, approval rate
+- **Completion history** — Track every decision with outcome and processing time
+
+Caseworkers open their queue in the morning and know exactly what to work on first.
+
+### Supervisor Dashboards — Team Visibility at Scale
+
+Supervisors get a bird's-eye view of the entire operation:
+
+**Workload Distribution**
+- Visual bar chart showing each caseworker's active queue size
+- Color-coded capacity indicators (green/yellow/red) to spot overloaded team members
+
+**Risk Analysis**
+- LTV and DTI stacked bar charts showing approval vs. denial rates by range
+- Quickly identify where risk is concentrated in your portfolio
+
+**Performance Trends**
+- 6-month multi-line chart tracking completed applications per caseworker
+- Spot performance patterns and seasonal trends
+
+**Team Management**
+- Auto-assign unassigned applications with one click (round-robin balancing)
+- Reassign cases between caseworkers as workloads shift
+- Activate or deactivate caseworkers
+- Full assignment audit trail — who assigned what, when, and why
+
 ### Industry-Standard Exports
 
 Seamlessly integrate with your existing systems:
@@ -159,7 +194,7 @@ MortMortgage is designed around the **URLA 2020** standard, ensuring:
 
 ## Security & Privacy
 
-- Secure authentication with role-based access
+- Secure authentication with 4-tier role-based access (Borrower, Caseworker, Admin, Supervisor)
 - Document uploads validated for type and size
 - Sensitive data (SSN) masked in exports
 - Bank connections through Plaid's secure infrastructure
@@ -176,12 +211,15 @@ MortMortgage is designed around the **URLA 2020** standard, ensuring:
 | Difficult to compare loan options | Side-by-side comparison tool |
 | Integration with existing LOS | MISMO v3.4 export ready |
 | Compliance concerns | Built on URLA 2020 standards |
+| Uneven caseworker workloads | Auto-assign with round-robin balancing |
+| No visibility into team performance | Supervisor dashboard with workload and trend charts |
+| Applications falling through the cracks | Priority queues with SLA tracking and overdue alerts |
 
 ---
 
 ## Ready to Modernize Your Mortgage Process?
 
-MortMortgage brings together everything borrowers and lenders need in one streamlined platform. From the first "Can I afford this?" question through final underwriting decisions, we make the mortgage process clearer, faster, and more transparent for everyone involved.
+MortMortgage brings together everything borrowers, caseworkers, and supervisors need in one streamlined platform. From the first "Can I afford this?" question through caseworker assignment to final underwriting decisions, we make the mortgage process clearer, faster, and more transparent for everyone involved.
 
 ---
 
