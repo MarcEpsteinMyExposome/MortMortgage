@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../../lib/prisma'
 import { withAuth, isRole } from '../../../../lib/auth'
-
-const prisma = new PrismaClient()
 
 async function handler(req: any, res: any, user: any) {
   if (req.method !== 'DELETE') {

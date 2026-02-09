@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../../../lib/prisma'
+import { isVercel } from '../../../../../lib/env'
 import fs from 'fs'
-
-const prisma = new PrismaClient()
 
 export default async function handler(req: any, res: any) {
   const { id, docId } = req.query
@@ -23,7 +22,7 @@ export default async function handler(req: any, res: any) {
   if (req.method === 'GET') {
     try {
       // Check if file exists
-      if (!fs.existsSync(document.path)) {
+      if (isVercel || !fs.existsSync(document.path)) {
         return res.status(404).json({ error: 'File not found on disk' })
       }
 
@@ -43,8 +42,8 @@ export default async function handler(req: any, res: any) {
   // DELETE - Remove document
   else if (req.method === 'DELETE') {
     try {
-      // Delete file from disk
-      if (fs.existsSync(document.path)) {
+      // Delete file from disk (skip on Vercel — no local files)
+      if (!isVercel && fs.existsSync(document.path)) {
         fs.unlinkSync(document.path)
       }
 

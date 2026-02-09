@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../../lib/prisma'
 import { generateURLAPdf } from '../../../../lib/pdf-generator'
-
-const prisma = new PrismaClient()
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {

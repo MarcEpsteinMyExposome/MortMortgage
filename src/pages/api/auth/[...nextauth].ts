@@ -1,8 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../../../lib/prisma'
 
 // Demo users (in production, use bcrypt for password hashing)
 const DEMO_USERS = [

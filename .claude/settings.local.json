@@ -45,7 +45,17 @@
       "Bash(npx eslint:*)",
       "Bash(npx ts-node:*)",
       "Bash(npx tsx:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr close:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(npx vercel:*)",
+      "Bash(npm view:*)",
+      "Bash(findstr:*)",
+      "Bash(tasklist:*)",
+      "Bash(npm ls:*)"
     ],
     "deny": [
       "Bash(rm:*)",

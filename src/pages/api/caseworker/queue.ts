@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../lib/prisma'
 import { withAuth } from '../../../lib/auth'
-
-const prisma = new PrismaClient()
 
 const PRIORITY_ORDER: Record<string, number> = { urgent: 0, high: 1, normal: 2, low: 3 }
 

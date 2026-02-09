@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../../lib/prisma'
 import { mapToMISMO, mismoToXML, validateMISMO } from '../../../../lib/mismo-mapper'
-
-const prisma = new PrismaClient()
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {

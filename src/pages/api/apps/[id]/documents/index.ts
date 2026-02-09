@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../../../lib/prisma'
+import { isVercel } from '../../../../../lib/env'
 import formidable from 'formidable'
 import fs from 'fs'
 import path from 'path'
-
-const prisma = new PrismaClient()
 
 // Disable body parser for file uploads
 export const config = {
@@ -14,8 +13,8 @@ export const config = {
 
 const UPLOAD_DIR = path.join(process.cwd(), 'uploads')
 
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
+// Only create upload directory when not on Vercel (read-only filesystem)
+if (!isVercel && !fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true })
 }
 
@@ -83,6 +82,9 @@ export default async function handler(req: any, res: any) {
 
   // POST - Upload new document
   if (req.method === 'POST') {
+    if (isVercel) {
+      return res.status(501).json({ error: 'File uploads are not available in the hosted demo. Use the local development server for document upload features.' })
+    }
     try {
       const form = formidable({
         uploadDir: UPLOAD_DIR,

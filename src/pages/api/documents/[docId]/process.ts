@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../../../lib/prisma'
+import { isVercel } from '../../../../lib/env'
 import fs from 'fs'
 import { extractDocument, SupportedDocumentType, ExtractedField } from '../../../../lib/ocr'
-
-const prisma = new PrismaClient()
 
 export default async function handler(req: any, res: any) {
   const { docId } = req.query
@@ -15,6 +14,10 @@ export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST'])
     return res.status(405).end(`Method ${req.method} Not Allowed`)
+  }
+
+  if (isVercel) {
+    return res.status(501).json({ error: 'OCR processing requires local file access and is not available in the hosted demo.' })
   }
 
   try {

@@ -14,6 +14,7 @@ const fetcher = (url: string) => fetch(url).then(r => r.json())
 export default function SupervisorDashboard() {
   const { data, error, mutate } = useSWR('/api/supervisor/analytics', fetcher)
   const [autoAssigning, setAutoAssigning] = useState(false)
+  const [seeding, setSeeding] = useState(false)
 
   async function handleAutoAssign() {
     setAutoAssigning(true)
@@ -26,6 +27,22 @@ export default function SupervisorDashboard() {
       alert('Auto-assign failed')
     } finally {
       setAutoAssigning(false)
+    }
+  }
+
+  async function handleSeedDemo() {
+    if (!window.confirm('This will delete existing demo data and create 46 new applications with assignment records. Continue?')) return
+    setSeeding(true)
+    try {
+      const res = await fetch('/api/admin/seed-demo', { method: 'POST' })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Seed failed')
+      alert(result.message)
+      mutate()
+    } catch (err: any) {
+      alert(err.message || 'Failed to seed demo data')
+    } finally {
+      setSeeding(false)
     }
   }
 
@@ -113,6 +130,13 @@ export default function SupervisorDashboard() {
               <Link href="/admin" className="btn btn-ghost">
                 Admin Portal
               </Link>
+              <button
+                onClick={handleSeedDemo}
+                disabled={seeding}
+                className="btn btn-ghost text-amber-700 hover:bg-amber-50 disabled:opacity-50 ml-auto"
+              >
+                {seeding ? 'Seeding...' : 'Seed Demo Data'}
+              </button>
             </div>
 
             {/* Workload Distribution */}

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "mort-mortgage-demo": "file:.."
+  }
+}
