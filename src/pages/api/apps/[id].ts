@@ -1,6 +1,7 @@
 import { prisma } from '../../../lib/prisma'
+import { withAuth } from '../../../lib/auth'
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any, user: any) {
   const { id } = req.query
 
   if (!id || typeof id !== 'string') {
@@ -23,6 +24,18 @@ export default async function handler(req: any, res: any) {
         return
       }
 
+      // Borrowers can only view their own apps
+      if (user.role === 'BORROWER' && app.userId !== user.id) {
+        res.status(403).json({ error: 'Forbidden' })
+        return
+      }
+
+      // Caseworkers can view apps assigned to them or unassigned
+      if (user.role === 'CASEWORKER' && app.assignedToId !== user.id && app.assignedToId !== null) {
+        res.status(403).json({ error: 'Forbidden' })
+        return
+      }
+
       res.status(200).json({
         ...app,
         data: JSON.parse(app.data || '{}'),
@@ -38,6 +51,24 @@ export default async function handler(req: any, res: any) {
   // PUT - Update application
   if (req.method === 'PUT') {
     try {
+      const app = await prisma.application.findUnique({ where: { id } })
+      if (!app) {
+        res.status(404).json({ error: 'Application not found' })
+        return
+      }
+
+      // Borrowers can only update their own apps
+      if (user.role === 'BORROWER' && app.userId !== user.id) {
+        res.status(403).json({ error: 'Forbidden' })
+        return
+      }
+
+      // Caseworkers can only update apps assigned to them
+      if (user.role === 'CASEWORKER' && app.assignedToId !== user.id) {
+        res.status(403).json({ error: 'Forbidden' })
+        return
+      }
+
       const { status, data, borrowers, priority, slaDeadline } = req.body
 
       const updateData: any = {
@@ -64,15 +95,15 @@ export default async function handler(req: any, res: any) {
         updateData.slaDeadline = slaDeadline ? new Date(slaDeadline) : null
       }
 
-      const app = await prisma.application.update({
+      const updated = await prisma.application.update({
         where: { id },
         data: updateData
       })
 
       res.status(200).json({
-        ...app,
-        data: JSON.parse(app.data || '{}'),
-        borrowers: JSON.parse(app.borrowers || '[]')
+        ...updated,
+        data: JSON.parse(updated.data || '{}'),
+        borrowers: JSON.parse(updated.borrowers || '[]')
       })
     } catch (error) {
       console.error('Error updating application:', error)
@@ -81,8 +112,13 @@ export default async function handler(req: any, res: any) {
     return
   }
 
-  // DELETE - Delete application
+  // DELETE - Delete application (SUPERVISOR only)
   if (req.method === 'DELETE') {
+    if (user.role !== 'SUPERVISOR') {
+      res.status(403).json({ error: 'Forbidden' })
+      return
+    }
+
     try {
       await prisma.application.delete({
         where: { id }
@@ -99,3 +135,5 @@ export default async function handler(req: any, res: any) {
   res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
   res.status(405).end(`Method ${req.method} Not Allowed`)
 }
+
+export default withAuth(handler)

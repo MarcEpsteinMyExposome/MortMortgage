@@ -1,6 +1,7 @@
 import useSWR from 'swr'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import UserMenu from '../../components/UserMenu'
 import CaseworkerSelect from '../../components/CaseworkerSelect'
 import PriorityBadge from '../../components/PriorityBadge'
@@ -41,12 +42,48 @@ const STATUS_CONFIG: Record<string, { bg: string; text: string; icon: React.Reac
 }
 
 export default function Admin() {
+  const { data: session } = useSession()
+  const user = session?.user as any
+  const isSupervisor = user?.role === 'SUPERVISOR'
   const { data, error, mutate } = useSWR('/api/apps', fetcher)
+  const { data: supervisorData } = useSWR(isSupervisor ? '/api/supervisor/analytics' : null, fetcher)
   const [statusFilter, setStatusFilter] = useState('all')
   const [assignedFilter, setAssignedFilter] = useState('all')
   const [deleting, setDeleting] = useState<string | null>(null)
   const [assigningApp, setAssigningApp] = useState<string | null>(null)
   const [selectedCw, setSelectedCw] = useState('')
+  const [autoAssigning, setAutoAssigning] = useState(false)
+  const [seeding, setSeeding] = useState(false)
+
+  async function handleAutoAssign() {
+    setAutoAssigning(true)
+    try {
+      const res = await fetch('/api/admin/assignments/auto-assign', { method: 'POST' })
+      const result = await res.json()
+      alert(result.message || `Assigned ${result.assigned} applications`)
+      mutate()
+    } catch (err) {
+      alert('Auto-assign failed')
+    } finally {
+      setAutoAssigning(false)
+    }
+  }
+
+  async function handleSeedDemo() {
+    if (!window.confirm('This will delete existing demo data and create 46 new applications with assignment records. Continue?')) return
+    setSeeding(true)
+    try {
+      const res = await fetch('/api/admin/seed-demo', { method: 'POST' })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Seed failed')
+      alert(result.message)
+      mutate()
+    } catch (err: any) {
+      alert(err.message || 'Failed to seed demo data')
+    } finally {
+      setSeeding(false)
+    }
+  }
 
   const filteredApps = data?.filter((a: any) => {
     if (statusFilter !== 'all' && a.status !== statusFilter) return false
@@ -136,7 +173,7 @@ export default function Admin() {
                 <span className="text-xl font-bold text-gray-900">MortMortgage</span>
               </Link>
               <span className="text-gray-300">|</span>
-              <span className="text-sm font-medium text-gray-600">Admin Portal</span>
+              <span className="text-sm font-medium text-gray-600">Supervisor Portal</span>
             </div>
             <UserMenu />
           </div>
@@ -258,6 +295,52 @@ export default function Admin() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Supervisor Overview Stats */}
+        {isSupervisor && supervisorData && (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="stat-card border-l-4 border-primary-500">
+              <div className="stat-value text-primary-600">{supervisorData.overview.totalOpen}</div>
+              <div className="stat-label">Total Open</div>
+            </div>
+            <div className="stat-card border-l-4 border-warning-500">
+              <div className="stat-value text-warning-600">{supervisorData.overview.unassigned}</div>
+              <div className="stat-label">Unassigned</div>
+            </div>
+            <div className="stat-card border-l-4 border-danger-500">
+              <div className="stat-value text-danger-600">{supervisorData.overview.overdue}</div>
+              <div className="stat-label">Overdue SLA</div>
+            </div>
+            <div className="stat-card border-l-4 border-success-500">
+              <div className="stat-value text-success-600">{supervisorData.overview.teamApprovalRate}%</div>
+              <div className="stat-label">Approval Rate</div>
+            </div>
+            <div className="stat-card border-l-4 border-purple-500">
+              <div className="stat-value text-purple-600">{supervisorData.overview.avgDaysToDecision}</div>
+              <div className="stat-label">Avg Days</div>
+            </div>
+          </div>
+        )}
+
+        {/* Supervisor Action Bar */}
+        {isSupervisor && (
+          <div className="flex items-center gap-4 mb-6">
+            <button
+              onClick={handleAutoAssign}
+              disabled={autoAssigning || (supervisorData?.overview?.unassigned === 0)}
+              className="btn btn-primary disabled:opacity-50"
+            >
+              {autoAssigning ? 'Assigning...' : `Auto-Assign${supervisorData ? ` (${supervisorData.overview.unassigned} unassigned)` : ''}`}
+            </button>
+            <button
+              onClick={handleSeedDemo}
+              disabled={seeding}
+              className="btn btn-ghost text-amber-700 hover:bg-amber-50 disabled:opacity-50"
+            >
+              {seeding ? 'Seeding...' : 'Seed Demo Data'}
+            </button>
           </div>
         )}
 
@@ -428,13 +511,15 @@ export default function Admin() {
                             >
                               Edit
                             </Link>
-                            <button
-                              onClick={() => handleDelete(app.id)}
-                              disabled={deleting === app.id}
-                              className="btn btn-sm btn-ghost text-danger-600 disabled:opacity-50"
-                            >
-                              {deleting === app.id ? '...' : 'Delete'}
-                            </button>
+                            {isSupervisor && (
+                              <button
+                                onClick={() => handleDelete(app.id)}
+                                disabled={deleting === app.id}
+                                className="btn btn-sm btn-ghost text-danger-600 disabled:opacity-50"
+                              >
+                                {deleting === app.id ? '...' : 'Delete'}
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

@@ -5,8 +5,8 @@ This file tracks the current development session progress. Claude updates this f
 ---
 
 ## Last Updated
-**Date**: 2026-02-05
-**Status**: 22 tasks complete
+**Date**: 2026-02-15
+**Status**: 23 tasks complete
 
 ---
 
@@ -46,13 +46,65 @@ This file tracks the current development session progress. Claude updates this f
 | TEST-01 | E2E Tests (Cypress) | TBD - Future |
 
 ### Test Coverage
-- **299 tests all passing**
+- **377 tests all passing**
 - Run with: `npm test`
 - OCR integration tests run separately: `npm run test:ocr`
 
 ---
 
-## Latest Session Work (2026-02-05)
+## Latest Session Work (2026-02-15)
+
+### ROLES-01: Consolidate Roles (Remove ADMIN, Three-Role System)
+**Branch**: `feature/consolidate-roles`
+**Status**: DONE
+
+Consolidated from 4 roles (BORROWER, ADMIN, CASEWORKER, SUPERVISOR) to 3 clean roles:
+- **BORROWER**: Create apps, view only their own
+- **CASEWORKER**: See assigned + unassigned queues, claim & process apps
+- **SUPERVISOR**: Full portal with stats, assign/auto-assign, analytics, manage caseworkers
+
+**Changes Made:**
+- **Schema**: Added `userId` to Application model for borrower ownership tracking
+- **Auth**: Removed ADMIN from `UserRole` type and role hierarchy; JWT fallback maps legacy ADMIN→SUPERVISOR
+- **Demo Users**: Removed `admin@demo.com` account
+- **API Routes (11 files)**: Updated all `isRole(user, 'ADMIN', 'SUPERVISOR')` → `isRole(user, 'SUPERVISOR')`; added borrower scoping (`where.userId`) and ownership checks; caseworkers can self-assign (claim) unassigned apps
+- **Pages**: Merged supervisor dashboard into admin page; removed `/supervisor` page; renamed "Admin Portal" → "Supervisor Portal"; added unassigned work queue with Claim button to caseworker page; updated sign-in page (removed admin button); updated confirmation page link
+- **Tests**: Added 26 new tests (role-access + borrower-scoping); all 377 tests pass
+- **Docs**: Updated CLAUDE.md, SESSION.md
+
+**Files Modified**: 23 | **Files Deleted**: 1 (supervisor/index.tsx) | **Files Created**: 2 (tests)
+
+---
+
+## Previous Session Work (2026-02-08)
+
+### ENV-FIX: Windows ARM64 Compatibility & Environment Setup
+**Branch**: `fix/env-setup-and-arm64-compat`
+**Status**: DONE — build and tests passing, ready to merge
+
+**Problem**: Project wouldn't run on Windows ARM64 (Node.js v24 arm64). Multiple issues:
+1. Prisma v7 installed despite `^5.22.0` pin (caret allowed major upgrade)
+2. `canvas` npm package had no ARM64 prebuilt binaries
+3. Next.js SWC native module not valid on ARM64
+4. Prisma query engine `.dll.node` couldn't load in ARM64 Node.js
+5. Turbopack WASM bindings don't support `createProject` on ARM64
+6. Seed script passed raw objects to SQLite (requires JSON strings)
+
+**Fixes Applied** (3 commits):
+1. **`2fd8710`** — Pin Prisma to exact `5.22.0`, replace `canvas` with `jest-canvas-mock`, fix seed script `JSON.stringify()`, pin Jest deps, add `--webpack` to dev script
+2. **`eb5f8aa`** — Add `engineType = "binary"` to Prisma schema (runs query engine as x64 `.exe` under emulation), add `jest-canvas-mock` import in setupTests
+3. **`0b8b900`** — Add `--webpack` to build script (Turbopack WASM unsupported), exclude `scripts/` and `prisma/` from tsconfig (avoids missing module errors from standalone scripts)
+
+**Verification**:
+- `npx prisma generate` — succeeds (engine=binary)
+- `npm run build` — compiles successfully with webpack, all 38 routes generated
+- `npm test` — 14 suites, 316 tests passing
+
+**Also done**: Updated `.claude/settings.local.json` to reduce permission prompts while keeping safety guards (deny `rm`, `force push`, `hard reset`).
+
+---
+
+## Previous Session Work (2026-02-05)
 
 ### ARCH-01: Layered Architecture Plan Created
 - Full 5-phase plan for refactoring to layered architecture (DB → Repository → Service → API → UI Hooks)
@@ -163,13 +215,14 @@ src/__tests__/loan-calculator.test.ts
 | Role | Email | Password |
 |------|-------|----------|
 | Borrower | borrower@demo.com | demo123 |
-| Admin | admin@demo.com | admin123 |
+| Supervisor | supervisor@demo.com | demo123 |
+| Caseworker | caseworker1@demo.com | demo123 |
 
 ### Common Commands
 ```bash
 npm install          # Install dependencies
 npm run dev          # Start dev server
-npm test             # Run 149+ unit tests
+npm test             # Run 377+ unit tests
 npx prisma db push   # Initialize database
 ```
 
@@ -181,8 +234,8 @@ npx prisma db push   # Initialize database
 | Pre-Qualify | `/prequalify` |
 | Compare Loans | `/compare` |
 | New Application | `/apply/new` |
-| Admin Portal | `/admin` |
-| Admin Analytics | `/admin/analytics` |
+| Supervisor Portal | `/admin` |
+| Analytics | `/admin/analytics` |
 
 ### Key Files
 | File | Purpose |
@@ -227,7 +280,7 @@ npx prisma db push   # Initialize database
 ```bash
 npm install
 npm run dev
-npm test  # Verify 149+ tests pass
+npm test  # Verify 377+ tests pass
 ```
 
 ### For Claude

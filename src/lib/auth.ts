@@ -1,13 +1,12 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../pages/api/auth/[...nextauth]'
 
-export type UserRole = 'BORROWER' | 'CASEWORKER' | 'ADMIN' | 'SUPERVISOR'
+export type UserRole = 'BORROWER' | 'CASEWORKER' | 'SUPERVISOR'
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   BORROWER: 0,
   CASEWORKER: 1,
-  ADMIN: 2,
-  SUPERVISOR: 3
+  SUPERVISOR: 2
 }
 
 export interface AuthUser {

@@ -2,7 +2,7 @@ import { prisma } from '../../../../lib/prisma'
 import { withAuth, isRole } from '../../../../lib/auth'
 
 async function handler(req: any, res: any, user: any) {
-  if (!isRole(user, 'ADMIN', 'SUPERVISOR')) {
+  if (!isRole(user, 'SUPERVISOR')) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
@@ -31,4 +31,4 @@ async function handler(req: any, res: any, user: any) {
   return res.status(200).json(updated)
 }
 
-export default withAuth(handler, 'ADMIN')
+export default withAuth(handler, 'SUPERVISOR')

@@ -128,7 +128,7 @@ export default function Home() {
                 </Link>
               )}
 
-              {user?.role === 'ADMIN' && (
+              {user?.role === 'SUPERVISOR' && (
                 <Link
                   href="/admin"
                   className="btn btn-lg bg-primary-500 bg-opacity-30 text-white border border-primary-300 hover:bg-opacity-50"
@@ -136,7 +136,7 @@ export default function Home() {
                   <svg width="20" height="20" className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
-                  Admin Portal
+                  Supervisor Portal
                 </Link>
               )}
             </div>
@@ -226,18 +226,18 @@ export default function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">For Admins</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">For Supervisors</h3>
                   <p className="text-gray-600 mb-6">
-                    Review applications, manage statuses, and export data
+                    Review applications, manage caseworkers, and export data
                     in MISMO format for integration with your LOS.
                   </p>
-                  {user?.role === 'ADMIN' ? (
+                  {user?.role === 'SUPERVISOR' ? (
                     <Link href="/admin" className="btn btn-secondary">
-                      Open Admin Portal
+                      Open Supervisor Portal
                     </Link>
                   ) : (
                     <Link href="/auth/signin?callbackUrl=/admin" className="btn btn-secondary">
-                      Admin Sign In
+                      Supervisor Sign In
                     </Link>
                   )}
                 </div>
@@ -268,7 +268,7 @@ export default function Home() {
               <span className="text-gray-500">Demo: </span>
               <code className="text-primary-400">borrower@demo.com</code>
               <span className="text-gray-500"> / </span>
-              <code className="text-primary-400">admin@demo.com</code>
+              <code className="text-primary-400">supervisor@demo.com</code>
             </div>
           </div>
         </div>

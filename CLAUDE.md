@@ -16,7 +16,7 @@
 ```bash
 npm install        # Install dependencies
 npm run dev        # Start dev server (runs on available port)
-npm test           # Run 149+ unit tests
+npm test           # Run 377+ unit tests
 ```
 
 ## Demo Accounts
@@ -24,7 +24,6 @@ npm test           # Run 149+ unit tests
 | Role | Email | Password |
 |------|-------|----------|
 | Borrower | borrower@demo.com | demo123 |
-| Admin | admin@demo.com | admin123 |
 | Supervisor | supervisor@demo.com | demo123 |
 | Caseworker | caseworker1@demo.com | demo123 |
 | Caseworker | caseworker2@demo.com | demo123 |
@@ -40,11 +39,10 @@ npm test           # Run 149+ unit tests
 | New Application | `/apply/new` | Start URLA wizard |
 | Pre-Qualify | `/prequalify` | Quick affordability calculator |
 | Compare Loans | `/compare` | Side-by-side loan comparison |
-| Admin Portal | `/admin` | Application management |
-| Admin Analytics | `/admin/analytics` | Charts and metrics |
-| Caseworker Queue | `/caseworker` | Caseworker workbench |
-| Supervisor Dashboard | `/supervisor` | Supervisor oversight |
-| Caseworker Management | `/admin/caseworkers` | Manage caseworker team |
+| Supervisor Portal | `/admin` | Application management & supervisor tools |
+| Analytics | `/admin/analytics` | Charts, metrics & supervisor analytics |
+| Caseworker Queue | `/caseworker` | Caseworker workbench with claim queue |
+| Caseworker Management | `/admin/caseworkers` | Manage caseworker team (supervisor only) |
 | Sign In | `/auth/signin` | Authentication |
 
 ## Project Structure

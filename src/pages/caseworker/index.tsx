@@ -22,7 +22,31 @@ export default function CaseworkerDashboard() {
   const { data: queue, error: queueError } = useSWR('/api/caseworker/queue', fetcher)
   const { data: stats } = useSWR('/api/caseworker/stats', fetcher)
   const { data: history, error: historyError } = useSWR('/api/caseworker/history?limit=10', fetcher)
+  const { data: unassigned, error: unassignedError, mutate: mutateUnassigned } = useSWR('/api/apps?unassigned=true', fetcher)
   const [historyPage, setHistoryPage] = useState(1)
+  const [claiming, setClaiming] = useState<string | null>(null)
+
+  async function handleClaim(applicationId: string) {
+    if (!user?.id) return
+    setClaiming(applicationId)
+    try {
+      const res = await fetch('/api/admin/assignments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicationId, assignedToId: user.id, note: 'Self-claimed from unassigned queue' })
+      })
+      if (res.ok) {
+        mutateUnassigned()
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Failed to claim application')
+      }
+    } catch (err) {
+      alert('Failed to claim application')
+    } finally {
+      setClaiming(null)
+    }
+  }
 
   function getBorrowerName(app: any): string {
     const b = app.borrowers?.[0]
@@ -181,6 +205,78 @@ export default function CaseworkerDashboard() {
                         <Link href={`/admin/apps/${app.id}`} className="btn btn-sm btn-primary">
                           View
                         </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Unassigned Work Queue */}
+        <div className="card overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Unassigned Work</h2>
+            <p className="text-sm text-gray-500">Claim an application to add it to your queue</p>
+          </div>
+
+          {unassignedError && (
+            <div className="p-6 text-center text-red-600">Failed to load unassigned applications</div>
+          )}
+
+          {!unassigned && !unassignedError && (
+            <div className="p-8 text-center text-gray-500">Loading...</div>
+          )}
+
+          {unassigned && unassigned.length === 0 && (
+            <div className="p-8 text-center text-gray-500">No unassigned applications available.</div>
+          )}
+
+          {unassigned && unassigned.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="table-header">
+                  <tr>
+                    <th className="table-header-cell">Borrower</th>
+                    <th className="table-header-cell">Loan Amount</th>
+                    <th className="table-header-cell">Property</th>
+                    <th className="table-header-cell">Status</th>
+                    <th className="table-header-cell">Priority</th>
+                    <th className="table-header-cell">Created</th>
+                    <th className="table-header-cell"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {unassigned.map((app: any) => (
+                    <tr key={app.id} className="table-row">
+                      <td className="table-cell">
+                        <div className="font-medium text-gray-900">{getBorrowerName(app)}</div>
+                        <div className="text-xs text-gray-500 font-mono">{app.id.slice(0, 8)}...</div>
+                      </td>
+                      <td className="table-cell font-semibold text-gray-900">
+                        {getLoanAmount(app)}
+                      </td>
+                      <td className="table-cell text-gray-600">{getPropertyInfo(app)}</td>
+                      <td className="table-cell">
+                        <span className={`badge ${STATUS_COLORS[app.status] || 'bg-gray-100 text-gray-800'}`}>
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="table-cell">
+                        <PriorityBadge priority={app.priority || 'normal'} />
+                      </td>
+                      <td className="table-cell text-gray-500">
+                        {new Date(app.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="table-cell">
+                        <button
+                          onClick={() => handleClaim(app.id)}
+                          disabled={claiming === app.id}
+                          className="btn btn-sm btn-primary disabled:opacity-50"
+                        >
+                          {claiming === app.id ? 'Claiming...' : 'Claim'}
+                        </button>
                       </td>
                     </tr>
                   ))}

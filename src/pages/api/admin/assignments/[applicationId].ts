@@ -7,7 +7,7 @@ async function handler(req: any, res: any, user: any) {
     return res.status(405).end()
   }
 
-  if (!isRole(user, 'ADMIN', 'SUPERVISOR')) {
+  if (!isRole(user, 'SUPERVISOR')) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 
@@ -40,4 +40,4 @@ async function handler(req: any, res: any, user: any) {
   return res.status(200).json({ success: true })
 }
 
-export default withAuth(handler, 'ADMIN')
+export default withAuth(handler, 'SUPERVISOR')
