@@ -1,10 +1,15 @@
 import { prisma } from '../../../lib/prisma'
 import { withAuth, isRole } from '../../../lib/auth'
+import {
+  randomChoice, fakeBorrower, fakeLoan, fakeProperty, fakeAssets, fakeLiabilities,
+  fakeRealEstateOwned, fakeDeclarations, fakeDemographics, fakeAddress, fakeCurrentAddress,
+  fakeEmployment, fakePastDate, fakeInterestRate
+} from '../../../lib/fake-data'
 
 // Vercel serverless timeout
 export const maxDuration = 60
 
-// --- Data pools (ported from prisma/seed-caseworker-data.ts) ---
+// --- Demo users ---
 
 const CASEWORKERS = [
   { id: 'demo-caseworker-1', email: 'caseworker1@demo.com', name: 'Sarah Chen', role: 'CASEWORKER' },
@@ -15,6 +20,8 @@ const CASEWORKERS = [
 
 const SUPERVISOR = { id: 'demo-supervisor-1', email: 'supervisor@demo.com', name: 'Maria Rodriguez', role: 'SUPERVISOR' }
 
+// --- Realistic name pools (replaces generic FirstName_42 from fake-data) ---
+
 const FIRST_NAMES = ['Michael', 'Jennifer', 'Robert', 'Patricia', 'David', 'Linda', 'William', 'Barbara', 'Richard', 'Susan',
   'Charles', 'Jessica', 'Joseph', 'Sarah', 'Thomas', 'Karen', 'Daniel', 'Nancy', 'Matthew', 'Lisa',
   'Anthony', 'Betty', 'Mark', 'Margaret', 'Donald', 'Sandra', 'Steven', 'Ashley', 'Paul', 'Dorothy',
@@ -23,17 +30,9 @@ const LAST_NAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 
   'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
   'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson',
   'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores']
-const STREETS = ['Oak Lane', 'Maple Drive', 'Cedar Court', 'Elm Street', 'Pine Avenue', 'Birch Way', 'Willow Road', 'Spruce Circle',
-  'Chestnut Boulevard', 'Sycamore Lane', 'Walnut Drive', 'Ash Street', 'Poplar Court', 'Magnolia Avenue', 'Cypress Way',
-  'Hickory Road', 'Juniper Circle', 'Redwood Lane', 'Cherry Drive', 'Dogwood Street']
-const CITIES = ['Austin', 'Denver', 'Portland', 'Nashville', 'Charlotte', 'Phoenix', 'San Diego', 'Tampa',
-  'Raleigh', 'Minneapolis', 'Salt Lake City', 'Boise', 'Asheville', 'Savannah', 'Charleston']
-const STATES = ['TX', 'CO', 'OR', 'TN', 'NC', 'AZ', 'CA', 'FL', 'NC', 'MN', 'UT', 'ID', 'NC', 'GA', 'SC']
-const EMPLOYERS = ['Acme Corp', 'TechVista Solutions', 'Global Industries', 'Pinnacle Services', 'Summit Healthcare',
-  'Meridian Financial', 'Horizon Technologies', 'Atlas Manufacturing', 'Vertex Engineering', 'Nova Consulting']
-const PROPERTY_TYPES = ['single_family', 'single_family', 'single_family', 'single_family', 'single_family', 'single_family',
-  'condo', 'condo', 'townhouse', 'multi_family']
-const LOAN_TYPES = ['Conventional', 'Conventional', 'Conventional', 'FHA', 'VA']
+const SUFFIXES = ['', '', '', '', '', '', '', '', '', '', 'Jr', 'Sr', 'II', 'III'] // ~30% chance
+
+const ADDITIONAL_INCOME_TYPES = ['rental_income', 'alimony', 'investment_income', 'pension', 'social_security', 'disability']
 
 function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
 function randBetween(min: number, max: number): number { return Math.floor(Math.random() * (max - min + 1)) + min }
@@ -54,15 +53,53 @@ interface AppConfig {
   updatedDaysAgo?: number
 }
 
-function generateApplication(config: AppConfig) {
+// Build a single realistic borrower using fake-data helpers + real names
+function buildSeedBorrower(isPrimary: boolean, overrides?: { monthlyIncome?: number; lastName?: string }) {
+  const base = fakeBorrower(isPrimary)
   const firstName = pick(FIRST_NAMES)
-  const lastName = pick(LAST_NAMES)
-  const cityIdx = randBetween(0, CITIES.length - 1)
+  const lastName = overrides?.lastName || pick(LAST_NAMES)
+  const suffix = pick(SUFFIXES)
+  const monthlyIncome = overrides?.monthlyIncome || base.employment[0].monthlyIncome
+
+  // Override name with realistic names
+  base.name = { firstName, lastName, middleName: randBetween(1, 2) === 1 ? pick(FIRST_NAMES) : '', suffix }
+  base.contact.email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com`
+  base.employment[0].monthlyIncome = monthlyIncome
+
+  // Previous address when current duration < 2 years (~40%)
+  if (base.currentAddress.durationYears < 2 && base.formerAddresses.length === 0) {
+    base.formerAddresses = [{
+      ...fakeCurrentAddress(),
+      durationYears: randBetween(2, 8),
+      durationMonths: randBetween(0, 11)
+    }]
+  }
+
+  // Previous employment when current job started recently (~30%)
+  const startYear = parseInt(base.employment[0].startDate.slice(0, 4))
+  if (startYear >= 2024 && randBetween(1, 3) <= 2) {
+    const prevJob = fakeEmployment()
+    prevJob.startDate = fakePastDate(10)
+    ;(prevJob as any).endDate = `${startYear - 1}-${String(randBetween(1, 12)).padStart(2, '0')}-01`
+    ;(prevJob as any).current = false
+    base.employment.push(prevJob as any)
+  }
+
+  // Additional income (~20%)
+  if (randBetween(1, 5) === 1) {
+    ;(base as any).additionalIncome = [{
+      type: pick(ADDITIONAL_INCOME_TYPES),
+      amount: randBetween(500, 3000)
+    }]
+  }
+
+  return base
+}
+
+function generateApplication(config: AppConfig) {
   const loanAmount = config.loanAmount || randBetween(150, 750) * 1000
   const propertyValue = config.propertyValue || Math.round(loanAmount / (0.6 + Math.random() * 0.35))
   const monthlyIncome = config.monthlyIncome || randBetween(5000, 15000)
-  const monthlyDebt = config.monthlyDebt || randBetween(200, 2000)
-  const streetNum = randBetween(100, 9999)
   const createdAt = daysAgo(config.createdDaysAgo || randBetween(5, 60))
   const updatedAt = config.updatedDaysAgo !== undefined ? daysAgo(config.updatedDaysAgo) : createdAt
 
@@ -75,64 +112,69 @@ function generateApplication(config: AppConfig) {
     slaDeadline = new Date(Date.now() + randBetween(2, 10) * 86400000)
   }
 
-  const data = {
+  // Build primary borrower
+  const primaryBorrower = buildSeedBorrower(true, { monthlyIncome })
+
+  // Correlate VA loan type with military service
+  const militaryStatus = primaryBorrower.militaryService.status
+  const isVeteran = militaryStatus !== 'never_served'
+  const loanType = isVeteran && randBetween(1, 3) === 1
+    ? 'VA'
+    : randomChoice(['Conventional', 'Conventional', 'Conventional', 'FHA'] as const)
+
+  // Build loan data
+  const loanPurpose = Math.random() > 0.3 ? 'purchase' : 'refinance'
+  const data: any = {
     loan: {
       loanAmount,
-      loanType: pick(LOAN_TYPES),
-      loanPurpose: Math.random() > 0.3 ? 'purchase' : 'refinance',
+      loanType,
+      loanPurpose,
       loanTermMonths: Math.random() > 0.3 ? 360 : 180,
-      interestRateType: 'fixed',
-      downPayment: { amount: propertyValue - loanAmount, source: 'savings' }
+      interestRate: fakeInterestRate(),
+      interestRateType: randBetween(1, 6) === 1 ? 'adjustable' : 'fixed',
+      downPayment: {
+        amount: propertyValue - loanAmount,
+        source: randBetween(1, 7) === 1 ? 'gift' : 'savings'
+      }
     },
     property: {
-      address: { street: `${streetNum} ${pick(STREETS)}`, city: CITIES[cityIdx], state: STATES[cityIdx], zip: String(randBetween(10000, 99999)) },
-      propertyType: pick(PROPERTY_TYPES),
+      ...fakeProperty(),
       propertyValue,
       occupancy: 'primary_residence',
-      numberOfUnits: 1,
-      yearBuilt: randBetween(1960, 2023)
     },
-    liabilities: {
-      liabilities: [
-        { type: 'credit_card', creditor: 'Chase', balance: randBetween(2000, 15000), monthlyPayment: Math.round(monthlyDebt * 0.4) },
-        { type: 'auto_loan', creditor: 'Toyota Financial', balance: randBetween(5000, 30000), monthlyPayment: Math.round(monthlyDebt * 0.6) }
-      ]
-    },
-    assets: {
-      assets: [
-        { type: 'checking', institution: 'Bank of America', balance: randBetween(10000, 80000) },
-        { type: 'savings', institution: 'Ally Bank', balance: randBetween(20000, 150000) }
-      ]
-    },
-    declarations: {
-      declarations: { outstandingJudgments: false, bankruptcy: false, foreclosure: false, lawsuit: false, loanDefault: false }
-    }
+    assets: { assets: fakeAssets(randBetween(2, 4)) },
+    liabilities: { liabilities: fakeLiabilities(randBetween(1, 4)) },
+    realEstate: fakeRealEstateOwned(loanPurpose === 'refinance' ? randBetween(1, 2) : randBetween(0, 1)),
+    declarations: { declarations: fakeDeclarations() },
+    demographics: fakeDemographics()
   }
 
-  const borrowers = [{
-    name: { firstName, lastName },
-    ssn: `${randBetween(100, 999)}-${randBetween(10, 99)}-${randBetween(1000, 9999)}`,
-    dob: `${randBetween(1960, 1995)}-${String(randBetween(1, 12)).padStart(2, '0')}-${String(randBetween(1, 28)).padStart(2, '0')}`,
-    citizenship: 'us_citizen',
-    contact: {
-      email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@email.com`,
-      cellPhone: `(${randBetween(200, 999)}) ${randBetween(200, 999)}-${randBetween(1000, 9999)}`
-    },
-    currentAddress: {
-      address: { street: `${randBetween(100, 9999)} ${pick(STREETS)}`, city: CITIES[cityIdx], state: STATES[cityIdx], zip: String(randBetween(10000, 99999)) },
-      housingType: Math.random() > 0.5 ? 'own' : 'rent',
-      monthlyRent: randBetween(1200, 3000),
-      durationYears: randBetween(1, 10),
-      durationMonths: randBetween(0, 11)
-    },
-    employment: [{
-      employerName: pick(EMPLOYERS),
-      position: pick(['Software Engineer', 'Sales Manager', 'Nurse', 'Teacher', 'Accountant', 'Marketing Director', 'Project Manager', 'Analyst']),
-      monthlyIncome,
-      current: true,
-      startDate: `${randBetween(2015, 2023)}-01-01`
+  // Gift funds for ~15% of purchase loans
+  if (loanPurpose === 'purchase' && data.loan.downPayment.source === 'gift') {
+    data.giftFunds = [{
+      donorName: `${pick(FIRST_NAMES)} ${primaryBorrower.name.lastName}`,
+      donorRelationship: randomChoice(['parent', 'grandparent', 'sibling', 'spouse'] as const),
+      amount: randBetween(10000, Math.min(80000, propertyValue - loanAmount)),
+      deposited: randBetween(1, 2) === 1
     }]
-  }]
+  }
+
+  // Build borrowers array: primary + optional co-borrower (25%)
+  const borrowers: any[] = [primaryBorrower]
+  if (randBetween(1, 4) === 1) {
+    // Co-borrower: 60% same last name (spouse), 40% different
+    const sameLastName = randBetween(1, 5) <= 3
+    const coBorrower = buildSeedBorrower(false, {
+      lastName: sameLastName ? primaryBorrower.name.lastName : undefined
+    })
+    // Co-borrower shares current address
+    coBorrower.currentAddress = { ...primaryBorrower.currentAddress }
+    if (sameLastName) {
+      coBorrower.maritalStatus = 'married'
+      ;(primaryBorrower as any).maritalStatus = 'married'
+    }
+    borrowers.push(coBorrower)
+  }
 
   return {
     id: randId(),
