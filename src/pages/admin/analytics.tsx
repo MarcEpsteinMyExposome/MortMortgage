@@ -1,8 +1,10 @@
 import useSWR from 'swr'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import UserMenu from '../../components/UserMenu'
 import StatusPieChart from '../../components/charts/StatusPieChart'
 import VolumeChart from '../../components/charts/VolumeChart'
+import ApprovalRateBar from '../../components/charts/ApprovalRateBar'
 import {
   BarChart,
   Bar,
@@ -13,6 +15,10 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts'
+
+const WorkloadBarChart = dynamic(() => import('../../components/charts/WorkloadBarChart'), { ssr: false })
+const LTVDTIStackedChart = dynamic(() => import('../../components/charts/LTVDTIStackedChart'), { ssr: false })
+const PerformanceTrendChart = dynamic(() => import('../../components/charts/PerformanceTrendChart'), { ssr: false })
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
@@ -61,6 +67,7 @@ function formatTimeAgo(timestamp: string): string {
 
 export default function Analytics() {
   const { data, error, isLoading } = useSWR('/api/admin/analytics', fetcher)
+  const { data: supData } = useSWR('/api/supervisor/analytics', fetcher)
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -329,6 +336,78 @@ export default function Analytics() {
                 </div>
               </div>
             </div>
+
+            {/* Supervisor Charts */}
+            {supData && (
+              <>
+                {/* Workload & Performance */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                  <div className="card p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Workload Distribution</h3>
+                    <p className="text-sm text-gray-500 mb-4">Active cases per caseworker</p>
+                    <WorkloadBarChart data={supData.workload} />
+                  </div>
+
+                  <div className="card overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-900">Caseworker Performance</h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="table-header">
+                          <tr>
+                            <th className="table-header-cell">Name</th>
+                            <th className="table-header-cell">Active</th>
+                            <th className="table-header-cell">Completed</th>
+                            <th className="table-header-cell">Approval</th>
+                            <th className="table-header-cell">Avg Days</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {supData.workload.map((cw: any) => (
+                            <tr key={cw.id} className="table-row">
+                              <td className="table-cell">
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-2 h-2 rounded-full ${cw.active ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                  <span className="font-medium text-sm">{cw.name}</span>
+                                </div>
+                              </td>
+                              <td className="table-cell text-sm">{cw.activeQueue}</td>
+                              <td className="table-cell text-sm">{cw.completed}</td>
+                              <td className="table-cell">
+                                <ApprovalRateBar rate={cw.approvalRate} />
+                              </td>
+                              <td className="table-cell text-sm">{cw.avgDaysToDecision}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* LTV/DTI Risk */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                  <div className="card p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">LTV Risk Analysis</h3>
+                    <p className="text-sm text-gray-500 mb-4">Approval vs denial by LTV range</p>
+                    <LTVDTIStackedChart data={supData.ltvAnalysis} label="LTV" />
+                  </div>
+                  <div className="card p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">DTI Risk Analysis</h3>
+                    <p className="text-sm text-gray-500 mb-4">Approval vs denial by DTI range</p>
+                    <LTVDTIStackedChart data={supData.dtiAnalysis} label="DTI" />
+                  </div>
+                </div>
+
+                {/* Performance Trend */}
+                <div className="card p-6 mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Performance Trend</h3>
+                  <p className="text-sm text-gray-500 mb-4">Completed applications per month by caseworker</p>
+                  <PerformanceTrendChart data={supData.performanceTrend} caseworkerNames={supData.caseworkerNames} />
+                </div>
+              </>
+            )}
 
             {/* Recent Activity Feed */}
             <div className="card p-6">

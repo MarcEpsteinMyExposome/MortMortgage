@@ -1,12 +1,25 @@
 import useSWR from 'swr'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 import UserMenu from '../../components/UserMenu'
 import ApprovalRateBar from '../../components/charts/ApprovalRateBar'
 
 const fetcher = (url: string) => fetch(url).then(r => r.json())
 
 export default function CaseworkerManagement() {
+  const { data: session, status: sessionStatus } = useSession()
+  const router = useRouter()
+  const userRole = (session?.user as any)?.role
+
+  // Redirect non-supervisors
+  if (sessionStatus !== 'loading' && userRole !== 'SUPERVISOR') {
+    if (typeof window !== 'undefined') {
+      router.replace('/')
+    }
+    return null
+  }
   const { data: caseworkers, error, mutate } = useSWR('/api/admin/caseworkers', fetcher)
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
@@ -82,8 +95,7 @@ export default function CaseworkerManagement() {
             <p className="text-sm text-gray-500 mt-1">Manage caseworker team members</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/supervisor" className="btn btn-ghost">Supervisor Dashboard</Link>
-            <Link href="/admin" className="btn btn-ghost">Admin Portal</Link>
+            <Link href="/admin" className="btn btn-ghost">Supervisor Portal</Link>
           </div>
         </div>
 

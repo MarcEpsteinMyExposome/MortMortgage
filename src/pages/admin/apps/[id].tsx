@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import type { UnderwritingData } from '../../../types/underwriting'
@@ -62,6 +63,9 @@ const STATUS_OPTIONS = [
 export default function AdminAppDetail() {
   const router = useRouter()
   const { id } = router.query
+  const { data: session } = useSession()
+  const userRole = (session?.user as any)?.role || 'BORROWER'
+  const isSupervisor = userRole === 'SUPERVISOR'
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -729,7 +733,9 @@ export default function AdminAppDetail() {
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <Link href="/admin" className="text-blue-600 hover:underline text-sm">← Back to Admin</Link>
+            <Link href={userRole === 'CASEWORKER' ? '/caseworker' : '/admin'} className="text-blue-600 hover:underline text-sm">
+              {userRole === 'CASEWORKER' ? '← Back to My Queue' : '← Back to Supervisor Portal'}
+            </Link>
             <h1 className="text-2xl font-bold mt-2">Application Details</h1>
             <p className="text-sm text-gray-500 font-mono">{app.id}</p>
           </div>
@@ -743,7 +749,9 @@ export default function AdminAppDetail() {
                 disabled={updating}
                 className={`input w-auto ${STATUS_OPTIONS.find(s => s.value === app.status)?.color}`}
               >
-                {STATUS_OPTIONS.map(opt => (
+                {STATUS_OPTIONS
+                  .filter(opt => isSupervisor || opt.value !== 'draft')
+                  .map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
@@ -751,18 +759,20 @@ export default function AdminAppDetail() {
           </div>
         </div>
 
-        {/* Assignment Panel */}
-        <AssignmentPanel
-          applicationId={app.id}
-          assignedTo={app.assignedTo || null}
-          assignedAt={app.assignedAt}
-          priority={app.priority || 'normal'}
-          slaDeadline={app.slaDeadline}
-          onUpdate={() => {
-            // Reload app data
-            fetch(`/api/apps/${id}`).then(r => r.json()).then(setApp)
-          }}
-        />
+        {/* Assignment Panel (supervisor only) */}
+        {isSupervisor && (
+          <AssignmentPanel
+            applicationId={app.id}
+            assignedTo={app.assignedTo || null}
+            assignedAt={app.assignedAt}
+            priority={app.priority || 'normal'}
+            slaDeadline={app.slaDeadline}
+            onUpdate={() => {
+              // Reload app data
+              fetch(`/api/apps/${id}`).then(r => r.json()).then(setApp)
+            }}
+          />
+        )}
 
         {/* Export Buttons */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

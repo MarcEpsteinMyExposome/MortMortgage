@@ -2,11 +2,10 @@ import { prisma } from '../../../../lib/prisma'
 import { withAuth, isRole } from '../../../../lib/auth'
 
 async function handler(req: any, res: any, user: any) {
-  if (!isRole(user, 'ADMIN', 'SUPERVISOR')) {
-    return res.status(403).json({ error: 'Forbidden' })
-  }
-
   if (req.method === 'GET') {
+    if (!isRole(user, 'CASEWORKER', 'SUPERVISOR')) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
     const caseworkers = await prisma.user.findMany({
       where: { role: 'CASEWORKER' },
       orderBy: { name: 'asc' }
@@ -46,6 +45,9 @@ async function handler(req: any, res: any, user: any) {
   }
 
   if (req.method === 'POST') {
+    if (!isRole(user, 'SUPERVISOR')) {
+      return res.status(403).json({ error: 'Forbidden' })
+    }
     const { email, name } = req.body
     if (!email || !name) {
       return res.status(400).json({ error: 'email and name are required' })
@@ -67,4 +69,4 @@ async function handler(req: any, res: any, user: any) {
   return res.status(405).end()
 }
 
-export default withAuth(handler, 'ADMIN')
+export default withAuth(handler, 'CASEWORKER')

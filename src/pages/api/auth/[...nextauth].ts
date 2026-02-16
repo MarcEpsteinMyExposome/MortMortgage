@@ -12,13 +12,6 @@ const DEMO_USERS = [
     role: 'BORROWER'
   },
   {
-    id: 'demo-admin-1',
-    email: 'admin@demo.com',
-    password: 'admin123',
-    name: 'Demo Admin',
-    role: 'ADMIN'
-  },
-  {
     id: 'demo-supervisor-1',
     email: 'supervisor@demo.com',
     password: 'demo123',
@@ -111,6 +104,10 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role
         token.id = user.id
+      }
+      // Fallback: map legacy ADMIN role to SUPERVISOR
+      if (token.role === 'ADMIN') {
+        token.role = 'SUPERVISOR'
       }
       return token
     },
