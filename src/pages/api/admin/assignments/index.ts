@@ -7,21 +7,31 @@ async function handler(req: any, res: any, user: any) {
     return res.status(405).end()
   }
 
-  if (!isRole(user, 'ADMIN', 'SUPERVISOR')) {
-    return res.status(403).json({ error: 'Forbidden' })
-  }
-
   const { applicationId, assignedToId, note } = req.body
 
   if (!applicationId || !assignedToId) {
     return res.status(400).json({ error: 'applicationId and assignedToId are required' })
   }
 
+  // Caseworkers can only self-assign unassigned apps
+  if (isRole(user, 'CASEWORKER')) {
+    if (assignedToId !== user.id) {
+      return res.status(403).json({ error: 'Caseworkers can only claim applications for themselves' })
+    }
+    const app = await prisma.application.findUnique({ where: { id: applicationId } })
+    if (!app) return res.status(404).json({ error: 'Application not found' })
+    if (app.assignedToId) {
+      return res.status(400).json({ error: 'Application is already assigned' })
+    }
+  } else if (!isRole(user, 'SUPERVISOR')) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+
   const app = await prisma.application.findUnique({ where: { id: applicationId } })
   if (!app) return res.status(404).json({ error: 'Application not found' })
 
   const caseworker = await prisma.user.findUnique({ where: { id: assignedToId } })
-  if (!caseworker || !['CASEWORKER', 'ADMIN', 'SUPERVISOR'].includes(caseworker.role)) {
+  if (!caseworker || !['CASEWORKER', 'SUPERVISOR'].includes(caseworker.role)) {
     return res.status(400).json({ error: 'Invalid caseworker' })
   }
 
@@ -55,4 +65,4 @@ async function handler(req: any, res: any, user: any) {
   return res.status(200).json(updated)
 }
 
-export default withAuth(handler, 'ADMIN')
+export default withAuth(handler, 'CASEWORKER')

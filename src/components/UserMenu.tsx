@@ -35,27 +35,11 @@ export default function UserMenu() {
         </Link>
       )}
       {user.role === 'SUPERVISOR' && (
-        <>
-          <Link
-            href="/supervisor"
-            className="text-sm text-gray-600 hover:text-gray-700 font-medium"
-          >
-            Supervisor
-          </Link>
-          <Link
-            href="/admin"
-            className="text-sm text-gray-600 hover:text-gray-700 font-medium"
-          >
-            Admin
-          </Link>
-        </>
-      )}
-      {user.role === 'ADMIN' && (
         <Link
           href="/admin"
           className="text-sm text-gray-600 hover:text-gray-700 font-medium"
         >
-          Admin
+          Supervisor Portal
         </Link>
       )}
       <div className="text-sm">

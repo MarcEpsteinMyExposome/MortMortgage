@@ -1,8 +1,14 @@
 import { prisma } from '../../../lib/prisma'
+import { withAuth } from '../../../lib/auth'
 
-export default async function handler(req: any, res: any) {
+async function handler(req: any, res: any, user: any) {
   if (req.method === 'GET') {
     const where: any = {}
+
+    // Borrowers can only see their own applications
+    if (user.role === 'BORROWER') {
+      where.userId = user.id
+    }
 
     // Filter by assigned caseworker
     if (req.query.assignedTo) {
@@ -38,7 +44,8 @@ export default async function handler(req: any, res: any) {
       data: {
         status: status || 'draft',
         data: JSON.stringify(data || {}),
-        borrowers: JSON.stringify(borrowers || [])
+        borrowers: JSON.stringify(borrowers || []),
+        userId: user.id
       }
     })
     return res.status(201).json({
@@ -51,3 +58,5 @@ export default async function handler(req: any, res: any) {
   res.setHeader('Allow', ['GET', 'POST'])
   res.status(405).end(`Method ${req.method} Not Allowed`)
 }
+
+export default withAuth(handler)

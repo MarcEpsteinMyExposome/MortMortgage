@@ -144,4 +144,4 @@ async function handler(req: any, res: any) {
   }
 }
 
-export default withAuth(handler, 'ADMIN')
+export default withAuth(handler, 'SUPERVISOR')

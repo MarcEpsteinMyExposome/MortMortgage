@@ -1,6 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
+  engineType      = "binary"
 }
 
 datasource db {
@@ -12,11 +13,12 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
-  role      String   @default("BORROWER") // BORROWER, ADMIN, CASEWORKER, SUPERVISOR
+  role      String   @default("BORROWER") // BORROWER, CASEWORKER, SUPERVISOR
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
 
   assignedApplications Application[] @relation("AssignedCaseworker")
+  createdApplications  Application[] @relation("CreatedBy")
   assignmentsReceived  Assignment[]  @relation("AssignedTo")
   assignmentsMade      Assignment[]  @relation("AssignedBy")
 }
@@ -26,6 +28,8 @@ model Application {
   status        String    @default("draft")
   data          String    @default("{}") // JSON string - URLA application data
   borrowers     String    @default("[]") // JSON string - array of borrowers
+  userId        String?
+  createdBy     User?     @relation("CreatedBy", fields: [userId], references: [id])
   assignedToId  String?
   assignedTo    User?     @relation("AssignedCaseworker", fields: [assignedToId], references: [id])
   assignedAt    DateTime?

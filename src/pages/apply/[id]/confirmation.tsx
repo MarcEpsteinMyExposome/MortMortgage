@@ -29,8 +29,8 @@ export default function Confirmation() {
             <Link href="/" className="btn bg-gray-200 text-gray-700">
               Return Home
             </Link>
-            <Link href="/admin" className="btn">
-              View in Admin Portal
+            <Link href="/dashboard" className="btn">
+              View Your Applications
             </Link>
           </div>
         </div>
