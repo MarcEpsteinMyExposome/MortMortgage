@@ -67,6 +67,21 @@ export const authOptions: NextAuthOptions = {
         )
 
         if (demoUser) {
+          // Ensure demo user exists in database for foreign key references
+          try {
+            await prisma.user.upsert({
+              where: { id: demoUser.id },
+              update: { name: demoUser.name, role: demoUser.role },
+              create: {
+                id: demoUser.id,
+                email: demoUser.email,
+                name: demoUser.name,
+                role: demoUser.role
+              }
+            })
+          } catch (err) {
+            console.error('Failed to upsert demo user:', err)
+          }
           return {
             id: demoUser.id,
             email: demoUser.email,
