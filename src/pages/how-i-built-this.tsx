@@ -188,7 +188,37 @@ export default function HowIBuiltThis() {
           </div>
         </section>
 
-        {/* Section 6 — Try It Yourself */}
+        {/* Section 6 — What Comes Next */}
+        <section>
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">What Comes Next?</h2>
+          <div className="prose prose-lg text-gray-600 space-y-4 mb-10">
+            <p>
+              Is this application ready for release? Of course not — it was purposefully built as a prototype and MVP
+              with no expectation of commercial use. Before anything real could ship, the tech stack would need
+              rethinking, every access point would need hardening, and the code would need validation for robustness
+              and scale. None of that work makes sense until there&apos;s a real business model behind it — something
+              people actually want to pay for, not just something fun to build.
+            </p>
+            <p>
+              The more interesting question is: what <em>should</em> you go after?
+            </p>
+            <p>
+              I recently looked at a mid-sized enterprise&apos;s SaaS CRM and found that over a third of the defined
+              entities had zero records, and more than 40% of the attributes on entities that <em>did</em> have
+              records were null. The reuse and speed-to-deploy that SaaS provides is real — but that emptiness points
+              to a lot of waste. You&apos;re paying for a platform shaped around someone else&apos;s model of your business.
+            </p>
+            <p>
+              Without wanting to pile onto the Saas&shy;pocalypse discourse, there&apos;s a genuine argument that the
+              pendulum is swinging back toward bespoke. If AI-orchestrated development can compress a months-long
+              engagement into a weekend sprint, the calculus changes. Better fit, lower ongoing cost, no licensing
+              creep — if done right. The &ldquo;if done right&rdquo; still matters enormously. But the cost of getting
+              there just dropped.
+            </p>
+          </div>
+        </section>
+
+        {/* Section 7 — Try It Yourself */}
         <section>
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Try It Yourself</h2>
           <div className="card p-8 bg-gradient-to-br from-primary-50 to-white border border-primary-100">
