@@ -93,12 +93,25 @@ export default function Home() {
               Mortgage Application
               <span className="block text-primary-200">Made Simple</span>
             </h1>
-            <p className="text-lg md:text-xl text-primary-100 max-w-2xl mx-auto mb-10">
-              A modern web-first mortgage application system with URLA 2020 compliance
-              and MISMO v3.x export capabilities.
-            </p>
+            <div className="text-left md:text-center max-w-3xl mx-auto mb-10 space-y-4 text-primary-100">
+              <p className="text-lg md:text-xl">
+                Twenty years ago I played a small but important role on a team that built a contract underwriting system.
+                It was a large team. The project took a long time. The budget was material.
+              </p>
+              <p className="text-lg md:text-xl">
+                Could I build it faster today? Here&apos;s what I got with one weekend and one friend.
+                For details on the process, see{' '}
+                <Link href="/how-i-built-this" className="underline text-white hover:text-primary-200 font-medium">
+                  How I Built This
+                </Link>.
+              </p>
+              <p className="text-base text-primary-200">
+                To try it out, sign in and explore as a borrower, caseworker, or supervisor using the demo accounts below.
+                Do not use real data.
+              </p>
+            </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
               <Link
                 href="/prequalify"
                 className="btn btn-lg bg-white text-primary-700 hover:bg-primary-50 shadow-lg"
@@ -139,6 +152,25 @@ export default function Home() {
                   Supervisor Portal
                 </Link>
               )}
+            </div>
+
+            {/* Demo credentials */}
+            <div className="inline-block bg-white bg-opacity-10 border border-white border-opacity-20 rounded-xl px-6 py-4 text-sm text-left">
+              <p className="text-primary-200 font-medium mb-3 text-center text-xs uppercase tracking-wider">Demo Accounts</p>
+              <table className="text-white border-collapse">
+                <thead>
+                  <tr className="text-primary-300 text-xs">
+                    <th className="font-medium pr-6 pb-2">Role</th>
+                    <th className="font-medium pr-6 pb-2">Email</th>
+                    <th className="font-medium pb-2">Password</th>
+                  </tr>
+                </thead>
+                <tbody className="font-mono text-xs">
+                  <tr><td className="pr-6 py-0.5 text-primary-200">Borrower</td><td className="pr-6">borrower@demo.com</td><td>demo123</td></tr>
+                  <tr><td className="pr-6 py-0.5 text-primary-200">Supervisor</td><td className="pr-6">supervisor@demo.com</td><td>demo123</td></tr>
+                  <tr><td className="pr-6 py-0.5 text-primary-200">Caseworker</td><td className="pr-6">caseworker1@demo.com</td><td>demo123</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
